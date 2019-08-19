@@ -45,5 +45,4 @@ def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
 
 def nordea_fi_lang_se_transactions_parser(transaction_file):
     df = import_nordea_fi_lang_se_transaction_file(transaction_file)
-    print(df.info())
     return nordea_fi_lang_se_transactions_to_general_clerk_format(df)
