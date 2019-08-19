@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -14,7 +14,7 @@ setup(
     license='ISC',
     url='https://github.com/clerk/python-clerkai',
     version='0.1.0',
-    packages=['clerkai'],
+    packages=find_packages(),
 
     # Dependencies
     install_requires=requirements,
