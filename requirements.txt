@@ -1,2 +1,5 @@
 # general
 pandas
+
+# for git-related util functions
+GitPython
