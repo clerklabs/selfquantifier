@@ -77,11 +77,13 @@ def list_files_in_folder(folder_path):
             file_sha256sum = sha256sum(join(root, file))
             file_sha1sum = sha1sum(join(root, file))
             all_files.append({
-                "file": file,
-                "root": root,
-                "size": getsize(join(root, file)),
-                "file_sha1sum": file_sha1sum,
-                "file_sha256sum": file_sha256sum,
+                "File name": file,
+                "File path": root,
+                "File metadata": {
+                    "size": getsize(join(root, file)),
+                    "sha1sum": file_sha1sum,
+                    "sha256sum": file_sha256sum,
+                }
             })
     return all_files
 
@@ -89,6 +91,6 @@ def list_files_in_folder(folder_path):
 def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path, repo):
     import pandas as pd
     _ = pd.DataFrame(list_files_in_folder(folder_path))
-    _["root"] = _["root"].apply(lambda root: root.replace(clerkai_folder_path, "@/"))
+    _["File path"] = _["File path"].apply(lambda root: root.replace(clerkai_folder_path, "@/"))
     _["Historic reference"] = current_gitsha1(repo)
     return _
