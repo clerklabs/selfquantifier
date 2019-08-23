@@ -3,3 +3,4 @@ pandas
 
 # for git-related util functions
 GitPython
+pydriller

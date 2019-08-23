@@ -8,6 +8,7 @@ from clerkai.transactions.parsers.parse_utils import (
 
 
 def test_amount_to_rounded_decimal():
+    # type: () -> None
     foo = amount_to_rounded_decimal("123.45")
     assert foo == Decimal("123.45")
     # foo = amount_to_rounded_decimal("123,45")
@@ -17,6 +18,7 @@ def test_amount_to_rounded_decimal():
 
 
 def test_convert_european_amount_to_decimal():
+    # type: () -> None
     foo = convert_european_amount_to_decimal("123.45")
     assert foo == Decimal("123.45")
     foo = convert_european_amount_to_decimal("123,45")
@@ -26,6 +28,7 @@ def test_convert_european_amount_to_decimal():
 
 
 def test_read_csv_with_decimal():
+    # type: () -> None
     df = pd.read_csv(StringIO("foo,bar,amount\nzoo,zar,123.45\n"),
                      converters={'amount': convert_european_amount_to_decimal})
     assert type(df["amount"][0]) == Decimal

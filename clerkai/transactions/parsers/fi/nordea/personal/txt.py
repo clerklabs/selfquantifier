@@ -1,18 +1,21 @@
-import datetime
+from datetime import datetime
 from io import StringIO
 
 import pandas as pd
+from pandas.core.frame import DataFrame
 
 from clerkai.transactions.parsers.parse_utils import \
     convert_european_amount_to_decimal
 
 
 def fi_date_to_datetime_obj(datetime_str):
-    datetime_obj = datetime.datetime.strptime(datetime_str, '%d.%m.%Y')
+    # type: (str) -> datetime
+    datetime_obj = datetime.strptime(datetime_str, '%d.%m.%Y')
     return datetime_obj
 
 
 def import_nordea_fi_lang_se_transaction_file(transaction_file):
+    # type: (str) -> DataFrame
     with open(transaction_file, "rb") as f:
         contents = f.read()
     # print(contents)
@@ -34,6 +37,7 @@ def import_nordea_fi_lang_se_transaction_file(transaction_file):
 
 
 def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
+    # type: (DataFrame) -> DataFrame
     normalized_df = pd.DataFrame()
     normalized_df['Date'] = df['Betalningsdag'].apply(fi_date_to_datetime_obj)
     normalized_df['Payee'] = df['Mottagare/Betalare']
@@ -48,5 +52,6 @@ def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
 
 
 def nordea_fi_lang_se_transactions_parser(transaction_file):
+    # type: (str) -> DataFrame
     df = import_nordea_fi_lang_se_transaction_file(transaction_file)
     return nordea_fi_lang_se_transactions_to_general_clerk_format(df)

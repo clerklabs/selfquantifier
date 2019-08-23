@@ -1,2 +1,7 @@
 pytest==5.1.0
 pytest-flake8==1.0.4
+
+# static typing
+mypy
+pytest-mypy
+pytest-annotate

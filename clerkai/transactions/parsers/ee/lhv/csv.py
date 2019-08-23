@@ -1,21 +1,24 @@
-# lhv.ee.csv-specific parsing:
-import datetime
+from datetime import datetime
 
 import pandas as pd
+from pandas.core.frame import DataFrame
 
 from clerkai.transactions.parsers.parse_utils import amount_to_rounded_decimal
 
 
 def ymd_date_to_datetime_obj(datetime_str):
-    datetime_obj = datetime.datetime.strptime(datetime_str, '%Y-%m-%d')
+    # type: (str) -> datetime
+    datetime_obj = datetime.strptime(datetime_str, '%Y-%m-%d')
     return datetime_obj
 
 
 def import_lhv_ee_csv_transaction_file(transaction_file):
+    # type: (str) -> DataFrame
     return pd.read_csv(transaction_file)
 
 
 def lhv_ee_csv_transactions_to_general_clerk_format(df):
+    # type: (DataFrame) -> DataFrame
     normalized_df = pd.DataFrame()
 
     normalized_df['Date'] = df['Date'].apply(ymd_date_to_datetime_obj)
@@ -36,5 +39,6 @@ def lhv_ee_csv_transactions_to_general_clerk_format(df):
 
 
 def lhv_ee_csv_transactions_parser(transaction_file):
+    # type: (str) -> DataFrame
     df = import_lhv_ee_csv_transaction_file(transaction_file)
     return lhv_ee_csv_transactions_to_general_clerk_format(df)

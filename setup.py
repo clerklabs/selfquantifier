@@ -19,6 +19,9 @@ setup(
     # Dependencies
     install_requires=requirements,
     tests_require=test_requirements,
+    dependency_links=[
+        'git+https://github.com/motin/pytest-annotate.git@allow-pytest-v4-and-v5#egg=pytest-annotate-1.0.2',
+    ],
     setup_requires=['setuptools_scm', 'pytest-runner'],
 
     # Packaging
