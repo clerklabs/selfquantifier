@@ -39,11 +39,12 @@ def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
     normalized_df['Payee'] = df['Mottagare/Betalare']
     normalized_df['Memo'] = df['Meddelande']
     normalized_df['Amount'] = df['Belopp'].apply(convert_european_amount_to_decimal)
+    normalized_df['Balance'] = None
     normalized_df['Original data'] = df[
         ['Bokningsdag', 'Valutadag', 'Betalningsdag', 'Belopp', 'Mottagare/Betalare', 'Kontonummer', 'BIC',
          'Kontotransaktion', 'Referens', 'Betalarens referens', 'Meddelande', 'Kortets nummer', 'Kvitto']].to_dict(
         orient='records')
-    return normalized_df[['Date', 'Payee', 'Memo', 'Amount', 'Original data']]
+    return normalized_df[['Date', 'Payee', 'Memo', 'Amount', 'Balance', 'Original data']]
 
 
 def nordea_fi_lang_se_transactions_parser(transaction_file):
