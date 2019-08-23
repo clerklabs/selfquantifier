@@ -8,7 +8,7 @@ from clerkai.utils import (add_all_untracked_and_changed_files,
 
 def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
     import re
-    p = re.compile('\\(([^\\)]*)\\)', re.IGNORECASE)
+    p = re.compile('\\(([^)]*)\\)', re.IGNORECASE)
     m = p.search(edit_subfolder_path)
     commit_sha = None
     if len(m.groups()) > 0:
@@ -38,12 +38,16 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     # some helper functions
     def list_transactions_files_in_transactions_folder():
         _ = list_files_in_clerk_subfolder(transactions_folder_path, clerkai_folder_path, repo)
-        _["Historic reference"] = current_gitsha1(repo)
-        return _
+        _["Include"] = None
+        _["Account provider"] = None
+        _["Account"] = None
+        _["Content type"] = None
+        _["Historic reference"] = current_history_reference()
+        return _[["File name", "File path", "Include", "Account provider", "Account", "Content type", "File metadata", "Historic reference"]]
 
     def list_receipt_files_in_receipts_folder():
         _ = list_files_in_clerk_subfolder(receipts_folder_path, clerkai_folder_path, repo)
-        _["Historic reference"] = current_gitsha1(repo)
+        _["Historic reference"] = current_history_reference()
         return _
 
     def list_edit_files_in_edits_folder():
@@ -79,7 +83,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         export_columns = df.columns
         import time
         commit_specific_directory = "%s (%s)" % (time.strftime(
-            "%Y-%m-%d %H%M", current_gitcommit_datetime(repo)), current_gitsha1(repo))
+            "%Y-%m-%d %H%M", current_gitcommit_datetime(repo)), current_history_reference())
         commit_specific_directory_path = os.path.join(edits_folder_path, commit_specific_directory)
         if not os.path.isdir(commit_specific_directory_path):
             os.mkdir(commit_specific_directory_path)
