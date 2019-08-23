@@ -24,6 +24,9 @@ def ensure_clerkai_folder_versioning(clerkai_folder_path):
 
 # add all untracked and changed files
 def add_all_untracked_and_changed_files(repo):
+    # track ignores within the git folder
+    with open(os.path.join(repo.working_tree_dir, ".git", "info", "exclude"), "w") as text_file:
+        text_file.write("Edits\n")
     repo.git.add('-A')
     uncommited_changes = repo.git.status('--porcelain')
     if uncommited_changes != '':
@@ -97,22 +100,6 @@ def list_files_in_folder(folder_path):
 def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path, repo):
     import pandas as pd
     _ = pd.DataFrame(list_files_in_folder(folder_path))
-    _["File path"] = _["File path"].apply(lambda root: root.replace(clerkai_folder_path, "@/"))
-    _["Historic reference"] = current_gitsha1(repo)
+    if len(_) > 0:
+        _["File path"] = _["File path"].apply(lambda root: root.replace(clerkai_folder_path, "@/"))
     return _
-
-
-def possibly_edited_df(df, export_file_name, edits_folder_path, repo):
-    export_columns = df.columns
-    import time
-    commit_specific_directory = "%s (%s)" % (time.strftime("%Y-%m-%d %H%M", current_gitcommit_datetime(repo)), current_gitsha1(repo))
-    commit_specific_directory_path = os.path.join(edits_folder_path, commit_specific_directory)
-    if not os.path.isdir(commit_specific_directory_path):
-        os.mkdir(commit_specific_directory_path)
-    xlsx_path = os.path.join(commit_specific_directory_path, export_file_name)
-    import pandas as pd
-    if not os.path.isfile(xlsx_path):
-        print("Saving '%s,%s'" % (commit_specific_directory, export_file_name))
-        with pd.ExcelWriter(xlsx_path, engine="xlsxwriter") as writer:
-            df[export_columns].to_excel(writer, sheet_name="Data", index=False, freeze_panes=(1,0))
-    return pd.read_excel(os.path.join(commit_specific_directory_path, export_file_name))

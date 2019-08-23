@@ -3,8 +3,17 @@ from io import StringIO
 
 import pandas as pd
 
-from clerkai.transactions.parsers.parse_utils import \
-    convert_european_amount_to_decimal
+from clerkai.transactions.parsers.parse_utils import (
+    amount_to_rounded_decimal, convert_european_amount_to_decimal)
+
+
+def test_amount_to_rounded_decimal():
+    foo = amount_to_rounded_decimal("123.45")
+    assert foo == Decimal("123.45")
+    # foo = amount_to_rounded_decimal("123,45")
+    # assert foo == Decimal("123.45")
+    foo = amount_to_rounded_decimal(123.45)
+    assert foo == Decimal("123.45")
 
 
 def test_convert_european_amount_to_decimal():
