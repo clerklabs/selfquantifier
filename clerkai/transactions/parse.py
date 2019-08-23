@@ -4,10 +4,11 @@ from clerkai.transactions.parsers.ee.lhv.csv import \
     lhv_ee_csv_transactions_parser
 from clerkai.transactions.parsers.fi.nordea.personal.txt import \
     nordea_fi_lang_se_transactions_parser
+from clerkai.transactions.parsers.se.danskebank.personal.csv import \
+    danskebank_se_csv_transactions_parser
 
 nordea_fi_lang_fi_transactions_parser = None
 nordea_se_transactions_parser = None
-danskebank_se_csv_transactions_parser = None
 
 parser_by_content_type = {
     "exported-transaction-file/nordea.fi.natbanken-privat.xls": nordea_fi_lang_se_transactions_parser,
@@ -25,7 +26,7 @@ parser_by_content_type = {
 }
 
 
-def parse_transaction_files(transaction_files, clerkai_file_path):
+def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False):
     def parse_transaction_file_row(transaction_file):
         transaction_file_path = clerkai_file_path(transaction_file)
         results = None
@@ -37,6 +38,8 @@ def parse_transaction_files(transaction_files, clerkai_file_path):
             results["Source transaction file index"] = transaction_file.name
         except Exception as e:
             error = e
+            if failfast:
+                raise e
         return pd.Series([results, error], index=['Parse results', 'Error'])
 
     if len(transaction_files) == 0:
@@ -46,3 +49,11 @@ def parse_transaction_files(transaction_files, clerkai_file_path):
 
     parsed_transaction_files = transaction_files.join(parsed_transaction_file_results)
     return parsed_transaction_files
+
+
+def transactions_from_parsed_transaction_files(parsed_transaction_files):
+    transactions_df = pd.concat(parsed_transaction_files["Parse results"].values, sort=False).reset_index(drop=True)
+    transactions_df = pd.merge(transactions_df,
+                     parsed_transaction_files.add_prefix("Source transaction file: "),
+                     left_on="Source transaction file index", right_index=True)
+    return transactions_df

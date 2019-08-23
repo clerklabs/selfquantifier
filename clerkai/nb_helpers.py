@@ -31,7 +31,9 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     # initiate / validate clerk.ai-folder versioning
     repo = ensure_clerkai_folder_versioning(clerkai_folder_path)
     add_all_untracked_and_changed_files(repo)
-    current_gitsha1(repo)
+
+    def current_history_reference():
+        return current_gitsha1(repo)
 
     # some helper functions
     def list_transactions_files_in_transactions_folder():
@@ -89,6 +91,12 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
                 df[export_columns].to_excel(writer, sheet_name="Data", index=False, freeze_panes=(1, 0))
         return pd.read_excel(os.path.join(commit_specific_directory_path, export_file_name))
 
-    return (list_transactions_files_in_transactions_folder, list_receipt_files_in_receipts_folder,
-            list_edit_files_in_edits_folder, list_transactions_files_in_downloads_folder, clerkai_file_path,
-            possibly_edited_df)
+    return (
+        current_history_reference,
+        list_transactions_files_in_transactions_folder,
+        list_receipt_files_in_receipts_folder,
+        list_edit_files_in_edits_folder,
+        list_transactions_files_in_downloads_folder,
+        clerkai_file_path,
+        possibly_edited_df
+    )
