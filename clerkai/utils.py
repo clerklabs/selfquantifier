@@ -1,7 +1,7 @@
 import hashlib
 import os
-from os.path import getsize, join
 import time
+from os.path import getsize, join
 
 
 def ensure_clerkai_folder_versioning(clerkai_folder_path):

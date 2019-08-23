@@ -13,9 +13,8 @@ def fi_date_to_datetime_obj(datetime_str):
 
 
 def import_nordea_fi_lang_se_transaction_file(transaction_file):
-    f = open(transaction_file, "rb")
-    contents = f.read()
-    f.close()
+    with open(transaction_file, "rb") as f:
+        contents = f.read()
     # print(contents)
     decoded_contents = contents.decode('utf8')
     # originally, these files use "\n\r\n" as line separator (go figure)
