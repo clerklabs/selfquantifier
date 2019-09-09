@@ -54,6 +54,6 @@ def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False
 def transactions_from_parsed_transaction_files(parsed_transaction_files):
     transactions_df = pd.concat(parsed_transaction_files["Parse results"].values, sort=False).reset_index(drop=True)
     transactions_df = pd.merge(transactions_df,
-                     parsed_transaction_files.add_prefix("Source transaction file: "),
+                     parsed_transaction_files.drop(["Parse results", "History reference"], axis=1).add_prefix("Source transaction file: "),
                      left_on="Source transaction file index", right_index=True)
-    return transactions_df
+    return transactions_df.drop(["Source transaction file index"], axis=1)

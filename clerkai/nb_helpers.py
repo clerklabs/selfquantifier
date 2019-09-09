@@ -42,18 +42,19 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         _["Account provider"] = None
         _["Account"] = None
         _["Content type"] = None
-        _["Historic reference"] = current_history_reference()
-        return _[["File name", "File path", "Include", "Account provider", "Account", "Content type", "File metadata", "Historic reference"]]
+        _["History reference"] = current_history_reference()
+        return _[["File name", "File path", "Include", "Account provider", "Account", "Content type", "File metadata",
+                  "History reference"]]
 
     def list_receipt_files_in_receipts_folder():
         _ = list_files_in_clerk_subfolder(receipts_folder_path, clerkai_folder_path, repo)
-        _["Historic reference"] = current_history_reference()
+        _["History reference"] = current_history_reference()
         return _
 
     def list_edit_files_in_edits_folder():
         _ = list_files_in_clerk_subfolder(edits_folder_path, clerkai_folder_path, repo)
         if len(_) > 0:
-            _["Related historic reference"] = _["File path"].apply(extract_commit_sha_from_edit_subfolder_path)
+            _["Related history reference"] = _["File path"].apply(extract_commit_sha_from_edit_subfolder_path)
         return _
 
     # TODO: make this guess which ones are transactions
