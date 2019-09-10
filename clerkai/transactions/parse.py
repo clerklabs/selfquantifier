@@ -40,20 +40,29 @@ def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False
             error = e
             if failfast:
                 raise e
-        return pd.Series([results, error], index=['Parse results', 'Error'])
+        return pd.Series([results, error], index=["Parse results", "Error"])
 
     if len(transaction_files) == 0:
         raise Exception("No transaction files to parse")
 
-    parsed_transaction_file_results = transaction_files.apply(parse_transaction_file_row, axis=1)
+    parsed_transaction_file_results = transaction_files.apply(
+        parse_transaction_file_row, axis=1
+    )
 
     parsed_transaction_files = transaction_files.join(parsed_transaction_file_results)
     return parsed_transaction_files
 
 
 def transactions_from_parsed_transaction_files(parsed_transaction_files):
-    transactions_df = pd.concat(parsed_transaction_files["Parse results"].values, sort=False).reset_index(drop=True)
-    transactions_df = pd.merge(transactions_df,
-                     parsed_transaction_files.drop(["Parse results", "History reference"], axis=1).add_prefix("Source transaction file: "),
-                     left_on="Source transaction file index", right_index=True)
+    transactions_df = pd.concat(
+        parsed_transaction_files["Parse results"].values, sort=False
+    ).reset_index(drop=True)
+    transactions_df = pd.merge(
+        transactions_df,
+        parsed_transaction_files.drop(
+            ["Parse results", "History reference"], axis=1
+        ).add_prefix("Source transaction file: "),
+        left_on="Source transaction file index",
+        right_index=True,
+    )
     return transactions_df.drop(["Source transaction file index"], axis=1)

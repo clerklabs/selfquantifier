@@ -29,8 +29,10 @@ def test_convert_european_amount_to_decimal():
 
 def test_read_csv_with_decimal():
     # type: () -> None
-    df = pd.read_csv(StringIO("foo,bar,amount\nzoo,zar,123.45\n"),
-                     converters={'amount': convert_european_amount_to_decimal})
+    df = pd.read_csv(
+        StringIO("foo,bar,amount\nzoo,zar,123.45\n"),
+        converters={"amount": convert_european_amount_to_decimal},
+    )
     assert type(df["amount"][0]) == Decimal
     # df = pd.read_csv(StringIO("foo,bar,amount\nzoo,zar,123.45\n"), dtype={'amount': Decimal})
     # assert type(df["amount"][0]) == Decimal
