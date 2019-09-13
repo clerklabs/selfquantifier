@@ -125,9 +125,14 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         # include earlier edits
         _edit_files_df = list_edit_files_in_edits_folder()
         edit_files_df = _edit_files_df[_edit_files_df["File name"] == export_file_name]
-        previous_edit_files = edit_files_df[
+        _previous_edit_files = edit_files_df[
             edit_files_df["Related history reference"] != current_history_reference()
         ]
+
+        # all earlier edits should have been incorporated in the
+        # most recent previous edit file, so we can restrict to only merge edits
+        # from that file
+        previous_edit_files = _previous_edit_files.tail(1)
 
         def possibly_edited_commit_specific_df_by_edit_file_row(edit_file):
             edit_file[
@@ -169,9 +174,6 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             history_reference=current_history_reference(),
             create_if_not_exists=True,
         )
-
-        # if all went well (eg all edits were merged) we can delete / inactivate previous edit files
-        # TODO
 
         return possibly_edited_df_with_previous_edits
 
