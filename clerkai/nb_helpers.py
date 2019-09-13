@@ -3,7 +3,11 @@ import os
 from clerkai.utils import (add_all_untracked_and_changed_files,
                            current_gitcommit_datetime, current_gitsha1,
                            ensure_clerkai_folder_versioning,
-                           list_files_in_clerk_subfolder)
+                           list_files_in_clerk_subfolder,
+                           merge_changes_from_previous_possibly_edited_df,
+                           possibly_edited_commit_specific_df,
+                           propagate_previous_edits_from_across_columns,
+                           short_gitsha1)
 
 
 def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
@@ -69,9 +73,26 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     def list_edit_files_in_edits_folder():
         _ = list_files_in_clerk_subfolder(edits_folder_path, clerkai_folder_path, repo)
         if len(_) > 0:
+            from pydriller import RepositoryMining
+
+            commits_iterator = RepositoryMining(
+                clerkai_folder_path, filepath="."
+            ).traverse_commits()
+            commits = {}
+            for commit in commits_iterator:
+                history_reference = short_gitsha1(repo, commit.hash)
+                commits[history_reference] = commit
             _["Related history reference"] = _["File path"].apply(
                 extract_commit_sha_from_edit_subfolder_path
             )
+
+            def commit_datetime_from_history_reference(history_reference):
+                return commits[history_reference].author_date
+
+            _["Related history reference date"] = _["Related history reference"].apply(
+                commit_datetime_from_history_reference
+            )
+            _ = _.sort_values(by="Related history reference date")
         return _
 
     # TODO: make this guess which ones are transactions
@@ -99,31 +120,60 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     if not os.path.isdir(pictures_folder_path):
         raise Exception("Pictures folder missing")
 
-    def possibly_edited_df(df, export_file_name):
-        export_columns = df.columns
-        import time
+    def possibly_edited_df(current_commit_df, export_file_name, editable_columns):
 
-        commit_specific_directory = "%s (%s)" % (
-            time.strftime("%Y-%m-%d %H%M", current_gitcommit_datetime(repo)),
-            current_history_reference(),
-        )
-        commit_specific_directory_path = os.path.join(
-            edits_folder_path, commit_specific_directory
-        )
-        if not os.path.isdir(commit_specific_directory_path):
-            os.mkdir(commit_specific_directory_path)
-        xlsx_path = os.path.join(commit_specific_directory_path, export_file_name)
-        import pandas as pd
+        # include earlier edits
+        _edit_files_df = list_edit_files_in_edits_folder()
+        edit_files_df = _edit_files_df[_edit_files_df["File name"] == export_file_name]
+        previous_edit_files = edit_files_df[
+            edit_files_df["Related history reference"] != current_history_reference()
+        ]
 
-        if not os.path.isfile(xlsx_path):
-            print("Saving '%s/%s'" % (commit_specific_directory, export_file_name))
-            with pd.ExcelWriter(xlsx_path, engine="xlsxwriter") as writer:
-                df[export_columns].to_excel(
-                    writer, sheet_name="Data", index=False, freeze_panes=(1, 0)
-                )
-        return pd.read_excel(
-            os.path.join(commit_specific_directory_path, export_file_name)
+        def possibly_edited_commit_specific_df_by_edit_file_row(edit_file):
+            edit_file[
+                "previous_possibly_edited_df"
+            ] = possibly_edited_commit_specific_df(
+                df=None,
+                export_file_name=export_file_name,
+                edits_folder_path=edits_folder_path,
+                commit_datetime=edit_file["Related history reference date"],
+                history_reference=edit_file["Related history reference"],
+                create_if_not_exists=False,
+            )
+            return edit_file
+
+        edit_files_with_previous_possibly_edited_df = previous_edit_files.apply(
+            possibly_edited_commit_specific_df_by_edit_file_row, axis=1
         )
+
+        df_with_previous_edits_across_columns = current_commit_df
+        for index, edit_file in edit_files_with_previous_possibly_edited_df.iterrows():
+            df_with_previous_edits_across_columns = merge_changes_from_previous_possibly_edited_df(
+                df_with_previous_edits_across_columns,
+                edit_file,
+                repo,
+                clerkai_folder_path,
+                current_history_reference,
+            )
+
+        df_with_previous_edits = propagate_previous_edits_from_across_columns(
+            df_with_previous_edits_across_columns, previous_edit_files, editable_columns
+        )
+
+        # make sure that the merged editable df file is available in the most current location
+        possibly_edited_df_with_previous_edits = possibly_edited_commit_specific_df(
+            df=df_with_previous_edits,
+            export_file_name=export_file_name,
+            edits_folder_path=edits_folder_path,
+            commit_datetime=current_gitcommit_datetime(repo),
+            history_reference=current_history_reference(),
+            create_if_not_exists=True,
+        )
+
+        # if all went well (eg all edits were merged) we can delete / inactivate previous edit files
+        # TODO
+
+        return possibly_edited_df_with_previous_edits
 
     return (
         current_history_reference,
