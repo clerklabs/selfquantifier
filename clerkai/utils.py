@@ -145,6 +145,7 @@ def merge_changes_from_previous_possibly_edited_df(
     merged_possibly_edited_df = pd.merge(
         df,
         previous_possibly_edited_df.add_suffix(suffix),
+        how="outer",
         left_on="full_path",
         right_on="full_path%s" % suffix,
         suffixes=(False, False),
