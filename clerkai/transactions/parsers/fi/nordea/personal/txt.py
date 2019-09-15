@@ -14,6 +14,15 @@ def fi_date_to_datetime_obj(datetime_str):
     return datetime_obj
 
 
+def nordea_fi_reference_number_to_datetime_obj(reference_number):
+    reference_number_str = str(reference_number)
+    if not reference_number_str.isdigit():
+        return None
+    datetime_str = reference_number_str[0:6]
+    datetime_obj = datetime.strptime(datetime_str, "%y%m%d")
+    return datetime_obj
+
+
 def import_nordea_fi_lang_se_transaction_file(transaction_file):
     # type: (str) -> DataFrame
     with open(transaction_file, "rb") as f:
@@ -41,11 +50,24 @@ def import_nordea_fi_lang_se_transaction_file(transaction_file):
 def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
     # type: (DataFrame) -> DataFrame
     normalized_df = pd.DataFrame()
-    normalized_df["Date"] = df["Betalningsdag"].apply(fi_date_to_datetime_obj)
-    normalized_df["Payee"] = df["Mottagare/Betalare"]
-    normalized_df["Memo"] = df["Meddelande"]
-    normalized_df["Amount"] = df["Belopp"].apply(convert_european_amount_to_decimal)
-    normalized_df["Balance"] = None
+    normalized_df["Raw Date Initiated"] = df["Referens"]
+    normalized_df["Raw Date Settled"] = df["Betalningsdag"]
+    normalized_df["Raw Payee"] = df["Mottagare/Betalare"]
+    normalized_df["Raw Memo"] = df["Meddelande"]
+    normalized_df["Raw Amount"] = df["Belopp"]
+    normalized_df["Raw Balance"] = None
+    normalized_df["Date Initiated"] = normalized_df["Raw Date Initiated"].apply(
+        nordea_fi_reference_number_to_datetime_obj
+    )
+    normalized_df["Date Settled"] = normalized_df["Raw Date Settled"].apply(
+        fi_date_to_datetime_obj
+    )
+    normalized_df["Payee"] = normalized_df["Raw Payee"]
+    normalized_df["Memo"] = normalized_df["Raw Memo"]
+    normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
+        convert_european_amount_to_decimal
+    )
+    normalized_df["Balance"] = normalized_df["Raw Balance"]
     normalized_df["Original data"] = df[
         [
             "Bokningsdag",
@@ -64,7 +86,21 @@ def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
         ]
     ].to_dict(orient="records")
     return normalized_df[
-        ["Date", "Payee", "Memo", "Amount", "Balance", "Original data"]
+        [
+            "Date Initiated",
+            "Date Settled",
+            "Payee",
+            "Memo",
+            "Amount",
+            "Balance",
+            "Original data",
+            "Raw Date Initiated",
+            "Raw Date Settled",
+            "Raw Payee",
+            "Raw Memo",
+            "Raw Amount",
+            "Raw Balance",
+        ]
     ]
 
 
