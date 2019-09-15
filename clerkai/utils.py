@@ -111,31 +111,56 @@ def merge_changes_from_previous_possibly_edited_df(
         clerkai_folder_path, filepath=".", from_commit=from_commit, to_commit=to_commit
     ).traverse_commits()
 
-    commits = {}
+    # follows file renames (ignores deletes and additions, so some new paths may have been
+    # subsequently deleted, and some old paths may have not existed in the from_commit
+    old_to_new_paths = {}
+    new_to_old_paths = {}
     for commit in commits_iterator:
-        history_reference = short_gitsha1(repo, commit.hash)
-        commits[history_reference] = commit
-    # print("commits", commits)
+        for modification in commit.modifications:
+            if (
+                modification.old_path
+                and modification.new_path
+                and modification.old_path != modification.new_path
+            ):
+                if modification.new_path in new_to_old_paths:
+                    old_to_new_paths[
+                        new_to_old_paths[modification.new_path]
+                    ] = modification.new_path
+                    new_to_old_paths[modification.new_path] = new_to_old_paths[
+                        modification.new_path
+                    ]
+                else:
+                    old_to_new_paths[modification.old_path] = modification.new_path
+                    new_to_old_paths[modification.new_path] = modification.old_path
+    del new_to_old_paths
+    # print("old_to_new_paths", old_to_new_paths)
 
     def joined_path(record):
         return "%s/%s" % (record["File path"], record["File name"])
 
-    df["full_path"] = df.apply(joined_path, axis=1)
+    df["clerkai_path"] = df.apply(joined_path, axis=1)
 
-    previous_possibly_edited_df["full_path"] = previous_possibly_edited_df.apply(
+    previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
         joined_path, axis=1
     )
 
-    # TODO - support tracking changes after files have been moved
-    def find_head_commit_corresponding_full_path(full_path):
-        full_path.replace("@/", "./")
-        return "foo"
+    def find_head_commit_corresponding_clerkai_path(clerkai_path):
+        clerkai_path_key = clerkai_path.replace("@/", "")
+        if clerkai_path_key in old_to_new_paths:
+            return "@/%s" % old_to_new_paths[clerkai_path_key]
+        else:
+            # if no moves occurred just use the old path as is
+            return clerkai_path
 
     previous_possibly_edited_df[
-        "head_commit_corresponding_full_path"
-    ] = previous_possibly_edited_df["full_path"].apply(
-        find_head_commit_corresponding_full_path
+        "head_commit_corresponding_clerkai_path"
+    ] = previous_possibly_edited_df["clerkai_path"].apply(
+        find_head_commit_corresponding_clerkai_path
     )
+
+    # create merge key
+    # transaction files - head_commit_corresponding_clerkai_path
+    # transactions - head_commit_corresponding_clerkai_path + ?
 
     import pandas as pd
 
@@ -145,8 +170,8 @@ def merge_changes_from_previous_possibly_edited_df(
         df,
         previous_possibly_edited_df.add_suffix(suffix),
         how="outer",
-        left_on="full_path",
-        right_on="full_path%s" % suffix,
+        left_on="clerkai_path",
+        right_on="head_commit_corresponding_clerkai_path%s" % suffix,
         suffixes=(False, False),
     )
 
