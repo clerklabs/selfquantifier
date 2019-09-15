@@ -1,6 +1,5 @@
 import hashlib
 import os
-import time
 from os.path import getsize, join
 
 
