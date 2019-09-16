@@ -27,8 +27,44 @@ parser_by_content_type = {
 
 
 def add_naive_transaction_id(transactions):
+    import json
+    import jellyfish
+
     def generate_naive_transaction_id(transaction):
-        return "foo"
+        transaction_id_key_dict = {}
+        transaction_id_key_dict["date_initiated"] = (
+            transaction["Raw Date Initiated"]
+            if (transaction["Raw Date Initiated"] is not None)
+            else transaction["Date Initiated"]
+        )
+        transaction_id_key_dict["date_settled"] = (
+            transaction["Raw Date Settled"]
+            if (transaction["Raw Date Settled"] is not None)
+            else transaction["Date Settled"]
+        )
+        payee = (
+            transaction["Raw Payee"]
+            if (transaction["Raw Payee"] is not None)
+            else transaction["Payee"]
+        )
+        memo = (
+            transaction["Raw Memo"]
+            if (transaction["Raw Memo"] is not None)
+            else transaction["Memo"]
+        )
+        transaction_id_key_dict["amount"] = (
+            transaction["Raw Amount"]
+            if (transaction["Raw Amount"] is not None)
+            else transaction["Amount"]
+        )
+        transaction_id_key_dict["balance"] = (
+            transaction["Raw Balance"]
+            if (transaction["Raw Balance"] is not None)
+            else transaction["Balance"]
+        )
+        transaction_id_key_dict["payee"] = jellyfish.soundex(payee)
+        transaction_id_key_dict["memo"] = jellyfish.soundex(memo)
+        return json.dumps(transaction_id_key_dict)
 
     transactions["naive_transaction_id"] = transactions.apply(
         generate_naive_transaction_id, axis=1

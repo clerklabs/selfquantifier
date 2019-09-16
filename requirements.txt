@@ -1,5 +1,6 @@
 # general
 pandas
+jellyfish
 
 # for git-related util functions
 GitPython
