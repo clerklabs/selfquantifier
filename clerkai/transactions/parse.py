@@ -26,6 +26,29 @@ parser_by_content_type = {
 }
 
 
+def add_naive_transaction_id(transactions):
+    def generate_naive_transaction_id(transaction):
+        return "foo"
+
+    transactions["naive_transaction_id"] = transactions.apply(
+        generate_naive_transaction_id, axis=1
+    )
+    return transactions
+
+
+def add_naive_transaction_id_duplicate_num(transactions):
+    transactions["naive_transaction_id_duplicate_num"] = (
+        transactions.groupby(["naive_transaction_id"]).cumcount() + 1
+    )
+    return transactions
+
+
+def add_transaction_id(transactions):
+    transactions = add_naive_transaction_id(transactions)
+    transactions = add_naive_transaction_id_duplicate_num(transactions)
+    return transactions
+
+
 def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False):
     def parse_transaction_file_row(transaction_file):
         transaction_file_path = clerkai_file_path(transaction_file)
@@ -34,8 +57,10 @@ def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False
         try:
             parser = parser_by_content_type[transaction_file["Content type"]]
             # print(parser, transaction_file_path)
-            results = parser(transaction_file_path)
-            results["Source transaction file index"] = transaction_file.name
+            transactions = parser(transaction_file_path)
+            transactions["Source transaction file index"] = transaction_file.name
+            # add future join/merge index
+            results = add_transaction_id(transactions)
         except Exception as e:
             error = e
             if failfast:
