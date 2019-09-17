@@ -93,28 +93,19 @@ def possibly_edited_commit_specific_df(
     return pd.read_excel(os.path.join(commit_specific_directory_path, export_file_name))
 
 
-def merge_changes_from_previous_possibly_edited_df(
-    df, edit_file, repo, clerkai_folder_path, current_history_reference
-):
-    previous_possibly_edited_df = edit_file["previous_possibly_edited_df"]
-
-    # print("df.head(), edit_file, previous_possibly_edited_df.head()")
-    # print(df.head(), edit_file, previous_possibly_edited_df.head())
-
-    # get relevant from and to commits between the old and new edit files
-    from_commit = edit_file["Related history reference"]
-    to_commit = current_history_reference()
-
+def changes_between_two_commits(repo_base_path, from_commit, to_commit):
     from pydriller import RepositoryMining
 
     commits_iterator = RepositoryMining(
-        clerkai_folder_path, filepath=".", from_commit=from_commit, to_commit=to_commit
+        repo_base_path, filepath=".", from_commit=from_commit, to_commit=to_commit
     ).traverse_commits()
 
     # follows file renames (ignores deletes and additions, so some new paths may have been
     # subsequently deleted, and some old paths may have not existed in the from_commit
     old_to_new_paths = {}
     new_to_old_paths = {}
+    old_now_deleted_paths = {}  # TODO
+    old_non_existing_now_added_paths = {}  # TODO
     for commit in commits_iterator:
         for modification in commit.modifications:
             if (
@@ -135,8 +126,44 @@ def merge_changes_from_previous_possibly_edited_df(
     del new_to_old_paths
     # print("old_to_new_paths", old_to_new_paths)
 
+    return (old_to_new_paths, old_now_deleted_paths, old_non_existing_now_added_paths)
+
+
+def merge_changes_from_previous_possibly_edited_df(
+    df, edit_file, record_type, clerkai_folder_path, current_history_reference
+):
+    # set config based on record type
+    if record_type == "transaction_files":
+        additional_join_columns = []
+        file_name_column_name = "File name"
+        file_path_column_name = "File path"
+    elif record_type == "transactions":
+        additional_join_columns = [
+            "naive_transaction_id",
+            "naive_transaction_id_duplicate_num",
+        ]
+        file_name_column_name = "Source transaction file: File name"
+        file_path_column_name = "Source transaction file: File path"
+    else:
+        raise ValueError("record_type '%s' not recognized" % record_type)
+
+    previous_possibly_edited_df = edit_file["previous_possibly_edited_df"]
+
+    # print("df.head(), edit_file, previous_possibly_edited_df.head()")
+    # print(df.head(), edit_file, previous_possibly_edited_df.head())
+
+    # get relevant from and to commits between the old and new edit files
+    from_commit = edit_file["Related history reference"]
+    to_commit = current_history_reference()
+
+    (
+        old_to_new_paths,
+        old_now_deleted_paths,
+        old_non_existing_now_added_paths,
+    ) = changes_between_two_commits(clerkai_folder_path, from_commit, to_commit)
+
     def joined_path(record):
-        return "%s/%s" % (record["File path"], record["File name"])
+        return "%s/%s" % (record[file_name_column_name], record[file_path_column_name])
 
     df["clerkai_path"] = df.apply(joined_path, axis=1)
 
@@ -166,12 +193,21 @@ def merge_changes_from_previous_possibly_edited_df(
 
     suffix = " (%s)" % from_commit
 
+    def add_suffix(column_name):
+        return "%s%s" % (column_name, suffix)
+
     merged_possibly_edited_df = pd.merge(
         df,
         previous_possibly_edited_df.add_suffix(suffix),
         how="outer",
-        left_on="clerkai_path",
-        right_on="head_commit_corresponding_clerkai_path%s" % suffix,
+        left_on=["clerkai_path", *additional_join_columns],
+        right_on=[
+            add_suffix(column_name)
+            for column_name in [
+                "head_commit_corresponding_clerkai_path",
+                *additional_join_columns,
+            ]
+        ],
         suffixes=(False, False),
     )
 
@@ -191,16 +227,20 @@ def propagate_previous_edits_from_across_columns(
         suffix = " (%s)" % history_reference
         for column_name in editable_columns:
             suffixed_column_name = "%s%s" % (column_name, suffix)
-            # print("suffixed_column_name", suffixed_column_name)
-            df_where_column_is_null = df_with_previous_edits_across_columns[
-                df_with_previous_edits_across_columns[column_name].isnull()
-            ]
-            df_where_column_is_null[
-                column_name
-            ] = df_with_previous_edits_across_columns[suffixed_column_name]
-            df_with_previous_edits_across_columns[
-                column_name
-            ] = df_where_column_is_null[column_name]
+            if column_name in df_with_previous_edits_across_columns.columns:
+                df_where_column_is_null = df_with_previous_edits_across_columns[
+                    df_with_previous_edits_across_columns[column_name].isnull()
+                ]
+                df_where_column_is_null[
+                    column_name
+                ] = df_with_previous_edits_across_columns[suffixed_column_name]
+                df_with_previous_edits_across_columns[
+                    column_name
+                ] = df_where_column_is_null[column_name]
+            else:
+                df_with_previous_edits_across_columns[
+                    column_name
+                ] = df_with_previous_edits_across_columns[suffixed_column_name]
         # print("df_with_previous_edits_across_columns.head()", df_with_previous_edits_across_columns.head())
 
     return df_with_previous_edits_across_columns

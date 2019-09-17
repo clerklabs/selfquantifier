@@ -120,7 +120,17 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     if not os.path.isdir(pictures_folder_path):
         raise Exception("Pictures folder missing")
 
-    def possibly_edited_df(current_commit_df, export_file_name, editable_columns):
+    def possibly_edited_df(current_commit_df, record_type, editable_columns):
+
+        # set config based on record type
+        if record_type == "transaction_files":
+            export_file_name = "Transaction files.xlsx"
+        elif record_type == "transactions":
+            export_file_name = "Transactions.xlsx"
+        else:
+            raise ValueError("record_type '%s' not recognized" % record_type)
+
+        # TODO: check if edit for the head commit already exists - in which case simply use it
 
         # include earlier edits
         _edit_files_df = list_edit_files_in_edits_folder()
@@ -154,11 +164,11 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         df_with_previous_edits_across_columns = current_commit_df
         for index, edit_file in edit_files_with_previous_possibly_edited_df.iterrows():
             df_with_previous_edits_across_columns = merge_changes_from_previous_possibly_edited_df(
-                df_with_previous_edits_across_columns,
-                edit_file,
-                repo,
-                clerkai_folder_path,
-                current_history_reference,
+                df=df_with_previous_edits_across_columns,
+                edit_file=edit_file,
+                record_type=record_type,
+                clerkai_folder_path=clerkai_folder_path,
+                current_history_reference=current_history_reference,
             )
 
         df_with_previous_edits = propagate_previous_edits_from_across_columns(
