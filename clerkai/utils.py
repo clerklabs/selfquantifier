@@ -163,7 +163,7 @@ def merge_changes_from_previous_possibly_edited_df(
     ) = changes_between_two_commits(clerkai_folder_path, from_commit, to_commit)
 
     def joined_path(record):
-        return "%s/%s" % (record[file_name_column_name], record[file_path_column_name])
+        return "%s/%s" % (record[file_path_column_name], record[file_name_column_name])
 
     df["clerkai_path"] = df.apply(joined_path, axis=1)
 
