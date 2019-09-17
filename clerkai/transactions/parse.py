@@ -90,17 +90,34 @@ def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False
         transaction_file_path = clerkai_file_path(transaction_file)
         results = None
         error = None
-        try:
-            parser = parser_by_content_type[transaction_file["Content type"]]
+
+        def parse():
+            content_type = transaction_file["Content type"]
+            if not content_type:
+                raise ValueError("Transaction file has no content type set")
+            if (
+                content_type not in parser_by_content_type
+                or not parser_by_content_type[content_type]
+            ):
+                raise ValueError("Content type '%s' has no parser" % content_type)
+            parser = parser_by_content_type[content_type]
             # print(parser, transaction_file_path)
             transactions = parser(transaction_file_path)
             transactions["Source transaction file index"] = transaction_file.name
             # add future join/merge index
-            results = add_transaction_id(transactions)
-        except Exception as e:
-            error = e
-            if failfast:
-                raise e
+            return add_transaction_id(transactions)
+
+        # failfast raises errors except expected/benign value errors
+        if failfast:
+            try:
+                results = parse()
+            except ValueError as e:
+                error = e
+        else:
+            try:
+                results = parse()
+            except Exception as e:
+                error = e
         return pd.Series([results, error], index=["Parse results", "Error"])
 
     if len(transaction_files) == 0:
