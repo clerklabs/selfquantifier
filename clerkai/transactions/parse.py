@@ -64,9 +64,9 @@ def naive_transaction_id_duplicate_nums(transactions):
 
 def transaction_ids(transactions):
     copy = transactions.copy()
-    copy["naive_transaction_id"] = naive_transaction_ids(transactions)
+    copy["naive_transaction_id"] = naive_transaction_ids(copy)
     copy["naive_transaction_id_duplicate_num"] = naive_transaction_id_duplicate_nums(
-        transactions
+        copy
     )
 
     def generate_transaction_id(transaction):
@@ -79,7 +79,7 @@ def transaction_ids(transactions):
     return copy.apply(generate_transaction_id, axis=1)
 
 
-def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False):
+def parse_transaction_files(transaction_files, clerkai_file_path, keepraw=False, failfast=False):
     def parse_transaction_file_row(transaction_file):
         transaction_file_path = clerkai_file_path(transaction_file)
         results = None
@@ -100,6 +100,10 @@ def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False
             transactions["Source transaction file index"] = transaction_file.name
             # add future join/merge index
             transactions["ID"] = transaction_ids(transactions)
+            # drop raw columns
+            if not keepraw:
+                transactions = transactions.drop(['Raw Date Initiated', 'Raw Date Settled', 'Raw Payee',
+                       'Raw Memo', 'Raw Amount', 'Raw Balance'], axis=1)
             return transactions
 
         # failfast raises errors except expected/benign value errors

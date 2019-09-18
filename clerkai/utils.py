@@ -130,24 +130,28 @@ def changes_between_two_commits(repo_base_path, from_commit, to_commit):
 
 
 def merge_changes_from_previous_possibly_edited_df(
-    df, edit_file, record_type, clerkai_folder_path, current_history_reference
+    df, edit_file, record_type, clerkai_folder_path, current_history_reference, keep_unmerged_previous_edits
 ):
+    previous_possibly_edited_df = edit_file["previous_possibly_edited_df"]
+
     # set config based on record type
     if record_type == "transaction_files":
-        additional_join_columns = []
+        additional_join_column = None
         file_name_column_name = "File name"
         file_path_column_name = "File path"
     elif record_type == "transactions":
-        additional_join_columns = [
-            "naive_transaction_id",
-            "naive_transaction_id_duplicate_num",
-        ]
+        additional_join_column = "ID"
         file_name_column_name = "Source transaction file: File name"
         file_path_column_name = "Source transaction file: File path"
+        # Add ID column if not present in previous edits file
+        if additional_join_column not in previous_possibly_edited_df.columns:
+            from clerkai.transactions.parse import transaction_ids
+
+            previous_possibly_edited_df[additional_join_column] = transaction_ids(
+                previous_possibly_edited_df
+            )
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
-
-    previous_possibly_edited_df = edit_file["previous_possibly_edited_df"]
 
     # print("df.head(), edit_file, previous_possibly_edited_df.head()")
     # print(df.head(), edit_file, previous_possibly_edited_df.head())
@@ -185,10 +189,6 @@ def merge_changes_from_previous_possibly_edited_df(
         find_head_commit_corresponding_clerkai_path
     )
 
-    # create merge key
-    # transaction files - head_commit_corresponding_clerkai_path
-    # transactions - head_commit_corresponding_clerkai_path + ?
-
     import pandas as pd
 
     suffix = " (%s)" % from_commit
@@ -196,22 +196,39 @@ def merge_changes_from_previous_possibly_edited_df(
     def add_suffix(column_name):
         return "%s%s" % (column_name, suffix)
 
+    left_on = ["clerkai_path"]
+    if additional_join_column:
+        left_on.append(additional_join_column)
+
+    right_on = ["head_commit_corresponding_clerkai_path"]
+    if additional_join_column:
+        right_on.append(additional_join_column)
+
+    suffixed_previous_possibly_edited_df = previous_possibly_edited_df.add_suffix(
+        suffix
+    )
+
     merged_possibly_edited_df = pd.merge(
         df,
-        previous_possibly_edited_df.add_suffix(suffix),
-        how="outer",
-        left_on=["clerkai_path", *additional_join_columns],
-        right_on=[
-            add_suffix(column_name)
-            for column_name in [
-                "head_commit_corresponding_clerkai_path",
-                *additional_join_columns,
-            ]
-        ],
+        suffixed_previous_possibly_edited_df,
+        how="left" if not keep_unmerged_previous_edits else "outer",
+        left_on=left_on,
+        right_on=[add_suffix(column_name) for column_name in right_on],
         suffixes=(False, False),
     )
 
-    return merged_possibly_edited_df
+    # drop temporary merge columns
+    merged_possibly_edited_df = merged_possibly_edited_df.drop(["clerkai_path"], axis=1)
+
+    # hint that more columns may be dropped upon successful propagation of previous edits
+    columns_to_drop_after_propagation_of_previous_edits = (
+        suffixed_previous_possibly_edited_df.columns
+    )
+
+    return (
+        merged_possibly_edited_df,
+        columns_to_drop_after_propagation_of_previous_edits,
+    )
 
 
 def set_where_nan():

@@ -120,7 +120,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     if not os.path.isdir(pictures_folder_path):
         raise Exception("Pictures folder missing")
 
-    def possibly_edited_df(current_commit_df, record_type, editable_columns):
+    def possibly_edited_df(current_commit_df, record_type, editable_columns, keep_unmerged_previous_edits=False):
 
         # set config based on record type
         if record_type == "transaction_files":
@@ -162,22 +162,40 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         )
 
         df_with_previous_edits_across_columns = current_commit_df
+        columns_to_drop_after_propagation_of_previous_edits = []
         for index, edit_file in edit_files_with_previous_possibly_edited_df.iterrows():
-            df_with_previous_edits_across_columns = merge_changes_from_previous_possibly_edited_df(
+            (
+                df_with_previous_edits_across_columns,
+                additional_columns_to_drop_after_propagation_of_previous_edits,
+            ) = merge_changes_from_previous_possibly_edited_df(
                 df=df_with_previous_edits_across_columns,
                 edit_file=edit_file,
                 record_type=record_type,
                 clerkai_folder_path=clerkai_folder_path,
                 current_history_reference=current_history_reference,
+                keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             )
+            columns_to_drop_after_propagation_of_previous_edits = [
+                *columns_to_drop_after_propagation_of_previous_edits,
+                *additional_columns_to_drop_after_propagation_of_previous_edits,
+            ]
 
         df_with_previous_edits = propagate_previous_edits_from_across_columns(
             df_with_previous_edits_across_columns, previous_edit_files, editable_columns
         )
 
+        # clean up irrelevant old columns (should have been merged and propagated already)
+        if not keep_unmerged_previous_edits:
+            clean_df_with_previous_edits = df_with_previous_edits.drop(
+                columns_to_drop_after_propagation_of_previous_edits, axis=1
+            )
+        else:
+            print("Keeping potential old edits and columns for reference")
+            clean_df_with_previous_edits = df_with_previous_edits
+
         # make sure that the merged editable df file is available in the most current location
         possibly_edited_df_with_previous_edits = possibly_edited_commit_specific_df(
-            df=df_with_previous_edits,
+            df=clean_df_with_previous_edits,
             export_file_name=export_file_name,
             edits_folder_path=edits_folder_path,
             commit_datetime=current_gitcommit_datetime(repo),
