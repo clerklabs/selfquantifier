@@ -62,8 +62,12 @@ def add_naive_transaction_id(transactions):
             if (transaction["Raw Balance"] is not None)
             else transaction["Balance"]
         )
-        transaction_id_key_dict["payee"] = jellyfish.soundex(payee)
-        transaction_id_key_dict["memo"] = jellyfish.soundex(memo)
+        transaction_id_key_dict["payee"] = (
+            jellyfish.soundex(payee) if type(payee) is str else payee
+        )
+        transaction_id_key_dict["memo"] = (
+            jellyfish.soundex(memo) if type(memo) is str else memo
+        )
         return json.dumps(transaction_id_key_dict)
 
     transactions["naive_transaction_id"] = transactions.apply(

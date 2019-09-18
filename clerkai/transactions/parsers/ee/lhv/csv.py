@@ -11,7 +11,7 @@ def lhv_ee_description_to_datetime_obj(description_str):
 
     p = re.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})", re.IGNORECASE)
     m = p.search(description_str)
-    if len(m.groups()) > 0:
+    if m and len(m.groups()) > 0:
         datetime_str = m.groups()[0]
     else:
         return None
