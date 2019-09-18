@@ -28,7 +28,7 @@ parser_by_content_type = {
 }
 
 
-def add_naive_transaction_id(transactions):
+def naive_transaction_ids(transactions):
     import jellyfish
 
     def generate_naive_transaction_id(transaction):
@@ -67,22 +67,19 @@ def add_naive_transaction_id(transactions):
         id_key_dict["memo"] = jellyfish.soundex(memo) if type(memo) is str else memo
         return json.dumps(id_key_dict)
 
-    transactions["naive_transaction_id"] = transactions.apply(
-        generate_naive_transaction_id, axis=1
+    return transactions.apply(generate_naive_transaction_id, axis=1)
+
+
+def naive_transaction_id_duplicate_nums(transactions):
+    return transactions.groupby(["naive_transaction_id"]).cumcount() + 1
+
+
+def transaction_ids(transactions):
+    copy = transactions.copy()
+    copy["naive_transaction_id"] = naive_transaction_ids(transactions)
+    copy["naive_transaction_id_duplicate_num"] = naive_transaction_id_duplicate_nums(
+        transactions
     )
-    return transactions
-
-
-def add_naive_transaction_id_duplicate_num(transactions):
-    transactions["naive_transaction_id_duplicate_num"] = (
-        transactions.groupby(["naive_transaction_id"]).cumcount() + 1
-    )
-    return transactions
-
-
-def add_transaction_id(transactions):
-    transactions = add_naive_transaction_id(transactions)
-    transactions = add_naive_transaction_id_duplicate_num(transactions)
 
     def generate_transaction_id(transaction):
         id_key_dict = {
@@ -91,10 +88,7 @@ def add_transaction_id(transactions):
         }
         return json.dumps(id_key_dict)
 
-    transactions["ID"] = transactions.apply(generate_transaction_id, axis=1)
-    return transactions.drop(
-        ["naive_transaction_id", "naive_transaction_id_duplicate_num"], axis=1
-    )
+    return copy.apply(generate_transaction_id, axis=1)
 
 
 def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False):
@@ -117,7 +111,8 @@ def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False
             transactions = parser(transaction_file_path)
             transactions["Source transaction file index"] = transaction_file.name
             # add future join/merge index
-            return add_transaction_id(transactions)
+            transactions["ID"] = transaction_ids(transactions)
+            return transactions
 
         # failfast raises errors except expected/benign value errors
         if failfast:

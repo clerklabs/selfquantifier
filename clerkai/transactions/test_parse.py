@@ -1,11 +1,9 @@
 from datetime import datetime
 
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
 
-from clerkai.transactions.parse import (add_naive_transaction_id,
-                                        add_naive_transaction_id_duplicate_num,
-                                        add_transaction_id)
+from clerkai.transactions.parse import (naive_transaction_id_duplicate_nums,
+                                        naive_transaction_ids, transaction_ids)
 
 transactions_df = pd.DataFrame(
     {
@@ -25,9 +23,9 @@ transactions_df = pd.DataFrame(
 )
 
 
-def test_add_naive_transaction_id():
-    df = add_naive_transaction_id(transactions_df)
-    assert not assert_frame_equal(transactions_df, df)
+def test_naive_transaction_ids():
+    df = transactions_df.copy()
+    df["naive_transaction_id"] = naive_transaction_ids(df)
     expected = pd.DataFrame(
         {
             "Raw Date Initiated": [None],
@@ -79,11 +77,11 @@ def test_add_duplicate_num():
     assert df.to_dict(orient="records") == expected.to_dict(orient="records")
 
 
-def test_add_duplicate_naive_transaction_id_num():
-    df2 = add_naive_transaction_id(transactions_df)
-    assert not assert_frame_equal(transactions_df, df2)
-    df3 = add_naive_transaction_id_duplicate_num(df2)
-    assert not assert_frame_equal(df2, df3)
+def test_naive_transaction_id_duplicate_nums():
+    df = transactions_df.copy()
+    df["naive_transaction_id"] = naive_transaction_ids(df)
+    df2 = df.copy()
+    df2["naive_transaction_id_duplicate_num"] = naive_transaction_id_duplicate_nums(df2)
     expected = pd.DataFrame(
         {
             "Raw Date Initiated": [None],
@@ -108,12 +106,12 @@ def test_add_duplicate_naive_transaction_id_num():
             "naive_transaction_id_duplicate_num": [1],
         }
     )
-    assert df3.to_dict(orient="records") == expected.to_dict(orient="records")
+    assert df2.to_dict(orient="records") == expected.to_dict(orient="records")
 
 
-def test_add_transaction_id():
-    df = add_transaction_id(transactions_df)
-    # assert not assert_frame_equal(transactions_df, df)
+def test_transaction_ids():
+    df = transactions_df.copy()
+    df["ID"] = transaction_ids(df)
     expected = pd.DataFrame(
         {
             "Raw Date Initiated": [None],
