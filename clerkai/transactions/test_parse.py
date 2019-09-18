@@ -33,6 +33,15 @@ transactions_without_raw_columns_df = pd.DataFrame(
     }
 )
 
+transactions_without_raw_columns_and_some_core_columns_df = pd.DataFrame(
+    {
+        "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+        "Payee": ["Acme-Industries 123 Inc"],
+        "Amount": [3000.12],
+        "Balance": [None],
+    }
+)
+
 
 def test_naive_transaction_ids():
     df = transactions_df.copy()
@@ -77,6 +86,26 @@ def test_naive_transaction_ids_without_raw_columns():
                 (
                     '{"amount": 3000.12, "balance": null, "date_initiated": null, "date_settled":'
                     ' "2019-05-02 00:00:00", "memo": "F000", "payee": "A255"}'
+                )
+            ],
+        }
+    )
+    assert df.to_dict(orient="records") == expected.to_dict(orient="records")
+
+
+def test_naive_transaction_ids_without_raw_columns_and_some_core_columns():
+    df = transactions_without_raw_columns_and_some_core_columns_df.copy()
+    df["naive_transaction_id"] = naive_transaction_ids(df)
+    expected = pd.DataFrame(
+        {
+            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Payee": ["Acme-Industries 123 Inc"],
+            "Amount": [3000.12],
+            "Balance": [None],
+            "naive_transaction_id": [
+                (
+                    '{"amount": 3000.12, "balance": null, "date_initiated": null, "date_settled":'
+                    ' "2019-05-02 00:00:00", "memo": null, "payee": "A255"}'
                 )
             ],
         }

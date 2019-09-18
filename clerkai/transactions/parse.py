@@ -39,7 +39,10 @@ def naive_transaction_ids(transactions):
                 and transaction[raw_field_name] is not None
             ):
                 return transaction[raw_field_name]
-            return transaction[field_name]
+            if field_name in transaction:
+                return transaction[field_name]
+            else:
+                return None
 
         id_key_dict = {}
         id_key_dict["date_initiated"] = raw_if_available("Date Initiated", transaction)
