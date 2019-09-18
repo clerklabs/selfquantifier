@@ -223,7 +223,12 @@ def changes_between_two_commits(repo_base_path, from_commit, to_commit):
 
 
 def merge_changes_from_previous_possibly_edited_df(
-    df, edit_file, record_type, clerkai_folder_path, current_history_reference, keep_unmerged_previous_edits
+    df,
+    edit_file,
+    record_type,
+    clerkai_folder_path,
+    current_history_reference,
+    keep_unmerged_previous_edits,
 ):
     previous_possibly_edited_df = edit_file["previous_possibly_edited_df"]
 
