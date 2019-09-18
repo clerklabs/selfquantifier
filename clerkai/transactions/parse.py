@@ -32,40 +32,25 @@ def naive_transaction_ids(transactions):
     import jellyfish
 
     def generate_naive_transaction_id(transaction):
+        def raw_if_available(field_name, transaction):
+            raw_field_name = "Raw %s" % field_name
+            if (
+                raw_field_name in transaction
+                and transaction[raw_field_name] is not None
+            ):
+                return transaction[raw_field_name]
+            return transaction[field_name]
+
         id_key_dict = {}
-        id_key_dict["date_initiated"] = (
-            transaction["Raw Date Initiated"]
-            if (transaction["Raw Date Initiated"] is not None)
-            else transaction["Date Initiated"]
-        )
-        id_key_dict["date_settled"] = (
-            transaction["Raw Date Settled"]
-            if (transaction["Raw Date Settled"] is not None)
-            else transaction["Date Settled"]
-        )
-        payee = (
-            transaction["Raw Payee"]
-            if (transaction["Raw Payee"] is not None)
-            else transaction["Payee"]
-        )
-        memo = (
-            transaction["Raw Memo"]
-            if (transaction["Raw Memo"] is not None)
-            else transaction["Memo"]
-        )
-        id_key_dict["amount"] = (
-            transaction["Raw Amount"]
-            if (transaction["Raw Amount"] is not None)
-            else transaction["Amount"]
-        )
-        id_key_dict["balance"] = (
-            transaction["Raw Balance"]
-            if (transaction["Raw Balance"] is not None)
-            else transaction["Balance"]
-        )
+        id_key_dict["date_initiated"] = raw_if_available("Date Initiated", transaction)
+        id_key_dict["date_settled"] = raw_if_available("Date Settled", transaction)
+        payee = raw_if_available("Payee", transaction)
+        memo = raw_if_available("Memo", transaction)
+        id_key_dict["amount"] = raw_if_available("Amount", transaction)
+        id_key_dict["balance"] = raw_if_available("Balance", transaction)
         id_key_dict["payee"] = jellyfish.soundex(payee) if type(payee) is str else payee
         id_key_dict["memo"] = jellyfish.soundex(memo) if type(memo) is str else memo
-        return json.dumps(id_key_dict)
+        return json.dumps(id_key_dict, sort_keys=True, default=str)
 
     return transactions.apply(generate_naive_transaction_id, axis=1)
 

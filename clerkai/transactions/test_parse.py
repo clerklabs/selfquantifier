@@ -22,6 +22,17 @@ transactions_df = pd.DataFrame(
     }
 )
 
+transactions_without_raw_columns_df = pd.DataFrame(
+    {
+        "Date Initiated": [None],
+        "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+        "Payee": ["Acme-Industries 123 Inc"],
+        "Memo": ["Foo"],
+        "Amount": [3000.12],
+        "Balance": [None],
+    }
+)
+
 
 def test_naive_transaction_ids():
     df = transactions_df.copy()
@@ -42,9 +53,30 @@ def test_naive_transaction_ids():
             "Balance": [None],
             "naive_transaction_id": [
                 (
-                    '{"date_initiated": null, "date_settled": '
-                    '"2019/05/02", "amount": "3.000,12", "balance": '
-                    'null, "payee": "A255", "memo": "F000"}'
+                    '{"amount": "3.000,12", "balance": null, "date_initiated": null, "date_settled":'
+                    ' "2019/05/02", "memo": "F000", "payee": "A255"}'
+                )
+            ],
+        }
+    )
+    assert df.to_dict(orient="records") == expected.to_dict(orient="records")
+
+
+def test_naive_transaction_ids_without_raw_columns():
+    df = transactions_without_raw_columns_df.copy()
+    df["naive_transaction_id"] = naive_transaction_ids(df)
+    expected = pd.DataFrame(
+        {
+            "Date Initiated": [None],
+            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Payee": ["Acme-Industries 123 Inc"],
+            "Memo": ["Foo"],
+            "Amount": [3000.12],
+            "Balance": [None],
+            "naive_transaction_id": [
+                (
+                    '{"amount": 3000.12, "balance": null, "date_initiated": null, "date_settled":'
+                    ' "2019-05-02 00:00:00", "memo": "F000", "payee": "A255"}'
                 )
             ],
         }
@@ -98,9 +130,8 @@ def test_naive_transaction_id_duplicate_nums():
             "Balance": [None],
             "naive_transaction_id": [
                 (
-                    '{"date_initiated": null, "date_settled": '
-                    '"2019/05/02", "amount": "3.000,12", "balance": '
-                    'null, "payee": "A255", "memo": "F000"}'
+                    '{"amount": "3.000,12", "balance": null, "date_initiated": null, "date_settled":'
+                    ' "2019/05/02", "memo": "F000", "payee": "A255"}'
                 )
             ],
             "naive_transaction_id_duplicate_num": [1],
@@ -128,8 +159,8 @@ def test_transaction_ids():
             "Balance": [None],
             "ID": [
                 (
-                    '{"ref": {"date_initiated": null, "date_settled": "2019/05/02", "amount": "3.000,12",'
-                    ' "balance": null, "payee": "A255", "memo": "F000"}, "ord": 1}'
+                    '{"ref": {"amount": "3.000,12", "balance": null, "date_initiated": null, '
+                    '"date_settled": "2019/05/02", "memo": "F000", "payee": "A255"}, "ord": 1}'
                 )
             ],
         }
