@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 
 from clerkai.transactions.parsers.ee.lhv.csv import \
@@ -27,17 +29,16 @@ parser_by_content_type = {
 
 
 def add_naive_transaction_id(transactions):
-    import json
     import jellyfish
 
     def generate_naive_transaction_id(transaction):
-        transaction_id_key_dict = {}
-        transaction_id_key_dict["date_initiated"] = (
+        id_key_dict = {}
+        id_key_dict["date_initiated"] = (
             transaction["Raw Date Initiated"]
             if (transaction["Raw Date Initiated"] is not None)
             else transaction["Date Initiated"]
         )
-        transaction_id_key_dict["date_settled"] = (
+        id_key_dict["date_settled"] = (
             transaction["Raw Date Settled"]
             if (transaction["Raw Date Settled"] is not None)
             else transaction["Date Settled"]
@@ -52,23 +53,19 @@ def add_naive_transaction_id(transactions):
             if (transaction["Raw Memo"] is not None)
             else transaction["Memo"]
         )
-        transaction_id_key_dict["amount"] = (
+        id_key_dict["amount"] = (
             transaction["Raw Amount"]
             if (transaction["Raw Amount"] is not None)
             else transaction["Amount"]
         )
-        transaction_id_key_dict["balance"] = (
+        id_key_dict["balance"] = (
             transaction["Raw Balance"]
             if (transaction["Raw Balance"] is not None)
             else transaction["Balance"]
         )
-        transaction_id_key_dict["payee"] = (
-            jellyfish.soundex(payee) if type(payee) is str else payee
-        )
-        transaction_id_key_dict["memo"] = (
-            jellyfish.soundex(memo) if type(memo) is str else memo
-        )
-        return json.dumps(transaction_id_key_dict)
+        id_key_dict["payee"] = jellyfish.soundex(payee) if type(payee) is str else payee
+        id_key_dict["memo"] = jellyfish.soundex(memo) if type(memo) is str else memo
+        return json.dumps(id_key_dict)
 
     transactions["naive_transaction_id"] = transactions.apply(
         generate_naive_transaction_id, axis=1
@@ -86,7 +83,18 @@ def add_naive_transaction_id_duplicate_num(transactions):
 def add_transaction_id(transactions):
     transactions = add_naive_transaction_id(transactions)
     transactions = add_naive_transaction_id_duplicate_num(transactions)
-    return transactions
+
+    def generate_transaction_id(transaction):
+        id_key_dict = {
+            "ref": json.loads(transaction["naive_transaction_id"]),
+            "ord": transaction["naive_transaction_id_duplicate_num"],
+        }
+        return json.dumps(id_key_dict)
+
+    transactions["ID"] = transactions.apply(generate_transaction_id, axis=1)
+    return transactions.drop(
+        ["naive_transaction_id", "naive_transaction_id_duplicate_num"], axis=1
+    )
 
 
 def parse_transaction_files(transaction_files, clerkai_file_path, failfast=False):
