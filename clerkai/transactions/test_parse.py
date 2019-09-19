@@ -22,6 +22,23 @@ transactions_df = pd.DataFrame(
     }
 )
 
+transactions_with_nan_df = pd.DataFrame(
+    {
+        "Raw Date Initiated": [float("NaN")],
+        "Raw Date Settled": ["2019/05/02"],
+        "Raw Payee": ["Acme-Industries 123 Inc"],
+        "Raw Memo": ["Foo"],
+        "Raw Amount": ["3.000,12"],
+        "Raw Balance": [None],
+        "Date Initiated": [None],
+        "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+        "Payee": ["Acme-Industries 123 Inc"],
+        "Memo": ["Foo"],
+        "Amount": [3000.12],
+        "Balance": [None],
+    }
+)
+
 transactions_without_raw_columns_df = pd.DataFrame(
     {
         "Date Initiated": [None],
@@ -69,6 +86,36 @@ def test_naive_transaction_ids():
         }
     )
     assert df.to_dict(orient="records") == expected.to_dict(orient="records")
+
+
+def test_naive_transaction_ids_with_nan():
+    df = transactions_with_nan_df.copy()
+    df["naive_transaction_id"] = naive_transaction_ids(df)
+    expected = pd.DataFrame(
+        {
+            "Raw Date Initiated": [float("NaN")],
+            "Raw Date Settled": ["2019/05/02"],
+            "Raw Payee": ["Acme-Industries 123 Inc"],
+            "Raw Memo": ["Foo"],
+            "Raw Amount": ["3.000,12"],
+            "Raw Balance": [None],
+            "Date Initiated": [None],
+            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Payee": ["Acme-Industries 123 Inc"],
+            "Memo": ["Foo"],
+            "Amount": [3000.12],
+            "Balance": [None],
+            "naive_transaction_id": [
+                (
+                    '{"amount": "3.000,12", "balance": null, "date_initiated": null, "date_settled":'
+                    ' "2019/05/02", "memo": "F000", "payee": "A255"}'
+                )
+            ],
+        }
+    )
+    assert df.replace({pd.np.nan: None}).to_dict(orient="records") == expected.replace(
+        {pd.np.nan: None}
+    ).to_dict(orient="records")
 
 
 def test_naive_transaction_ids_without_raw_columns():

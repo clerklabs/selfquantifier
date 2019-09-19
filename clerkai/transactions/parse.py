@@ -30,8 +30,21 @@ parser_by_content_type = {
 
 def naive_transaction_ids(transactions):
     import jellyfish
+    import math
+
+    def is_nan(x):
+        try:
+            return math.isnan(x)
+        except TypeError:
+            return False
 
     def generate_naive_transaction_id(transaction):
+        def none_if_nan(x):
+            if is_nan(x):
+                return None
+            else:
+                return x
+
         def raw_if_available(field_name, transaction):
             raw_field_name = "Raw %s" % field_name
             if (
@@ -45,15 +58,19 @@ def naive_transaction_ids(transactions):
                 return None
 
         id_key_dict = {}
-        id_key_dict["date_initiated"] = raw_if_available("Date Initiated", transaction)
-        id_key_dict["date_settled"] = raw_if_available("Date Settled", transaction)
-        payee = raw_if_available("Payee", transaction)
-        memo = raw_if_available("Memo", transaction)
-        id_key_dict["amount"] = raw_if_available("Amount", transaction)
-        id_key_dict["balance"] = raw_if_available("Balance", transaction)
+        id_key_dict["date_initiated"] = none_if_nan(
+            raw_if_available("Date Initiated", transaction)
+        )
+        id_key_dict["date_settled"] = none_if_nan(
+            raw_if_available("Date Settled", transaction)
+        )
+        payee = none_if_nan(raw_if_available("Payee", transaction))
+        memo = none_if_nan(raw_if_available("Memo", transaction))
+        id_key_dict["amount"] = none_if_nan(raw_if_available("Amount", transaction))
+        id_key_dict["balance"] = none_if_nan(raw_if_available("Balance", transaction))
         id_key_dict["payee"] = jellyfish.soundex(payee) if type(payee) is str else payee
         id_key_dict["memo"] = jellyfish.soundex(memo) if type(memo) is str else memo
-        return json.dumps(id_key_dict, sort_keys=True, default=str)
+        return json.dumps(id_key_dict, sort_keys=True, default=str, allow_nan=False)
 
     return transactions.apply(generate_naive_transaction_id, axis=1)
 
@@ -82,6 +99,12 @@ def transaction_ids(transactions):
 def parse_transaction_files(
     transaction_files, clerkai_file_path, keepraw=False, failfast=False
 ):
+    class ContentTypeNotSetError(Exception):
+        pass
+
+    class ParserNotAvailableError(Exception):
+        pass
+
     def parse_transaction_file_row(transaction_file):
         transaction_file_path = clerkai_file_path(transaction_file)
         results = None
@@ -90,12 +113,14 @@ def parse_transaction_files(
         def parse():
             content_type = transaction_file["Content type"]
             if not content_type:
-                raise ValueError("Transaction file has no content type set")
+                raise ContentTypeNotSetError("Transaction file has no content type set")
             if (
                 content_type not in parser_by_content_type
                 or not parser_by_content_type[content_type]
             ):
-                raise ValueError("Content type '%s' has no parser" % content_type)
+                raise ParserNotAvailableError(
+                    "Content type '%s' has no parser" % content_type
+                )
             parser = parser_by_content_type[content_type]
             # print(parser, transaction_file_path)
             transactions = parser(transaction_file_path)
@@ -121,7 +146,7 @@ def parse_transaction_files(
         if failfast:
             try:
                 results = parse()
-            except ValueError as e:
+            except (ContentTypeNotSetError, ParserNotAvailableError) as e:
                 error = e
         else:
             try:
