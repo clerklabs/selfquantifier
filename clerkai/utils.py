@@ -81,7 +81,7 @@ def possibly_edited_df_util(
         history_reference=current_history_reference(),
         create_if_not_exists=False,
     )
-    if existing:
+    if type(existing) is not bool:
         return existing
 
     # include earlier edits
