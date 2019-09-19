@@ -72,7 +72,17 @@ def possibly_edited_df_util(
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
 
-    # TODO: check if edit for the head commit already exists - in which case simply use it
+    # if edit for the head commit already exists - use it
+    existing = possibly_edited_commit_specific_df(
+        df=None,
+        export_file_name=export_file_name,
+        edits_folder_path=edits_folder_path,
+        commit_datetime=current_gitcommit_datetime(repo),
+        history_reference=current_history_reference(),
+        create_if_not_exists=False,
+    )
+    if existing:
+        return existing
 
     # include earlier edits
     _edit_files_df = list_edit_files_in_edits_folder()
@@ -154,6 +164,31 @@ def possibly_edited_commit_specific_df(
     history_reference,
     create_if_not_exists,
 ):
+    (
+        exists,
+        commit_specific_directory,
+        commit_specific_directory_path,
+        xlsx_path,
+    ) = edited_commit_specific_df_exists(
+        export_file_name, edits_folder_path, commit_datetime, history_reference
+    )
+    if not exists:
+        if create_if_not_exists:
+            save_edited_commit_specific_df(
+                df,
+                commit_specific_directory,
+                commit_specific_directory_path,
+                export_file_name,
+                xlsx_path,
+            )
+        else:
+            return False
+    return pd.read_excel(xlsx_path)
+
+
+def edited_commit_specific_df_exists(
+    export_file_name, edits_folder_path, commit_datetime, history_reference
+):
     import pytz
 
     utc_commit_datetime = commit_datetime.astimezone(pytz.utc)
@@ -165,26 +200,28 @@ def possibly_edited_commit_specific_df(
     commit_specific_directory_path = os.path.join(
         edits_folder_path, commit_specific_directory
     )
-    # print("Checking if '%s/' exists" % (commit_specific_directory))
-    if not os.path.isdir(commit_specific_directory_path):
-        if create_if_not_exists:
-            os.mkdir(commit_specific_directory_path)
-        else:
-            return False
     xlsx_path = os.path.join(commit_specific_directory_path, export_file_name)
 
     # print("Checking if '%s/%s' exists" % (commit_specific_directory, export_file_name))
-    if not os.path.isfile(xlsx_path):
-        if create_if_not_exists:
-            print("Creating '%s/%s'" % (commit_specific_directory, export_file_name))
-            export_columns = df.columns
-            with pd.ExcelWriter(xlsx_path, engine="xlsxwriter") as writer:
-                df[export_columns].to_excel(
-                    writer, sheet_name="Data", index=False, freeze_panes=(1, 0)
-                )
-        else:
-            return False
-    return pd.read_excel(os.path.join(commit_specific_directory_path, export_file_name))
+    exists = os.path.isfile(xlsx_path)
+    return exists, commit_specific_directory, commit_specific_directory_path, xlsx_path
+
+
+def save_edited_commit_specific_df(
+    df,
+    commit_specific_directory,
+    commit_specific_directory_path,
+    export_file_name,
+    xlsx_path,
+):
+    print("Creating '%s/%s'" % (commit_specific_directory, export_file_name))
+    if not os.path.isdir(commit_specific_directory_path):
+        os.mkdir(commit_specific_directory_path)
+    export_columns = df.columns
+    with pd.ExcelWriter(xlsx_path, engine="xlsxwriter") as writer:
+        df[export_columns].to_excel(
+            writer, sheet_name="Data", index=False, freeze_panes=(1, 0)
+        )
 
 
 def changes_between_two_commits(repo_base_path, from_commit, to_commit):
