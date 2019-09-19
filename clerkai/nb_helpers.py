@@ -31,7 +31,9 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
     # initiate / validate clerk.ai-folder versioning
     repo = ensure_clerkai_folder_versioning(clerkai_folder_path)
-    add_all_untracked_and_changed_files(repo)
+
+    def acknowledge_changes_in_clerkai_folder():
+        add_all_untracked_and_changed_files(repo)
 
     def current_history_reference():
         return current_gitsha1(repo)
@@ -134,7 +136,18 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             repo,
         )
 
+    def save_transaction_files_editable_data_in_transactions_folder(
+        transaction_files_editable_data_df
+    ):
+        csv = transaction_files_editable_data_df.to_csv(index=False)
+        file_path = os.path.join(
+            transactions_folder_path, "transaction_files_editable_data.csv"
+        )
+        with open(file_path, "w") as f:
+            f.write(csv)
+
     return (
+        acknowledge_changes_in_clerkai_folder,
         current_history_reference,
         list_transactions_files_in_transactions_folder,
         list_receipt_files_in_receipts_folder,
@@ -142,4 +155,5 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         list_transactions_files_in_downloads_folder,
         clerkai_file_path,
         possibly_edited_df,
+        save_transaction_files_editable_data_in_transactions_folder,
     )
