@@ -2,6 +2,8 @@ import hashlib
 import os
 from os.path import getsize, join
 
+import pandas as pd
+
 
 def ensure_clerkai_folder_versioning(clerkai_folder_path):
     from git import Repo
@@ -170,7 +172,6 @@ def possibly_edited_commit_specific_df(
         else:
             return False
     xlsx_path = os.path.join(commit_specific_directory_path, export_file_name)
-    import pandas as pd
 
     # print("Checking if '%s/%s' exists" % (commit_specific_directory, export_file_name))
     if not os.path.isfile(xlsx_path):
@@ -258,53 +259,60 @@ def merge_changes_from_previous_possibly_edited_df(
     from_commit = edit_file["Related history reference"]
     to_commit = current_history_reference()
 
-    (
-        old_to_new_paths,
-        old_now_deleted_paths,
-        old_non_existing_now_added_paths,
-    ) = changes_between_two_commits(clerkai_folder_path, from_commit, to_commit)
-
     def joined_path(record):
         return "%s/%s" % (record[file_path_column_name], record[file_name_column_name])
 
     df["clerkai_path"] = df.apply(joined_path, axis=1)
+    left_on = ["clerkai_path"]
 
-    previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
-        joined_path, axis=1
-    )
+    if from_commit != to_commit:
+        (
+            old_to_new_paths,
+            old_now_deleted_paths,
+            old_non_existing_now_added_paths,
+        ) = changes_between_two_commits(clerkai_folder_path, from_commit, to_commit)
 
-    def find_head_commit_corresponding_clerkai_path(clerkai_path):
-        clerkai_path_key = clerkai_path.replace("@/", "")
-        if clerkai_path_key in old_to_new_paths:
-            return "@/%s" % old_to_new_paths[clerkai_path_key]
-        else:
-            # if no moves occurred just use the old path as is
-            return clerkai_path
+        previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
+            joined_path, axis=1
+        )
 
-    previous_possibly_edited_df[
-        "head_commit_corresponding_clerkai_path"
-    ] = previous_possibly_edited_df["clerkai_path"].apply(
-        find_head_commit_corresponding_clerkai_path
-    )
+        def find_head_commit_corresponding_clerkai_path(clerkai_path):
+            clerkai_path_key = clerkai_path.replace("@/", "")
+            if clerkai_path_key in old_to_new_paths:
+                return "@/%s" % old_to_new_paths[clerkai_path_key]
+            else:
+                # if no moves occurred just use the old path as is
+                return clerkai_path
 
-    import pandas as pd
+        previous_possibly_edited_df[
+            "head_commit_corresponding_clerkai_path"
+        ] = previous_possibly_edited_df["clerkai_path"].apply(
+            find_head_commit_corresponding_clerkai_path
+        )
+
+        right_on = ["head_commit_corresponding_clerkai_path"]
+    else:
+        previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
+            joined_path, axis=1
+        )
+        right_on = ["clerkai_path"]
 
     suffix = " (%s)" % from_commit
 
     def add_suffix(column_name):
         return "%s%s" % (column_name, suffix)
 
-    left_on = ["clerkai_path"]
     if additional_join_column:
         left_on.append(additional_join_column)
 
-    right_on = ["head_commit_corresponding_clerkai_path"]
     if additional_join_column:
         right_on.append(additional_join_column)
 
     suffixed_previous_possibly_edited_df = previous_possibly_edited_df.add_suffix(
         suffix
     )
+
+    import pandas as pd
 
     merged_possibly_edited_df = pd.merge(
         df,
