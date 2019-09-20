@@ -69,6 +69,8 @@ def possibly_edited_df_util(
         export_file_name = "Transaction files.xlsx"
     elif record_type == "transactions":
         export_file_name = "Transactions.xlsx"
+    elif record_type == "receipt_files":
+        export_file_name = "Receipt files.xlsx"
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
 
@@ -271,7 +273,7 @@ def merge_changes_from_previous_possibly_edited_df(
     previous_possibly_edited_df = edit_file["previous_possibly_edited_df"]
 
     # set config based on record type
-    if record_type == "transaction_files":
+    if record_type == "transaction_files" or record_type == "receipt_files":
         additional_join_column = None
         file_name_column_name = "File name"
         file_path_column_name = "File path"
