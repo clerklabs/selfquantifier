@@ -43,7 +43,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         _ = list_files_in_clerk_subfolder(
             transactions_folder_path, clerkai_folder_path, repo
         )
-        _["Include"] = None
+        _["Ignore"] = None
         _["Account provider"] = None
         _["Account"] = None
         _["Content type"] = None
@@ -52,7 +52,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             [
                 "File name",
                 "File path",
-                "Include",
+                "Ignore",
                 "Account provider",
                 "Account",
                 "Content type",
