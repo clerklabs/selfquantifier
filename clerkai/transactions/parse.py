@@ -58,18 +58,22 @@ def naive_transaction_ids(transactions):
                 return None
 
         id_key_dict = {}
-        id_key_dict["date_initiated"] = none_if_nan(
-            raw_if_available("Date Initiated", transaction)
+        id_key_dict["real_date"] = none_if_nan(
+            raw_if_available("Real Date", transaction)
         )
-        id_key_dict["date_settled"] = none_if_nan(
-            raw_if_available("Date Settled", transaction)
+        id_key_dict["bank_date"] = none_if_nan(
+            raw_if_available("Bank Date", transaction)
         )
         payee = none_if_nan(raw_if_available("Payee", transaction))
-        memo = none_if_nan(raw_if_available("Memo", transaction))
+        bank_message = none_if_nan(raw_if_available("Bank Message", transaction))
         id_key_dict["amount"] = none_if_nan(raw_if_available("Amount", transaction))
         id_key_dict["balance"] = none_if_nan(raw_if_available("Balance", transaction))
         id_key_dict["payee"] = jellyfish.soundex(payee) if type(payee) is str else payee
-        id_key_dict["memo"] = jellyfish.soundex(memo) if type(memo) is str else memo
+        id_key_dict["bank_message"] = (
+            jellyfish.soundex(bank_message)
+            if type(bank_message) is str
+            else bank_message
+        )
         return json.dumps(id_key_dict, sort_keys=True, default=str, allow_nan=False)
 
     return transactions.apply(generate_naive_transaction_id, axis=1)
@@ -131,10 +135,10 @@ def parse_transaction_files(
             if not keepraw:
                 transactions = transactions.drop(
                     [
-                        "Raw Date Initiated",
-                        "Raw Date Settled",
+                        "Raw Real Date",
+                        "Raw Bank Date",
                         "Raw Payee",
-                        "Raw Memo",
+                        "Raw Bank Message",
                         "Raw Amount",
                         "Raw Balance",
                     ],

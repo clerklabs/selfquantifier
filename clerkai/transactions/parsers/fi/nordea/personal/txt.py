@@ -50,20 +50,20 @@ def import_nordea_fi_lang_se_transaction_file(transaction_file):
 def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
     # type: (DataFrame) -> DataFrame
     normalized_df = pd.DataFrame()
-    normalized_df["Raw Date Initiated"] = df["Referens"]
-    normalized_df["Raw Date Settled"] = df["Betalningsdag"]
+    normalized_df["Raw Real Date"] = df["Referens"]
+    normalized_df["Raw Bank Date"] = df["Betalningsdag"]
     normalized_df["Raw Payee"] = df["Mottagare/Betalare"]
-    normalized_df["Raw Memo"] = df["Meddelande"]
+    normalized_df["Raw Bank Message"] = df["Meddelande"]
     normalized_df["Raw Amount"] = df["Belopp"]
     normalized_df["Raw Balance"] = None
-    normalized_df["Date Initiated"] = normalized_df["Raw Date Initiated"].apply(
+    normalized_df["Real Date"] = normalized_df["Raw Real Date"].apply(
         nordea_fi_reference_number_to_datetime_obj
     )
-    normalized_df["Date Settled"] = normalized_df["Raw Date Settled"].apply(
+    normalized_df["Bank Date"] = normalized_df["Raw Bank Date"].apply(
         fi_date_to_datetime_obj
     )
     normalized_df["Payee"] = normalized_df["Raw Payee"]
-    normalized_df["Memo"] = normalized_df["Raw Memo"]
+    normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]
     normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
         convert_european_amount_to_decimal
     )
@@ -87,17 +87,17 @@ def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
     ].to_dict(orient="records")
     return normalized_df[
         [
-            "Date Initiated",
-            "Date Settled",
+            "Real Date",
+            "Bank Date",
             "Payee",
-            "Memo",
+            "Bank Message",
             "Amount",
             "Balance",
             "Original data",
-            "Raw Date Initiated",
-            "Raw Date Settled",
+            "Raw Real Date",
+            "Raw Bank Date",
             "Raw Payee",
-            "Raw Memo",
+            "Raw Bank Message",
             "Raw Amount",
             "Raw Balance",
         ]

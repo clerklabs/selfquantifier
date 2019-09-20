@@ -33,20 +33,20 @@ def import_lhv_ee_csv_transaction_file(transaction_file):
 def lhv_ee_csv_transactions_to_general_clerk_format(df):
     # type: (DataFrame) -> DataFrame
     normalized_df = pd.DataFrame()
-    normalized_df["Raw Date Initiated"] = df["Description"]
-    normalized_df["Raw Date Settled"] = df["Date"]
+    normalized_df["Raw Real Date"] = df["Description"]
+    normalized_df["Raw Bank Date"] = df["Date"]
     normalized_df["Raw Payee"] = df["Sender/receiver name"]
-    normalized_df["Raw Memo"] = df["Description"]
+    normalized_df["Raw Bank Message"] = df["Description"]
     normalized_df["Raw Amount"] = df["Amount"]
     normalized_df["Raw Balance"] = None
-    normalized_df["Date Initiated"] = normalized_df["Raw Date Initiated"].apply(
+    normalized_df["Real Date"] = normalized_df["Raw Real Date"].apply(
         lhv_ee_description_to_datetime_obj
     )
-    normalized_df["Date Settled"] = normalized_df["Raw Date Settled"].apply(
+    normalized_df["Bank Date"] = normalized_df["Raw Bank Date"].apply(
         ymd_date_to_datetime_obj
     )
     normalized_df["Payee"] = normalized_df["Raw Payee"]
-    normalized_df["Memo"] = normalized_df["Raw Memo"]
+    normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]
     normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
         amount_to_rounded_decimal
     )
@@ -76,17 +76,17 @@ def lhv_ee_csv_transactions_to_general_clerk_format(df):
     ].to_dict(orient="records")
     return normalized_df[
         [
-            "Date Initiated",
-            "Date Settled",
+            "Real Date",
+            "Bank Date",
             "Payee",
-            "Memo",
+            "Bank Message",
             "Amount",
             "Balance",
             "Original data",
-            "Raw Date Initiated",
-            "Raw Date Settled",
+            "Raw Real Date",
+            "Raw Bank Date",
             "Raw Payee",
-            "Raw Memo",
+            "Raw Bank Message",
             "Raw Amount",
             "Raw Balance",
         ]

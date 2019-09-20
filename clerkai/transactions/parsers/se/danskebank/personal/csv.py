@@ -30,7 +30,7 @@ def danskebank_se_csv_transactions_to_general_clerk_format(df):
 
     normalized_df["Date"] = df["Bokföringsdag"].apply(ymd_date_to_datetime_obj)
     normalized_df["Payee"] = None
-    normalized_df["Memo"] = df["Specifikation"]
+    normalized_df["Bank Message"] = df["Specifikation"]
     normalized_df["Amount"] = df["Belopp"].apply(amount_to_rounded_decimal)
     normalized_df["Balance"] = df["Saldo"].apply(amount_to_rounded_decimal)
 
@@ -38,7 +38,7 @@ def danskebank_se_csv_transactions_to_general_clerk_format(df):
         ["Bokföringsdag", "Specifikation", "Belopp", "Saldo", "Status", "Avstämt"]
     ].to_dict(orient="records")
     return normalized_df[
-        ["Date", "Payee", "Memo", "Amount", "Balance", "Original data"]
+        ["Date", "Payee", "Bank Message", "Amount", "Balance", "Original data"]
     ]
 
 

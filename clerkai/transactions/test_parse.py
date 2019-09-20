@@ -7,16 +7,16 @@ from clerkai.transactions.parse import (naive_transaction_id_duplicate_nums,
 
 transactions_df = pd.DataFrame(
     {
-        "Raw Date Initiated": [None],
-        "Raw Date Settled": ["2019/05/02"],
+        "Raw Real Date": [None],
+        "Raw Bank Date": ["2019/05/02"],
         "Raw Payee": ["Acme-Industries 123 Inc"],
-        "Raw Memo": ["Foo"],
+        "Raw Bank Message": ["Foo"],
         "Raw Amount": ["3.000,12"],
         "Raw Balance": [None],
-        "Date Initiated": [None],
-        "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+        "Real Date": [None],
+        "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
         "Payee": ["Acme-Industries 123 Inc"],
-        "Memo": ["Foo"],
+        "Bank Message": ["Foo"],
         "Amount": [3000.12],
         "Balance": [None],
     }
@@ -24,16 +24,16 @@ transactions_df = pd.DataFrame(
 
 transactions_with_nan_df = pd.DataFrame(
     {
-        "Raw Date Initiated": [float("NaN")],
-        "Raw Date Settled": ["2019/05/02"],
+        "Raw Real Date": [float("NaN")],
+        "Raw Bank Date": ["2019/05/02"],
         "Raw Payee": ["Acme-Industries 123 Inc"],
-        "Raw Memo": ["Foo"],
+        "Raw Bank Message": ["Foo"],
         "Raw Amount": ["3.000,12"],
         "Raw Balance": [None],
-        "Date Initiated": [None],
-        "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+        "Real Date": [None],
+        "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
         "Payee": ["Acme-Industries 123 Inc"],
-        "Memo": ["Foo"],
+        "Bank Message": ["Foo"],
         "Amount": [3000.12],
         "Balance": [None],
     }
@@ -41,10 +41,10 @@ transactions_with_nan_df = pd.DataFrame(
 
 transactions_without_raw_columns_df = pd.DataFrame(
     {
-        "Date Initiated": [None],
-        "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+        "Real Date": [None],
+        "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
         "Payee": ["Acme-Industries 123 Inc"],
-        "Memo": ["Foo"],
+        "Bank Message": ["Foo"],
         "Amount": [3000.12],
         "Balance": [None],
     }
@@ -52,7 +52,7 @@ transactions_without_raw_columns_df = pd.DataFrame(
 
 transactions_without_raw_columns_and_some_core_columns_df = pd.DataFrame(
     {
-        "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+        "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
         "Payee": ["Acme-Industries 123 Inc"],
         "Amount": [3000.12],
         "Balance": [None],
@@ -65,22 +65,22 @@ def test_naive_transaction_ids():
     df["naive_transaction_id"] = naive_transaction_ids(df)
     expected = pd.DataFrame(
         {
-            "Raw Date Initiated": [None],
-            "Raw Date Settled": ["2019/05/02"],
+            "Raw Real Date": [None],
+            "Raw Bank Date": ["2019/05/02"],
             "Raw Payee": ["Acme-Industries 123 Inc"],
-            "Raw Memo": ["Foo"],
+            "Raw Bank Message": ["Foo"],
             "Raw Amount": ["3.000,12"],
             "Raw Balance": [None],
-            "Date Initiated": [None],
-            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Real Date": [None],
+            "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
             "Payee": ["Acme-Industries 123 Inc"],
-            "Memo": ["Foo"],
+            "Bank Message": ["Foo"],
             "Amount": [3000.12],
             "Balance": [None],
             "naive_transaction_id": [
                 (
-                    '{"amount": "3.000,12", "balance": null, "date_initiated": null, "date_settled":'
-                    ' "2019/05/02", "memo": "F000", "payee": "A255"}'
+                    '{"amount": "3.000,12", "balance": null, "bank_date": "2019/05/02", '
+                    '"bank_message": "F000", "payee": "A255", "real_date": null}'
                 )
             ],
         }
@@ -93,22 +93,22 @@ def test_naive_transaction_ids_with_nan():
     df["naive_transaction_id"] = naive_transaction_ids(df)
     expected = pd.DataFrame(
         {
-            "Raw Date Initiated": [float("NaN")],
-            "Raw Date Settled": ["2019/05/02"],
+            "Raw Real Date": [float("NaN")],
+            "Raw Bank Date": ["2019/05/02"],
             "Raw Payee": ["Acme-Industries 123 Inc"],
-            "Raw Memo": ["Foo"],
+            "Raw Bank Message": ["Foo"],
             "Raw Amount": ["3.000,12"],
             "Raw Balance": [None],
-            "Date Initiated": [None],
-            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Real Date": [None],
+            "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
             "Payee": ["Acme-Industries 123 Inc"],
-            "Memo": ["Foo"],
+            "Bank Message": ["Foo"],
             "Amount": [3000.12],
             "Balance": [None],
             "naive_transaction_id": [
                 (
-                    '{"amount": "3.000,12", "balance": null, "date_initiated": null, "date_settled":'
-                    ' "2019/05/02", "memo": "F000", "payee": "A255"}'
+                    '{"amount": "3.000,12", "balance": null, "bank_date": "2019/05/02", '
+                    '"bank_message": "F000", "payee": "A255", "real_date": null}'
                 )
             ],
         }
@@ -123,16 +123,16 @@ def test_naive_transaction_ids_without_raw_columns():
     df["naive_transaction_id"] = naive_transaction_ids(df)
     expected = pd.DataFrame(
         {
-            "Date Initiated": [None],
-            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Real Date": [None],
+            "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
             "Payee": ["Acme-Industries 123 Inc"],
-            "Memo": ["Foo"],
+            "Bank Message": ["Foo"],
             "Amount": [3000.12],
             "Balance": [None],
             "naive_transaction_id": [
                 (
-                    '{"amount": 3000.12, "balance": null, "date_initiated": null, "date_settled":'
-                    ' "2019-05-02 00:00:00", "memo": "F000", "payee": "A255"}'
+                    '{"amount": 3000.12, "balance": null, "bank_date": "2019-05-02 00:00:00", '
+                    '"bank_message": "F000", "payee": "A255", "real_date": null}'
                 )
             ],
         }
@@ -145,14 +145,14 @@ def test_naive_transaction_ids_without_raw_columns_and_some_core_columns():
     df["naive_transaction_id"] = naive_transaction_ids(df)
     expected = pd.DataFrame(
         {
-            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
             "Payee": ["Acme-Industries 123 Inc"],
             "Amount": [3000.12],
             "Balance": [None],
             "naive_transaction_id": [
                 (
-                    '{"amount": 3000.12, "balance": null, "date_initiated": null, "date_settled":'
-                    ' "2019-05-02 00:00:00", "memo": null, "payee": "A255"}'
+                    '{"amount": 3000.12, "balance": null, "bank_date": "2019-05-02 00:00:00",'
+                    ' "bank_message": null, "payee": "A255", "real_date": null}'
                 )
             ],
         }
@@ -192,22 +192,22 @@ def test_naive_transaction_id_duplicate_nums():
     df2["naive_transaction_id_duplicate_num"] = naive_transaction_id_duplicate_nums(df2)
     expected = pd.DataFrame(
         {
-            "Raw Date Initiated": [None],
-            "Raw Date Settled": ["2019/05/02"],
+            "Raw Real Date": [None],
+            "Raw Bank Date": ["2019/05/02"],
             "Raw Payee": ["Acme-Industries 123 Inc"],
-            "Raw Memo": ["Foo"],
+            "Raw Bank Message": ["Foo"],
             "Raw Amount": ["3.000,12"],
             "Raw Balance": [None],
-            "Date Initiated": [None],
-            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Real Date": [None],
+            "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
             "Payee": ["Acme-Industries 123 Inc"],
-            "Memo": ["Foo"],
+            "Bank Message": ["Foo"],
             "Amount": [3000.12],
             "Balance": [None],
             "naive_transaction_id": [
                 (
-                    '{"amount": "3.000,12", "balance": null, "date_initiated": null, "date_settled":'
-                    ' "2019/05/02", "memo": "F000", "payee": "A255"}'
+                    '{"amount": "3.000,12", "balance": null, "bank_date": "2019/05/02", '
+                    '"bank_message": "F000", "payee": "A255", "real_date": null}'
                 )
             ],
             "naive_transaction_id_duplicate_num": [1],
@@ -221,22 +221,22 @@ def test_transaction_ids():
     df["ID"] = transaction_ids(df)
     expected = pd.DataFrame(
         {
-            "Raw Date Initiated": [None],
-            "Raw Date Settled": ["2019/05/02"],
+            "Raw Real Date": [None],
+            "Raw Bank Date": ["2019/05/02"],
             "Raw Payee": ["Acme-Industries 123 Inc"],
-            "Raw Memo": ["Foo"],
+            "Raw Bank Message": ["Foo"],
             "Raw Amount": ["3.000,12"],
             "Raw Balance": [None],
-            "Date Initiated": [None],
-            "Date Settled": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
+            "Real Date": [None],
+            "Bank Date": [datetime.strptime("2019/05/02", "%Y/%m/%d")],
             "Payee": ["Acme-Industries 123 Inc"],
-            "Memo": ["Foo"],
+            "Bank Message": ["Foo"],
             "Amount": [3000.12],
             "Balance": [None],
             "ID": [
                 (
-                    '{"ref": {"amount": "3.000,12", "balance": null, "date_initiated": null, '
-                    '"date_settled": "2019/05/02", "memo": "F000", "payee": "A255"}, "ord": 1}'
+                    '{"ref": {"amount": "3.000,12", "balance": null, "bank_date": "2019/05/02",'
+                    ' "bank_message": "F000", "payee": "A255", "real_date": null}, "ord": 1}'
                 )
             ],
         }
