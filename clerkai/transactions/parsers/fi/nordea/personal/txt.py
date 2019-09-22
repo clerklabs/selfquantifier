@@ -23,7 +23,7 @@ def nordea_fi_reference_number_to_datetime_obj(reference_number):
     return datetime_obj
 
 
-def import_nordea_fi_lang_se_transaction_file(transaction_file):
+def import_nordea_fi_lang_se_txt_transaction_file(transaction_file):
     # type: (str) -> DataFrame
     with open(transaction_file, "rb") as f:
         contents = f.read()
@@ -47,7 +47,7 @@ def import_nordea_fi_lang_se_transaction_file(transaction_file):
     )
 
 
-def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
+def nordea_fi_lang_se_txt_transactions_to_general_clerk_format(df):
     # type: (DataFrame) -> DataFrame
     normalized_df = pd.DataFrame()
     normalized_df["Raw Real Date"] = df["Referens"]
@@ -104,7 +104,7 @@ def nordea_fi_lang_se_transactions_to_general_clerk_format(df):
     ]
 
 
-def nordea_fi_lang_se_transactions_parser(transaction_file):
+def nordea_fi_lang_se_txt_transactions_parser(transaction_file):
     # type: (str) -> DataFrame
-    df = import_nordea_fi_lang_se_transaction_file(transaction_file)
-    return nordea_fi_lang_se_transactions_to_general_clerk_format(df)
+    df = import_nordea_fi_lang_se_txt_transaction_file(transaction_file)
+    return nordea_fi_lang_se_txt_transactions_to_general_clerk_format(df)

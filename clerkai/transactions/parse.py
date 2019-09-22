@@ -5,19 +5,19 @@ import pandas as pd
 from clerkai.transactions.parsers.ee.lhv.csv import \
     lhv_ee_csv_transactions_parser
 from clerkai.transactions.parsers.fi.nordea.personal.txt import \
-    nordea_fi_lang_se_transactions_parser
+    nordea_fi_lang_se_txt_transactions_parser
 from clerkai.transactions.parsers.international.xolo.csv import \
     xolo_csv_transactions_parser
 from clerkai.transactions.parsers.parse_utils import is_nan
 from clerkai.transactions.parsers.se.danskebank.personal.csv import \
     danskebank_se_csv_transactions_parser
 
-nordea_fi_lang_fi_transactions_parser = None
 nordea_se_transactions_parser = None
+nordea_fi_lang_fi_txt_transactions_parser = None
 
 parser_by_content_type = {
-    "exported-transaction-file/nordea.fi.natbanken-privat.xls": nordea_fi_lang_se_transactions_parser,
-    "exported-transaction-file/nordea.fi.verkopankki-henkiloasiakkaat.xls": nordea_fi_lang_fi_transactions_parser,
+    "exported-transaction-file/nordea.fi.natbanken-privat.xls": nordea_fi_lang_se_txt_transactions_parser,
+    "exported-transaction-file/nordea.fi.verkopankki-henkiloasiakkaat.xls": nordea_fi_lang_fi_txt_transactions_parser,
     "exported-transaction-file/lhv.ee.account-statement.csv": lhv_ee_csv_transactions_parser,
     "exported-transaction-file/nordea.se.internetbanken-privat.xls": nordea_se_transactions_parser,
     "exported-transaction-file/danskebank.se.csv": danskebank_se_csv_transactions_parser,

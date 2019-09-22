@@ -480,5 +480,5 @@ def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path, repo):
             lambda root: root.replace(clerkai_folder_path, "@/")
         )
         # ignore *_editable_data.csv
-        _ = _[~_["File name"].str.contains('_editable_data.csv$', regex=True)]
+        _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]
     return _

@@ -65,8 +65,11 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         _ = list_files_in_clerk_subfolder(
             receipts_folder_path, clerkai_folder_path, repo
         )
+        _["Ignore"] = None
         _["History reference"] = current_history_reference()
-        return _
+        return _[
+            ["File name", "File path", "Ignore", "File metadata", "History reference"]
+        ]
 
     def list_edit_files_in_edits_folder():
         _ = list_files_in_clerk_subfolder(edits_folder_path, clerkai_folder_path, repo)
