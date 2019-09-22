@@ -400,9 +400,15 @@ def propagate_previous_edits_from_across_columns(
                     column_name
                 ] = df_where_column_is_null[column_name]
             else:
-                df_with_previous_edits_across_columns[
-                    column_name
-                ] = df_with_previous_edits_across_columns[suffixed_column_name]
+                if (
+                    suffixed_column_name
+                    in df_with_previous_edits_across_columns.columns
+                ):
+                    df_with_previous_edits_across_columns[
+                        column_name
+                    ] = df_with_previous_edits_across_columns[suffixed_column_name]
+                else:
+                    df_with_previous_edits_across_columns[column_name] = None
         # print("df_with_previous_edits_across_columns.head()", df_with_previous_edits_across_columns.head())
 
     return df_with_previous_edits_across_columns
