@@ -13,18 +13,20 @@ def banknorwegian_se_xlsx_transactions_to_general_clerk_format(df):
     normalized_df["Raw Bank Message"] = df["Text"]
     normalized_df["Raw Amount"] = df["Amount"]
     normalized_df["Raw Balance"] = None
-    normalized_df["Raw Currency"] = df["Currency"]
-    normalized_df["Raw Currency Amount"] = df["Currency Amount"]
-    normalized_df["Raw Currency Rate"] = df["Currency Rate"]
+    normalized_df["Raw Foreign Currency"] = df["Currency"]
+    normalized_df["Raw Foreign Currency Amount"] = df["Currency Amount"]
+    normalized_df["Raw Foreign Currency Rate"] = df["Currency Rate"]
     normalized_df["Real Date"] = normalized_df["Raw Real Date"]
     normalized_df["Bank Date"] = normalized_df["Raw Bank Date"]
     normalized_df["Payee"] = normalized_df["Raw Payee"]
     normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]
     normalized_df["Amount"] = normalized_df["Raw Amount"]
     normalized_df["Balance"] = normalized_df["Raw Balance"]
-    normalized_df["Currency"] = normalized_df["Raw Currency"]
-    normalized_df["Currency Amount"] = normalized_df["Raw Currency Amount"]
-    normalized_df["Currency Rate"] = normalized_df["Raw Currency Rate"]
+    normalized_df["Foreign Currency"] = normalized_df["Raw Foreign Currency"]
+    normalized_df["Foreign Currency Amount"] = normalized_df[
+        "Raw Foreign Currency Amount"
+    ]
+    normalized_df["Foreign Currency Rate"] = normalized_df["Raw Foreign Currency Rate"]
     normalized_df["Original data"] = df[
         [
             "TransactionDate",
@@ -48,9 +50,9 @@ def banknorwegian_se_xlsx_transactions_to_general_clerk_format(df):
             "Bank Message",
             "Amount",
             "Balance",
-            # "Currency",
-            # "Doc Status",
-            # "Payment Status",
+            "Foreign Currency",
+            "Foreign Currency Amount",
+            "Foreign Currency Rate",
             "Original data",
             "Raw Real Date",
             "Raw Bank Date",
@@ -58,9 +60,9 @@ def banknorwegian_se_xlsx_transactions_to_general_clerk_format(df):
             "Raw Bank Message",
             "Raw Amount",
             "Raw Balance",
-            # "Raw Currency",
-            # "Raw Doc Status",
-            # "Raw Payment Status",
+            "Raw Foreign Currency",
+            "Raw Foreign Currency Amount",
+            "Raw Foreign Currency Rate",
         ]
     ]
 
