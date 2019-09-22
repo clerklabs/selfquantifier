@@ -146,9 +146,16 @@ def parse_transaction_files(
                         "Raw Payee",
                         "Raw Bank Message",
                         "Raw Amount",
+                        "Raw Currency",
                         "Raw Balance",
+                        "Raw Foreign Currency",
+                        "Raw Foreign Currency Amount",
+                        "Raw Foreign Currency Rate",
+                        "Raw Doc Status",
+                        "Raw Payment Status",
                     ],
                     axis=1,
+                    errors="ignore",
                 )
             return transactions
 

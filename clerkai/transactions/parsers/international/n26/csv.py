@@ -83,5 +83,4 @@ def n26_csv_transactions_to_general_clerk_format(df):
 def n26_csv_transactions_parser(transaction_file):
     # type: (str) -> DataFrame
     df = import_n26_csv_transaction_file(transaction_file)
-    print(df, df.columns)
     return n26_csv_transactions_to_general_clerk_format(df)
