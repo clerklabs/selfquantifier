@@ -2,6 +2,10 @@
 pandas
 jellyfish
 
+# for panda's df.to_excel()
+openpyxl
+xlsxwriter
+
 # for git-related util functions
 GitPython
 pydriller
