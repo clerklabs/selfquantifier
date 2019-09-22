@@ -6,6 +6,9 @@ jellyfish
 openpyxl
 xlsxwriter
 
+# for panda's df.read_excel()
+xlrd
+
 # for git-related util functions
 GitPython
 pydriller
