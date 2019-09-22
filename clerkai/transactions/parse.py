@@ -6,6 +6,9 @@ from clerkai.transactions.parsers.ee.lhv.csv import \
     lhv_ee_csv_transactions_parser
 from clerkai.transactions.parsers.fi.nordea.personal.txt import \
     nordea_fi_lang_se_transactions_parser
+from clerkai.transactions.parsers.international.xolo.csv import \
+    xolo_csv_transactions_parser
+from clerkai.transactions.parsers.parse_utils import is_nan
 from clerkai.transactions.parsers.se.danskebank.personal.csv import \
     danskebank_se_csv_transactions_parser
 
@@ -18,6 +21,7 @@ parser_by_content_type = {
     "exported-transaction-file/lhv.ee.account-statement.csv": lhv_ee_csv_transactions_parser,
     "exported-transaction-file/nordea.se.internetbanken-privat.xls": nordea_se_transactions_parser,
     "exported-transaction-file/danskebank.se.csv": danskebank_se_csv_transactions_parser,
+    "exported-transaction-file/xolo.io.expenses.csv": xolo_csv_transactions_parser,
     "exported-transaction-file/avanza.se.transaktioner.csv": None,
     "exported-transaction-file/norwegianreward.se.via-dataminer.xlsx": None,
     "exported-transaction-file/nordea.se.internetbanken-foretag.xls": None,
@@ -30,13 +34,6 @@ parser_by_content_type = {
 
 def naive_transaction_ids(transactions):
     import jellyfish
-    import math
-
-    def is_nan(x):
-        try:
-            return math.isnan(x)
-        except TypeError:
-            return False
 
     def generate_naive_transaction_id(transaction):
         def none_if_nan(x):
@@ -113,6 +110,9 @@ def parse_transaction_files(
         transaction_file_path = clerkai_file_path(transaction_file)
         results = None
         error = None
+
+        if failfast:
+            print("transaction_file", transaction_file)
 
         def parse():
             content_type = transaction_file["Content type"]
