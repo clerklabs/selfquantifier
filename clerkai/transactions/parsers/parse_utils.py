@@ -11,9 +11,10 @@ def amount_to_rounded_decimal(amount):
     return Decimal(amount).quantize(TWO_PLACES)
 
 
+# 195.689,01 -> Decimal(195689.01)
 def convert_european_amount_to_decimal(value):
     # type: (Union[float, str]) -> Decimal
-    value = str(value).replace(",", ".")
+    value = str(value).replace(".", "").replace(",", ".")
     return amount_to_rounded_decimal(value)
 
 

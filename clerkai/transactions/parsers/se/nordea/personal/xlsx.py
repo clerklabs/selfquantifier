@@ -1,6 +1,7 @@
 import pandas as pd
 
-from clerkai.transactions.parsers.parse_utils import ymd_date_to_datetime_obj
+from clerkai.transactions.parsers.parse_utils import (
+    convert_european_amount_to_decimal, ymd_date_to_datetime_obj)
 
 
 def import_nordea_se_xlsx_transaction_file(transaction_file):
@@ -24,8 +25,12 @@ def nordea_se_xlsx_transactions_to_general_clerk_format(df):
     )
     normalized_df["Payee"] = normalized_df["Raw Payee"]
     normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]
-    normalized_df["Amount"] = normalized_df["Raw Amount"]
-    normalized_df["Balance"] = normalized_df["Raw Balance"]
+    normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
+        convert_european_amount_to_decimal
+    )
+    normalized_df["Balance"] = normalized_df["Raw Balance"].apply(
+        convert_european_amount_to_decimal
+    )
     # normalized_df["Currency"] = normalized_df["Raw Currency"]
     # normalized_df["Doc Status"] = normalized_df["Raw Doc Status"]
     # normalized_df["Payment Status"] = normalized_df["Raw Payment Status"]

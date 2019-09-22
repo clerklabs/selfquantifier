@@ -19,12 +19,16 @@ def test_amount_to_rounded_decimal():
 
 def test_convert_european_amount_to_decimal():
     # type: () -> None
-    foo = convert_european_amount_to_decimal("123.45")
-    assert foo == Decimal("123.45")
+    # eu formats:
     foo = convert_european_amount_to_decimal("123,45")
     assert foo == Decimal("123.45")
+    foo = convert_european_amount_to_decimal("1.123,45")
+    assert foo == Decimal("1123.45")
+    # not eu formats:
+    foo = convert_european_amount_to_decimal("123.45")
+    assert foo == Decimal("12345.00")
     foo = convert_european_amount_to_decimal(123.45)
-    assert foo == Decimal("123.45")
+    assert foo == Decimal("12345.00")
 
 
 def test_read_csv_with_decimal():
