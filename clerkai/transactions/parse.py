@@ -9,6 +9,8 @@ from clerkai.transactions.parsers.fi.nordea.personal.txt import \
 from clerkai.transactions.parsers.international.xolo.csv import \
     xolo_csv_transactions_parser
 from clerkai.transactions.parsers.parse_utils import is_nan
+from clerkai.transactions.parsers.se.banknorwegian.xlsx import \
+    banknorwegian_se_xlsx_transactions_parser
 from clerkai.transactions.parsers.se.danskebank.personal.csv import \
     danskebank_se_csv_transactions_parser
 from clerkai.transactions.parsers.se.nordea.personal.xlsx import \
@@ -26,7 +28,7 @@ parser_by_content_type = {
     "exported-transaction-file/avanza.se.transaktioner.csv": None,
     "exported-transaction-file/norwegianreward.se.via-dataminer.xlsx": None,
     "exported-transaction-file/nordea.se.internetbanken-foretag.xls": None,
-    "exported-transaction-file/banknorwegian.se.xlsx": None,
+    "exported-transaction-file/banknorwegian.se.xlsx": banknorwegian_se_xlsx_transactions_parser,
     "exported-transaction-file/clerk.ai.general-transactions-format.xlsx": None,
     "exported-transaction-file/paypal.com.activity-report.csv": None,
     "exported-transaction-file/skatteverket.se.skattekonto": None,
