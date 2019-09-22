@@ -30,7 +30,7 @@ def add_all_untracked_and_changed_files(repo):
     with open(
         os.path.join(repo.working_tree_dir, ".git", "info", "exclude"), "w"
     ) as text_file:
-        text_file.write("Edits\n")
+        text_file.write("Edits\n.~lock.*\n")
     repo.git.add("-A")
     uncommited_changes = repo.git.status("--porcelain")
     if uncommited_changes != "":

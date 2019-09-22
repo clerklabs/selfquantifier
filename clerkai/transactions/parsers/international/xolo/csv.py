@@ -1,7 +1,8 @@
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from clerkai.transactions.parsers.parse_utils import ymd_date_to_datetime_obj
+from clerkai.transactions.parsers.parse_utils import (
+    amount_to_rounded_decimal, ymd_date_to_datetime_obj)
 
 
 def import_xolo_csv_transaction_file(transaction_file):
@@ -36,8 +37,10 @@ def xolo_csv_transactions_to_general_clerk_format(df):
     )
     normalized_df["Payee"] = df.apply(xolo_expenses_vendor_category_bug_fixer, axis=1)
     normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]
-    normalized_df["Amount"] = normalized_df["Raw Amount"]
-    normalized_df["Balance"] = normalized_df["Raw Balance"]
+    normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
+        amount_to_rounded_decimal
+    )
+    normalized_df["Balance"] = None
     normalized_df["Currency"] = normalized_df["Raw Currency"]
     normalized_df["Doc Status"] = normalized_df["Raw Doc Status"]
     normalized_df["Payment Status"] = normalized_df["Raw Payment Status"]

@@ -33,12 +33,14 @@ def n26_csv_transactions_to_general_clerk_format(df):
         amount_to_rounded_decimal
     )
     normalized_df["Currency"] = "EUR"
-    normalized_df["Balance"] = normalized_df["Raw Balance"]
+    normalized_df["Balance"] = None
     normalized_df["Foreign Currency"] = normalized_df["Raw Foreign Currency"]
     normalized_df["Foreign Currency Amount"] = normalized_df[
         "Raw Foreign Currency Amount"
-    ]
-    normalized_df["Foreign Currency Rate"] = normalized_df["Raw Foreign Currency Rate"]
+    ].apply(amount_to_rounded_decimal)
+    normalized_df["Foreign Currency Rate"] = normalized_df[
+        "Raw Foreign Currency Rate"
+    ].apply(amount_to_rounded_decimal, accuracy=14)
     normalized_df["Original data"] = df[
         [
             "Date",

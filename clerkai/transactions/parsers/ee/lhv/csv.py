@@ -45,7 +45,7 @@ def lhv_ee_csv_transactions_to_general_clerk_format(df):
     normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
         amount_to_rounded_decimal
     )
-    normalized_df["Balance"] = normalized_df["Raw Balance"]
+    normalized_df["Balance"] = None
     normalized_df["Original data"] = df[
         [
             "Customer account no",

@@ -118,7 +118,11 @@ def parse_transaction_files(
         error = None
 
         if failfast:
-            print("transaction_file", transaction_file)
+            print(
+                "transaction_file",
+                "%s/%s"
+                % (transaction_file["File path"], transaction_file["File name"]),
+            )
 
         def parse():
             content_type = transaction_file["Content type"]

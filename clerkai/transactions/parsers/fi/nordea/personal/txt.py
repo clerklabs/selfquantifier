@@ -67,7 +67,7 @@ def nordea_fi_lang_se_txt_transactions_to_general_clerk_format(df):
     normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
         convert_european_amount_to_decimal
     )
-    normalized_df["Balance"] = normalized_df["Raw Balance"]
+    normalized_df["Balance"] = None
     normalized_df["Original data"] = df[
         [
             "Bokningsdag",
