@@ -220,9 +220,61 @@ def save_edited_commit_specific_df(
     if not os.path.isdir(commit_specific_directory_path):
         os.mkdir(commit_specific_directory_path)
     export_columns = df.columns
+    export_df = df[export_columns]
+    from xlsxwriter.utility import xl_col_to_name
+
     with pd.ExcelWriter(xlsx_path, engine="xlsxwriter") as writer:
-        df[export_columns].to_excel(
-            writer, sheet_name="Data", index=False, freeze_panes=(1, 0)
+        export_df["Account"] = (
+            '=INDIRECT("R[0]C[%s]", 0)&" - "&INDIRECT("R[0]C[%s]", 0)'
+            % (
+                export_df.columns.get_loc("Source transaction file: Account provider"),
+                export_df.columns.get_loc("Source transaction file: Account"),
+            )
+        )
+        date_formula = '=IF(INDIRECT("R[0]C[-2]", FALSE)<>"",INDIRECT("R[0]C[-2]", FALSE),INDIRECT("R[0]C[-1]", FALSE))'
+        export_df["Date"] = date_formula
+        export_df[
+            "Year"
+        ] = '=IF(INDIRECT("R[0]C[-1]", FALSE)="","",Text(INDIRECT("R[0]C[-1]", FALSE), "yyyy"))'
+        export_df[
+            "Month"
+        ] = '=IF(INDIRECT("R[0]C[-2]", FALSE)="","",Text(INDIRECT("R[0]C[-2]", FALSE), "yyyy-mm"))'
+        export_df.to_excel(writer, sheet_name="Data", index=False, freeze_panes=(1, 0))
+        # adjust styles etc
+        workbook = writer.book
+        worksheet = workbook.get_worksheet_by_name("Data")
+        default_column_width = 10
+        account_column_index = export_df.columns.get_loc("Account")
+        date_column_index = export_df.columns.get_loc("Date")
+        # account column
+        account_column_letter = xl_col_to_name(account_column_index)
+        worksheet.set_column(
+            "%s:%s" % (account_column_letter, account_column_letter), 30
+        )
+        # columns between account column and date column
+        worksheet.set_column(
+            "%s:%s"
+            % (
+                xl_col_to_name(account_column_index + 1),
+                xl_col_to_name(date_column_index - 1),
+            ),
+            default_column_width,
+        )
+        # date column
+        date_format = workbook.add_format({"num_format": "yyyy-mm-dd"})
+        date_column_letter = xl_col_to_name(date_column_index)
+        last_row_number = len(export_df) + 2
+        for row in range(2, last_row_number):
+            worksheet.write(
+                "%s%s" % (date_column_letter, row), date_formula, date_format
+            )
+        worksheet.set_column("%s:%s" % (date_column_letter, date_column_letter), 20)
+        # columns from date column to end
+        last_column_index = len(export_df.columns) - 1
+        last_column_letter = xl_col_to_name(last_column_index)
+        worksheet.set_column(
+            "%s:%s" % (xl_col_to_name(date_column_index + 1), last_column_letter),
+            default_column_width,
         )
 
 
