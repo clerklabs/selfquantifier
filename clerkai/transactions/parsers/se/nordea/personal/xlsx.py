@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas as pd
 
 from clerkai.transactions.parsers.parse_utils import (
@@ -8,15 +10,31 @@ def import_nordea_se_xlsx_transaction_file(transaction_file):
     return pd.read_excel(transaction_file)
 
 
+def nordea_se_transaction_text_to_datetime_obj(description_str):
+    import re
+
+    p = re.compile("^Kortköp (\\d{6})", re.IGNORECASE)
+    m = p.search(description_str)
+    if m and len(m.groups()) > 0:
+        datetime_str = m.groups()[0]
+    else:
+        return None
+    datetime_obj = datetime.strptime(datetime_str, "%y%m%d")
+    return datetime_obj
+
+
 def nordea_se_xlsx_transactions_to_general_clerk_format(df):
     normalized_df = pd.DataFrame()
+    # Opting not to set Transaktion here even though it sometimes contains the date
     normalized_df["Raw Real Date"] = None
     normalized_df["Raw Bank Date"] = df["Datum"]
     normalized_df["Raw Payee"] = df["Transaktion"]
     normalized_df["Raw Bank Message"] = df["Kategori"]
     normalized_df["Raw Amount"] = df["Belopp"]
     normalized_df["Raw Balance"] = df["Saldo"]
-    normalized_df["Real Date"] = normalized_df["Raw Real Date"]
+    normalized_df["Real Date"] = df["Transaktion"].apply(
+        nordea_se_transaction_text_to_datetime_obj
+    )
     normalized_df["Bank Date"] = normalized_df["Raw Bank Date"].apply(
         ymd_date_to_datetime_obj
     )

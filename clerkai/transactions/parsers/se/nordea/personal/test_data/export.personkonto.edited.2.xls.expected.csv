@@ -1,0 +1,5 @@
+Real Date,Bank Date,Payee,Bank Message,Amount,Balance,Original data,Raw Real Date,Raw Bank Date,Raw Payee,Raw Bank Message,Raw Amount,Raw Balance
+2019-05-31,2019-06-03,Kortköp 190531 LIM,,-59.06,173066.59,"{'Datum': '2019-06-03', 'Transaktion': 'Kortköp 190531 LIM', 'Kategori': nan, 'Belopp': '-59,06', 'Saldo': '173.066,59'}",,2019-06-03,Kortköp 190531 LIM,,"-59,06","173.066,59"
+2019-05-31,2019-06-03,Kortköp 190531 LIM,,-77.32,173125.65,"{'Datum': '2019-06-03', 'Transaktion': 'Kortköp 190531 LIM', 'Kategori': nan, 'Belopp': '-77,32', 'Saldo': '173.125,65'}",,2019-06-03,Kortköp 190531 LIM,,"-77,32","173.125,65"
+,2019-06-01,Vardagspaket Månadspris kort,,-24.00,173202.97,"{'Datum': '2019-06-01', 'Transaktion': 'Vardagspaket Månadspris kort', 'Kategori': nan, 'Belopp': '-24,00', 'Saldo': '173.202,97'}",,2019-06-01,Vardagspaket Månadspris kort,,"-24,00","173.202,97"
+,2019-05-31,Autogiro FRIENDS,,-100.00,173226.97,"{'Datum': '2019-05-31', 'Transaktion': 'Autogiro FRIENDS', 'Kategori': nan, 'Belopp': '-100,00', 'Saldo': '173.226,97'}",,2019-05-31,Autogiro FRIENDS,,"-100,00","173.226,97"
