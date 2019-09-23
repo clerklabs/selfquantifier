@@ -389,26 +389,26 @@ def propagate_previous_edits_from_across_columns(
         suffix = " (%s)" % history_reference
         for column_name in editable_columns:
             suffixed_column_name = "%s%s" % (column_name, suffix)
-            if column_name in df_with_previous_edits_across_columns.columns:
-                df_where_column_is_null = df_with_previous_edits_across_columns[
-                    df_with_previous_edits_across_columns[column_name].isnull()
-                ]
-                df_where_column_is_null[
-                    column_name
-                ] = df_with_previous_edits_across_columns[suffixed_column_name]
-                df_with_previous_edits_across_columns[
-                    column_name
-                ] = df_where_column_is_null[column_name]
+            if (
+                suffixed_column_name
+                not in df_with_previous_edits_across_columns.columns
+            ):
+                pass
             else:
-                if (
-                    suffixed_column_name
-                    in df_with_previous_edits_across_columns.columns
-                ):
+                if column_name in df_with_previous_edits_across_columns.columns:
+                    df_where_column_is_null = df_with_previous_edits_across_columns[
+                        df_with_previous_edits_across_columns[column_name].isnull()
+                    ]
+                    df_where_column_is_null[
+                        column_name
+                    ] = df_with_previous_edits_across_columns[suffixed_column_name]
+                    df_with_previous_edits_across_columns[
+                        column_name
+                    ] = df_where_column_is_null[column_name]
+                else:
                     df_with_previous_edits_across_columns[
                         column_name
                     ] = df_with_previous_edits_across_columns[suffixed_column_name]
-                else:
-                    df_with_previous_edits_across_columns[column_name] = None
         # print("df_with_previous_edits_across_columns.head()", df_with_previous_edits_across_columns.head())
 
     return df_with_previous_edits_across_columns
