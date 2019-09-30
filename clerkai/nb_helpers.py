@@ -128,7 +128,11 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             )
 
             def commit_datetime_from_history_reference(history_reference):
-                return commits[history_reference].author_date
+                first_matching_commit_history_reference_key = next(
+                    filter(lambda _: _.startswith(history_reference), commits.keys()),
+                    False,
+                )
+                return commits[first_matching_commit_history_reference_key].author_date
 
             _["Related history reference date"] = _["Related history reference"].apply(
                 commit_datetime_from_history_reference
