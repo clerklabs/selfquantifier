@@ -52,32 +52,32 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
     transactions_editable_columns = [
         "Include in expense report",
+        "Expense report receiver",
+        "Expense report",
+        "Expense report accounting period",
         "Walletsharing",
         "Real Date (Corrected)",
         "Days between real and bank dates",
         "Doc Source",
+        "Doc Status",
+        "Doc",
         "Clarification",
     ]
 
-    # Fiscal year (incl tax entity)	Doc	Expense report	Doc status	Doc type	Account	Date initiated	Date settled	Source text	Merchant	Hash	Transaction id	Amount (Incl. VAT)	Balance	Original amount (In local currency)	Local currency	Account Owner	Comments / Notes	Doc notes	Doc filename	Doc link	Doc inbox search	Sorting ordinal	Legacy Id	Date initiated value	Date settled value	Absolute amount	Absolute original amount	Vendor	Category	Description	Status	Invoice date	Paid date	Source	Amount	Currency	Status
+    # Account	Date initiated	Date settled	Source text	Merchant	Hash	Transaction id	Amount (Incl. VAT)	Balance	Original amount (In local currency)	Local currency	Account Owner	Comments / Notes	Doc notes	Doc filename	Doc link	Doc inbox search	Sorting ordinal	Legacy Id	Date initiated value	Date settled value	Absolute amount	Absolute original amount	Vendor	Category	Description	Status	Invoice date	Paid date	Source	Amount	Currency	Status
 
     def list_transactions_files_in_transactions_folder():
         _ = list_files_in_clerk_subfolder(
             transactions_folder_path, clerkai_folder_path, repo
         )
-        _["Ignore"] = None
-        _["Account provider"] = None
-        _["Account"] = None
-        _["Content type"] = None
+        for column in transaction_files_editable_columns:
+            _[column] = None
         _["History reference"] = current_history_reference()
         return _[
             [
                 "File name",
                 "File path",
-                "Ignore",
-                "Account provider",
-                "Account",
-                "Content type",
+                *transaction_files_editable_columns,
                 "File metadata",
                 "History reference",
             ]
@@ -188,5 +188,4 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         list_transactions_files_in_downloads_folder,
         clerkai_file_path,
         possibly_edited_df,
-        save_transaction_files_editable_data_in_transactions_folder,
     )
