@@ -64,74 +64,81 @@ def transactions_flow(
         parsed_transaction_files["Error"].isnull()
     ].drop(["Error"], axis=1)
 
-    # concat all transactions
-    all_parsed_transactions_df = pd.concat(
-        successfully_parsed_transaction_files["Parse results"].values, sort=False
-    ).reset_index(drop=True)
-    all_parsed_transactions_df["History reference"] = current_history_reference()
-    # include transaction_files data
-    all_parsed_transactions_df = pd.merge(
-        all_parsed_transactions_df,
-        included_transaction_files.drop(["Ignore"], axis=1).add_prefix(
-            "Source transaction file: "
-        ),
-        left_on="Source transaction file index",
-        right_index=True,
-        suffixes=(False, False),
-    )
-    # print("all_parsed_transactions_df.columns", all_parsed_transactions_df.columns)
+    if len(successfully_parsed_transaction_files) > 0:
+        # concat all transactions
+        all_parsed_transactions_df = pd.concat(
+            successfully_parsed_transaction_files["Parse results"].values, sort=False
+        ).reset_index(drop=True)
+        all_parsed_transactions_df["History reference"] = current_history_reference()
+        # include transaction_files data
+        all_parsed_transactions_df = pd.merge(
+            all_parsed_transactions_df,
+            included_transaction_files.drop(["Ignore"], axis=1).add_prefix(
+                "Source transaction file: "
+            ),
+            left_on="Source transaction file index",
+            right_index=True,
+            suffixes=(False, False),
+        )
 
-    transactions_df = all_parsed_transactions_df.drop_duplicates(subset=["ID"])
+        # print("all_parsed_transactions_df.columns", all_parsed_transactions_df.columns)
 
-    # export all transactions to xlsx
-    record_type = "transactions"
+        transactions_df = all_parsed_transactions_df.drop_duplicates(subset=["ID"])
 
-    transactions_first_columns = [
-        "Account",
-        *transactions_editable_columns,
-        "Real Date",
-        "Bank Date",
-        "Date",
-        "Year",
-        "Month",
-    ]
-    transactions_export_columns = [
-        *transactions_first_columns,
-        *transactions_df.columns.difference(transactions_first_columns, sort=False),
-    ]
-    # print("transactions_export_columns", transactions_export_columns)
-    transactions_export_df = transactions_df.reindex(
-        transactions_export_columns, axis=1
-    )
+        # export all transactions to xlsx
+        record_type = "transactions"
 
-    # convert Decimal columns to float prior to export or excel will treat them as strings
-    # todo: less hacky conversion of Decimal-columns
-    from clerkai.transactions.parsers.parse_utils import is_nan
+        transactions_first_columns = [
+            "Account",
+            *transactions_editable_columns,
+            "Real Date",
+            "Bank Date",
+            "Date",
+            "Year",
+            "Month",
+        ]
+        transactions_export_columns = [
+            *transactions_first_columns,
+            *transactions_df.columns.difference(transactions_first_columns, sort=False),
+        ]
+        # print("transactions_export_columns", transactions_export_columns)
+        transactions_export_df = transactions_df.reindex(
+            transactions_export_columns, axis=1
+        )
 
-    def float_if_not_nan(number):
-        if is_nan(number) or number is None:
-            return None
-        return float(number)
+        # convert Decimal columns to float prior to export or excel will treat them as strings
+        # todo: less hacky conversion of Decimal-columns
+        from clerkai.transactions.parsers.parse_utils import is_nan
 
-    transactions_export_df["Amount"] = transactions_export_df["Amount"].apply(
-        float_if_not_nan
-    )
-    transactions_export_df["Balance"] = transactions_export_df["Balance"].apply(
-        float_if_not_nan
-    )
-    transactions_export_df["Foreign Currency Amount"] = transactions_export_df[
-        "Foreign Currency Amount"
-    ].apply(float_if_not_nan)
-    transactions_export_df["Foreign Currency Rate"] = transactions_export_df[
-        "Foreign Currency Rate"
-    ].apply(float_if_not_nan)
+        def float_if_not_nan(number):
+            if is_nan(number) or number is None:
+                return None
+            return float(number)
 
-    possibly_edited_transactions_df = possibly_edited_df(
-        transactions_export_df,
-        record_type,
-        transactions_editable_columns,
-        keep_unmerged_previous_edits=False,
-    )
+        transactions_export_df["Amount"] = transactions_export_df["Amount"].apply(
+            float_if_not_nan
+        )
+        transactions_export_df["Balance"] = transactions_export_df["Balance"].apply(
+            float_if_not_nan
+        )
+        transactions_export_df["Foreign Currency Amount"] = transactions_export_df[
+            "Foreign Currency Amount"
+        ].apply(float_if_not_nan)
+        transactions_export_df["Foreign Currency Rate"] = transactions_export_df[
+            "Foreign Currency Rate"
+        ].apply(float_if_not_nan)
+
+        possibly_edited_transactions_df = possibly_edited_df(
+            transactions_export_df,
+            record_type,
+            transactions_editable_columns,
+            keep_unmerged_previous_edits=False,
+        )
+
+    else:
+        all_parsed_transactions_df = []
+        transactions_df = []
+        possibly_edited_transactions_df = []
 
     return (
         transaction_files_df,
