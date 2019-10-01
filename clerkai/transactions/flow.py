@@ -10,7 +10,7 @@ def transactions_flow(
     possibly_edited_df,
     transactions_folder_path,
     acknowledge_changes_in_clerkai_folder,
-    clerkai_file_path,
+    clerkai_input_file_path,
     current_history_reference,
     keep_unmerged_previous_edits=False,
     failfast=False,
@@ -53,7 +53,7 @@ def transactions_flow(
     from clerkai.transactions.parse import parse_transaction_files
 
     parsed_transaction_files = parse_transaction_files(
-        included_transaction_files, clerkai_file_path, failfast
+        included_transaction_files, clerkai_input_file_path, failfast
     )
 
     unsuccessfully_parsed_transaction_files = parsed_transaction_files[

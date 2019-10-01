@@ -3,6 +3,7 @@ import os
 from clerkai.transactions.flow import transactions_flow
 from clerkai.utils import (add_all_untracked_and_changed_files,
                            current_gitsha1, ensure_clerkai_folder_versioning,
+                           list_files_in_clerk_input_subfolder,
                            list_files_in_clerk_subfolder,
                            possibly_edited_df_util, short_gitsha1)
 
@@ -20,7 +21,7 @@ def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
 
 def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_folder):
     # expand given paths to absolute paths
-    clerkai_folder_path = os.path.expanduser(clerkai_folder)
+    clerkai_folder_path = os.path.expanduser(clerkai_folder).rstrip(os.sep)
     clerkai_input_folder_path = os.path.join(clerkai_folder_path, "Input")
     transactions_folder_path = os.path.join(clerkai_input_folder_path, "Transactions")
     receipts_folder_path = os.path.join(clerkai_input_folder_path, "Receipts")
@@ -35,7 +36,9 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     os.chdir(clerkai_folder_path)
 
     # initiate / validate clerk.ai-folder versioning
-    repo = ensure_clerkai_folder_versioning(clerkai_input_folder_path)
+    repo = ensure_clerkai_folder_versioning(
+        clerkai_input_folder_path=clerkai_input_folder_path
+    )
 
     def acknowledge_changes_in_clerkai_folder():
         add_all_untracked_and_changed_files(repo)
@@ -70,8 +73,9 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     # Account	Date initiated	Date settled	Source text	Merchant	Hash	Transaction id	Amount (Incl. VAT)	Balance	Original amount (In local currency)	Local currency	Account Owner	Comments / Notes	Doc notes	Doc filename	Doc link	Doc inbox search	Sorting ordinal	Legacy Id	Date initiated value	Date settled value	Absolute amount	Absolute original amount	Vendor	Category	Description	Status	Invoice date	Paid date	Source	Amount	Currency	Status
 
     def list_transactions_files_in_transactions_folder():
-        _ = list_files_in_clerk_subfolder(
-            transactions_folder_path, clerkai_folder_path, repo
+        _ = list_files_in_clerk_input_subfolder(
+            transactions_folder_path,
+            clerkai_input_folder_path=clerkai_input_folder_path,
         )
         if len(_) == 0:
             return _
@@ -96,7 +100,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             possibly_edited_df=possibly_edited_df,
             transactions_folder_path=transactions_folder_path,
             acknowledge_changes_in_clerkai_folder=acknowledge_changes_in_clerkai_folder,
-            clerkai_file_path=clerkai_file_path,
+            clerkai_input_file_path=clerkai_input_file_path,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             failfast=failfast,
@@ -105,8 +109,8 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     # receipts
 
     def list_receipt_files_in_receipts_folder():
-        _ = list_files_in_clerk_subfolder(
-            receipts_folder_path, clerkai_folder_path, repo
+        _ = list_files_in_clerk_input_subfolder(
+            receipts_folder_path, clerkai_input_folder_path=clerkai_input_folder_path
         )
         if len(_) == 0:
             return _
@@ -119,13 +123,15 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     # other
 
     def list_edit_files_in_edits_folder():
-        _ = list_files_in_clerk_subfolder(edits_folder_path, clerkai_folder_path, repo)
+        _ = list_files_in_clerk_subfolder(
+            edits_folder_path, clerkai_folder_path=clerkai_folder_path
+        )
         if len(_) == 0:
             return _
         from pydriller import RepositoryMining
 
         commits_iterator = RepositoryMining(
-            clerkai_folder_path, filepath="."
+            clerkai_input_folder_path, filepath="."
         ).traverse_commits()
         commits = {}
         for commit in commits_iterator:
@@ -155,9 +161,9 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
                 transaction_files.append(file_name)
         return transaction_files
 
-    def clerkai_file_path(file):
+    def clerkai_input_file_path(file):
         return os.path.join(
-            file["File path"].replace("@", clerkai_folder_path), file["File name"]
+            file["File path"].replace("@", clerkai_input_folder_path), file["File name"]
         )
 
     # ensure_directories_are_in_place()
@@ -186,7 +192,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             list_edit_files_in_edits_folder,
             current_history_reference,
             edits_folder_path,
-            clerkai_folder_path,
+            clerkai_input_folder_path,
             repo,
         )
 

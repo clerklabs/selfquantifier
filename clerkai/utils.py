@@ -61,7 +61,7 @@ def possibly_edited_df_util(
     list_edit_files_in_edits_folder,
     current_history_reference,
     edits_folder_path,
-    clerkai_folder_path,
+    clerkai_input_folder_path,
     repo,
 ):
     # set config based on record type
@@ -536,13 +536,26 @@ def list_files_in_folder(folder_path):
     return all_files
 
 
-def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path, repo):
+def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path):
     import pandas as pd
 
     _ = pd.DataFrame(list_files_in_folder(folder_path))
     if len(_) > 0:
         _["File path"] = _["File path"].apply(
-            lambda root: root.replace(clerkai_folder_path, "@/")
+            lambda root: root.replace(clerkai_folder_path, "@")
+        )
+        # ignore *_editable_data.csv
+        _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]
+    return _
+
+
+def list_files_in_clerk_input_subfolder(folder_path, clerkai_input_folder_path):
+    import pandas as pd
+
+    _ = pd.DataFrame(list_files_in_folder(folder_path))
+    if len(_) > 0:
+        _["File path"] = _["File path"].apply(
+            lambda root: root.replace(clerkai_input_folder_path, "@")
         )
         # ignore *_editable_data.csv
         _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]

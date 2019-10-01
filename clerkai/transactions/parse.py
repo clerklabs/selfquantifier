@@ -104,7 +104,7 @@ def transaction_ids(transactions):
 
 
 def parse_transaction_files(
-    transaction_files, clerkai_file_path, keepraw=False, failfast=False
+    transaction_files, clerkai_input_file_path, keepraw=False, failfast=False
 ):
     class ContentTypeNotSetError(Exception):
         pass
@@ -113,7 +113,7 @@ def parse_transaction_files(
         pass
 
     def parse_transaction_file_row(transaction_file):
-        transaction_file_path = clerkai_file_path(transaction_file)
+        transaction_file_path = clerkai_input_file_path(transaction_file)
         results = None
         error = None
 
