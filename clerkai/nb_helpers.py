@@ -21,10 +21,13 @@ def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
 def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_folder):
     # expand given paths to absolute paths
     clerkai_folder_path = os.path.expanduser(clerkai_folder)
-    transactions_folder_path = os.path.join(clerkai_folder_path, "Transactions")
-    receipts_folder_path = os.path.join(clerkai_folder_path, "Receipts")
+    clerkai_input_folder_path = os.path.join(clerkai_folder_path, "Input")
+    transactions_folder_path = os.path.join(clerkai_input_folder_path, "Transactions")
+    receipts_folder_path = os.path.join(clerkai_input_folder_path, "Receipts")
+    location_history_folder_path = os.path.join(
+        clerkai_input_folder_path, "Location History"
+    )
     edits_folder_path = os.path.join(clerkai_folder_path, "Edits")
-    travels_folder_path = os.path.join(clerkai_folder_path, "Travels")
     downloads_folder_path = os.path.expanduser(downloads_folder)
     pictures_folder_path = os.path.expanduser(pictures_folder)
 
@@ -32,7 +35,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     os.chdir(clerkai_folder_path)
 
     # initiate / validate clerk.ai-folder versioning
-    repo = ensure_clerkai_folder_versioning(clerkai_folder_path)
+    repo = ensure_clerkai_folder_versioning(clerkai_input_folder_path)
 
     def acknowledge_changes_in_clerkai_folder():
         add_all_untracked_and_changed_files(repo)

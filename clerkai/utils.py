@@ -5,14 +5,14 @@ from os.path import getsize, join
 import pandas as pd
 
 
-def ensure_clerkai_folder_versioning(clerkai_folder_path):
+def ensure_clerkai_folder_versioning(clerkai_input_folder_path):
     from git import Repo
 
-    if os.path.isdir(os.path.join(clerkai_folder_path, ".git")):
+    if os.path.isdir(os.path.join(clerkai_input_folder_path, ".git")):
         # TODO make sure that this is a clerk-managed git repository
-        repo = Repo(clerkai_folder_path)
+        repo = Repo(clerkai_input_folder_path)
     else:
-        repo = Repo.init(clerkai_folder_path)
+        repo = Repo.init(clerkai_input_folder_path)
         # make the commits in this repo be from clerk automation by default
         config = repo.config_writer()
         config.set_value("user", "name", "Clerk.ai")
@@ -125,7 +125,7 @@ def possibly_edited_df_util(
             df=df_with_previous_edits_across_columns,
             edit_file=edit_file,
             record_type=record_type,
-            clerkai_folder_path=clerkai_folder_path,
+            clerkai_input_folder_path=clerkai_input_folder_path,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
         )
@@ -329,7 +329,7 @@ def merge_changes_from_previous_possibly_edited_df(
     df,
     edit_file,
     record_type,
-    clerkai_folder_path,
+    clerkai_input_folder_path,
     current_history_reference,
     keep_unmerged_previous_edits,
 ):
@@ -372,7 +372,9 @@ def merge_changes_from_previous_possibly_edited_df(
             old_to_new_paths,
             old_now_deleted_paths,
             old_non_existing_now_added_paths,
-        ) = changes_between_two_commits(clerkai_folder_path, from_commit, to_commit)
+        ) = changes_between_two_commits(
+            clerkai_input_folder_path, from_commit, to_commit
+        )
 
         previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
             joined_path, axis=1
