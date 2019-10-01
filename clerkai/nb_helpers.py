@@ -1,5 +1,6 @@
 import os
 
+from clerkai.location_history.flow import location_history_flow
 from clerkai.transactions.flow import transactions_flow
 from clerkai.utils import (add_all_untracked_and_changed_files,
                            current_gitsha1, ensure_clerkai_folder_versioning,
@@ -123,6 +124,72 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         return _[
             ["File name", "File path", "Ignore", "File metadata", "History reference"]
         ]
+
+    # location_history
+
+    location_history_files_editable_columns = [
+        "Ignore",
+        "Location history provider",
+        "Content type",
+    ]
+
+    location_history_editable_columns = []
+
+    """
+    travel_reports_editable_columns = [
+        "Include in expense report",
+        "Expense report receiver",
+        "Expense report",
+        "Expense report accounting period",
+        "Destination",
+        "Travel purpose",
+        "Left date & time",
+        "Returned date & time",
+        "Other comment",
+        "Days Of Personal Vacation",
+        "Private Car Kilometers",
+        "Days With Paid Breakfast",
+        "Days With Paid Lunch",
+        "Days With Paid Dinner",
+    ]
+    """
+
+    def list_location_history_files_in_location_history_folder():
+        _ = list_files_in_clerk_input_subfolder(
+            location_history_folder_path,
+            clerkai_input_folder_path=clerkai_input_folder_path,
+        )
+        for column in location_history_files_editable_columns:
+            _[column] = None
+        _["History reference"] = current_history_reference()
+        if len(_) == 0:
+            return _
+        return _[
+            [
+                "File name",
+                "File path",
+                *location_history_files_editable_columns,
+                "File metadata",
+                "History reference",
+            ]
+        ]
+
+    def location_history(keep_unmerged_previous_edits=False, failfast=False):
+        list_lh_files_in_lh_folder = (
+            list_location_history_files_in_location_history_folder
+        )
+        return location_history_flow(
+            location_history_files_editable_columns=location_history_files_editable_columns,
+            location_history_editable_columns=location_history_editable_columns,
+            list_location_history_files_in_location_history_folder=list_lh_files_in_lh_folder,
+            possibly_edited_df=possibly_edited_df,
+            location_history_folder_path=location_history_folder_path,
+            acknowledge_changes_in_clerkai_folder=acknowledge_changes_in_clerkai_folder,
+            clerkai_input_file_path=clerkai_input_file_path,
+            current_history_reference=current_history_reference,
+            keep_unmerged_previous_edits=keep_unmerged_previous_edits,
+            failfast=failfast,
+        )
 
     # other
 

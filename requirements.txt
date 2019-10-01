@@ -2,6 +2,9 @@
 pandas
 jellyfish
 
+# for reverse geocoding
+reverse_geocoder
+
 # for panda's df.to_excel()
 openpyxl
 xlsxwriter
