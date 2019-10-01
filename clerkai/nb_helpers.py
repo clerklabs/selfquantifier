@@ -70,7 +70,11 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         "Clarification",
     ]
 
-    # Account	Date initiated	Date settled	Source text	Merchant	Hash	Transaction id	Amount (Incl. VAT)	Balance	Original amount (In local currency)	Local currency	Account Owner	Comments / Notes	Doc notes	Doc filename	Doc link	Doc inbox search	Sorting ordinal	Legacy Id	Date initiated value	Date settled value	Absolute amount	Absolute original amount	Vendor	Category	Description	Status	Invoice date	Paid date	Source	Amount	Currency	Status
+    # Account	Date initiated	Date settled	Source text	Merchant	Hash	Transaction id	Amount (Incl. VAT)
+    # Balance	Original amount (In local currency)	Local currency	Account Owner	Comments / Notes	Doc notes
+    # Doc filename	Doc link	Doc inbox search	Sorting ordinal	Legacy Id	Date initiated value
+    # Date settled value	Absolute amount	Absolute original amount	Vendor	Category	Description	Status
+    # Invoice date	Paid date	Source	Amount	Currency	Status
 
     def list_transactions_files_in_transactions_folder():
         _ = list_files_in_clerk_input_subfolder(
@@ -197,12 +201,8 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         )
 
     return (
-        acknowledge_changes_in_clerkai_folder,
-        current_history_reference,
         transactions,
         list_receipt_files_in_receipts_folder,
-        list_edit_files_in_edits_folder,
+        location_history,
         list_transactions_files_in_downloads_folder,
-        clerkai_file_path,
-        possibly_edited_df,
     )

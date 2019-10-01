@@ -461,15 +461,12 @@ def propagate_previous_edits_from_across_columns(
                 pass
             else:
                 if column_name in df_with_previous_edits_across_columns.columns:
-                    df_where_column_is_null = df_with_previous_edits_across_columns[
-                        df_with_previous_edits_across_columns[column_name].isnull()
-                    ]
-                    df_where_column_is_null[
+                    df_where_column_is_null_mask = df_with_previous_edits_across_columns[
                         column_name
+                    ].isnull()
+                    df_with_previous_edits_across_columns.loc[
+                        df_where_column_is_null_mask, column_name
                     ] = df_with_previous_edits_across_columns[suffixed_column_name]
-                    df_with_previous_edits_across_columns[
-                        column_name
-                    ] = df_where_column_is_null[column_name]
                 else:
                     df_with_previous_edits_across_columns[
                         column_name
