@@ -73,6 +73,8 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         _ = list_files_in_clerk_subfolder(
             transactions_folder_path, clerkai_folder_path, repo
         )
+        if len(_) == 0:
+            return _
         for column in transaction_files_editable_columns:
             _[column] = None
         _["History reference"] = current_history_reference()
@@ -106,6 +108,8 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         _ = list_files_in_clerk_subfolder(
             receipts_folder_path, clerkai_folder_path, repo
         )
+        if len(_) == 0:
+            return _
         _["Ignore"] = None
         _["History reference"] = current_history_reference()
         return _[
@@ -116,31 +120,31 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
     def list_edit_files_in_edits_folder():
         _ = list_files_in_clerk_subfolder(edits_folder_path, clerkai_folder_path, repo)
-        if len(_) > 0:
-            from pydriller import RepositoryMining
+        if len(_) == 0:
+            return _
+        from pydriller import RepositoryMining
 
-            commits_iterator = RepositoryMining(
-                clerkai_folder_path, filepath="."
-            ).traverse_commits()
-            commits = {}
-            for commit in commits_iterator:
-                history_reference = short_gitsha1(repo, commit.hash)
-                commits[history_reference] = commit
-            _["Related history reference"] = _["File path"].apply(
-                extract_commit_sha_from_edit_subfolder_path
+        commits_iterator = RepositoryMining(
+            clerkai_folder_path, filepath="."
+        ).traverse_commits()
+        commits = {}
+        for commit in commits_iterator:
+            history_reference = short_gitsha1(repo, commit.hash)
+            commits[history_reference] = commit
+        _["Related history reference"] = _["File path"].apply(
+            extract_commit_sha_from_edit_subfolder_path
+        )
+
+        def commit_datetime_from_history_reference(history_reference):
+            first_matching_commit_history_reference_key = next(
+                filter(lambda _: _.startswith(history_reference), commits.keys()), False
             )
+            return commits[first_matching_commit_history_reference_key].author_date
 
-            def commit_datetime_from_history_reference(history_reference):
-                first_matching_commit_history_reference_key = next(
-                    filter(lambda _: _.startswith(history_reference), commits.keys()),
-                    False,
-                )
-                return commits[first_matching_commit_history_reference_key].author_date
-
-            _["Related history reference date"] = _["Related history reference"].apply(
-                commit_datetime_from_history_reference
-            )
-            _ = _.sort_values(by="Related history reference date")
+        _["Related history reference date"] = _["Related history reference"].apply(
+            commit_datetime_from_history_reference
+        )
+        _ = _.sort_values(by="Related history reference date")
         return _
 
     # TODO: make this guess which ones are transactions
