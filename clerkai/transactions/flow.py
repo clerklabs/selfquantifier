@@ -41,8 +41,8 @@ def transactions_flow(
         possibly_edited_transaction_files_df["Ignore"] != 1
     ]
 
-    # make sure that the edited column values yields new commits so that
-    # transaction-edit-files are dependent on the editable values
+    # make sure that the edited column values yields new commits
+    # so that edit-files are dependent on the editable values
     transaction_files_editable_data_df = included_transaction_files[
         transaction_files_editable_columns + ["File metadata"]
     ]
