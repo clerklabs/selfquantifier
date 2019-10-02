@@ -1,17 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# Create and activate a local Python 3 venv
-python3 -m venv venv
-source venv/bin/activate
+# Create and update a local Python 3 venv
+conda env create python==3.7 --prefix venv --file=environment.yml
 
-# Ensure latest version of pip (avoids annoying warning notice)
-pip install --upgrade pip
-
-# Install requirements
-pip install -U -r requirements.txt
-pip install -U -r requirements_dev.txt
-pip install -U -r requirements_test.txt
+# For receipts parsing
+brew install poppler || true
+brew install tesseract || true
 
 echo "* Success: To activate the python venv, run"
-echo "    source venv/bin/activate"
+echo "    conda activate ./venv"
