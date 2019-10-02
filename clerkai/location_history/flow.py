@@ -9,7 +9,7 @@ def location_history_flow(
     list_location_history_files_in_location_history_folder,
     possibly_edited_df,
     location_history_folder_path,
-    acknowledge_changes_in_clerkai_folder,
+    acknowledge_changes_in_clerkai_input_folder,
     clerkai_input_file_path,
     current_history_reference,
     keep_unmerged_previous_edits=False,
@@ -51,7 +51,7 @@ def location_history_flow(
     save_location_history_files_editable_data_in_location_history_folder(
         location_history_folder_path, location_history_files_editable_data_df
     )
-    acknowledge_changes_in_clerkai_folder()
+    acknowledge_changes_in_clerkai_input_folder()
 
     from clerkai.location_history.parse import parse_location_history_files
 

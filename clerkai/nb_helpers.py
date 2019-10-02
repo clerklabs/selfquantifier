@@ -37,15 +37,15 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     os.chdir(clerkai_folder_path)
 
     # initiate / validate clerk.ai-folder versioning
-    repo = ensure_clerkai_folder_versioning(
+    clerkai_input_folder_repo = ensure_clerkai_folder_versioning(
         clerkai_input_folder_path=clerkai_input_folder_path
     )
 
-    def acknowledge_changes_in_clerkai_folder():
-        add_all_untracked_and_changed_files(repo)
+    def acknowledge_changes_in_clerkai_input_folder():
+        add_all_untracked_and_changed_files(clerkai_input_folder_repo)
 
     def current_history_reference():
-        return current_gitsha1(repo)
+        return current_gitsha1(clerkai_input_folder_repo)
 
     # transactions
 
@@ -104,7 +104,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             list_transactions_files_in_transactions_folder=list_transactions_files_in_transactions_folder,
             possibly_edited_df=possibly_edited_df,
             transactions_folder_path=transactions_folder_path,
-            acknowledge_changes_in_clerkai_folder=acknowledge_changes_in_clerkai_folder,
+            acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
             clerkai_input_file_path=clerkai_input_file_path,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
@@ -184,7 +184,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             list_location_history_files_in_location_history_folder=list_lh_files_in_lh_folder,
             possibly_edited_df=possibly_edited_df,
             location_history_folder_path=location_history_folder_path,
-            acknowledge_changes_in_clerkai_folder=acknowledge_changes_in_clerkai_folder,
+            acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
             clerkai_input_file_path=clerkai_input_file_path,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
@@ -206,7 +206,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         ).traverse_commits()
         commits = {}
         for commit in commits_iterator:
-            history_reference = short_gitsha1(repo, commit.hash)
+            history_reference = short_gitsha1(clerkai_input_folder_repo, commit.hash)
             commits[history_reference] = commit
         _["Related history reference"] = _["File path"].apply(
             extract_commit_sha_from_edit_subfolder_path
@@ -264,7 +264,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             current_history_reference,
             edits_folder_path,
             clerkai_input_folder_path,
-            repo,
+            clerkai_input_folder_repo,
         )
 
     return (
@@ -272,4 +272,5 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         list_receipt_files_in_receipts_folder,
         location_history,
         list_transactions_files_in_downloads_folder,
+        acknowledge_changes_in_clerkai_input_folder,
     )

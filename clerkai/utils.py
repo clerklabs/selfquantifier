@@ -62,7 +62,7 @@ def possibly_edited_df_util(
     current_history_reference,
     edits_folder_path,
     clerkai_input_folder_path,
-    repo,
+    clerkai_input_folder_repo,
 ):
     # set config based on record type
     if record_type == "transaction_files":
@@ -84,7 +84,7 @@ def possibly_edited_df_util(
         record_type=record_type,
         export_file_name=export_file_name,
         edits_folder_path=edits_folder_path,
-        commit_datetime=current_gitcommit_datetime(repo),
+        commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
         history_reference=current_history_reference(),
         create_if_not_exists=False,
     )
@@ -157,7 +157,7 @@ def possibly_edited_df_util(
         record_type=record_type,
         export_file_name=export_file_name,
         edits_folder_path=edits_folder_path,
-        commit_datetime=current_gitcommit_datetime(repo),
+        commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
         history_reference=current_history_reference(),
         create_if_not_exists=True,
     )

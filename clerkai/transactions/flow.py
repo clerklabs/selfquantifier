@@ -9,7 +9,7 @@ def transactions_flow(
     list_transactions_files_in_transactions_folder,
     possibly_edited_df,
     transactions_folder_path,
-    acknowledge_changes_in_clerkai_folder,
+    acknowledge_changes_in_clerkai_input_folder,
     clerkai_input_file_path,
     current_history_reference,
     keep_unmerged_previous_edits=False,
@@ -49,7 +49,7 @@ def transactions_flow(
     save_transaction_files_editable_data_in_transactions_folder(
         transactions_folder_path, transaction_files_editable_data_df
     )
-    acknowledge_changes_in_clerkai_folder()
+    acknowledge_changes_in_clerkai_input_folder()
 
     from clerkai.transactions.parse import parse_transaction_files
 
