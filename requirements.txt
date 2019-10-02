@@ -1,6 +1,15 @@
 # general
 pandas
 jellyfish
+gspread-pandas
+matplotlib
+
+# for maps
+cartopy
+
+# for receipts parsing
+pdftotext
+invoice2data
 
 # for reverse geocoding
 reverse_geocoder
