@@ -4,15 +4,14 @@ jellyfish
 gspread-pandas
 matplotlib
 
-# for maps
+# for location history analysis
+reverse_geocoder
+geopy
 cartopy
 
 # for receipts parsing
 pdftotext
 invoice2data
-
-# for reverse geocoding
-reverse_geocoder
 
 # for panda's df.to_excel()
 openpyxl

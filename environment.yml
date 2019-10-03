@@ -24,6 +24,8 @@ dependencies:
   - flake8=3.7.8=py37_1
   - freetype=2.10.0=h24853df_1
   - future=0.17.1=py37_1000
+  - geographiclib=1.50=py_0
+  - geopy=1.20.0=py_0
   - geos=3.7.2=h6de7cb9_2
   - gitdb2=2.0.6=py_0
   - gitpython=3.0.2=py_0
