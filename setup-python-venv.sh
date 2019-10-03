@@ -2,7 +2,11 @@
 set -e
 
 # Create and update a local Python 3 venv
-conda env create python==3.7 --prefix venv --file=environment.yml
+if [[ ! -d venv ]]; then
+  conda env create python==3.7 --prefix venv --file=environment.yml
+else
+  conda env update --prefix venv --file=environment.yml
+fi
 
 # For receipts parsing
 brew install poppler || true
