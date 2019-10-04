@@ -1,7 +1,8 @@
-import math
 from datetime import datetime
 from decimal import Decimal
 from typing import Union
+
+from clerkai.utils import is_nan
 
 
 def amount_to_rounded_decimal(amount, **kwargs):
@@ -20,13 +21,6 @@ def convert_european_amount_to_decimal(value):
     # type: (Union[float, str]) -> Decimal
     value = str(value).replace(".", "").replace(",", ".")
     return amount_to_rounded_decimal(value)
-
-
-def is_nan(x):
-    try:
-        return math.isnan(x)
-    except TypeError:
-        return False
 
 
 def strip_whitespace_if_not_is_nan(x):

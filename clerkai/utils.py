@@ -73,8 +73,8 @@ def possibly_edited_df_util(
         export_file_name = "Receipt files.xlsx"
     elif record_type == "location_history_files":
         export_file_name = "Location history files.xlsx"
-    elif record_type == "location_history":
-        export_file_name = "Location history.xlsx"
+    elif record_type == "location_history_by_date":
+        export_file_name = "Location history day-by-day.xlsx"
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
 
@@ -359,6 +359,22 @@ def merge_changes_from_previous_possibly_edited_df(
             previous_possibly_edited_df[additional_join_column] = transaction_ids(
                 previous_possibly_edited_df
             )
+    elif record_type == "location_history_by_date":
+        # for now simply return the current df, ignoring the previously possibly edited df
+        return (df, [])
+        # TODO: Support editing location history
+        additional_join_column = "ID"
+        file_name_column_name = "Source location history file: File name"
+        file_path_column_name = "Source location history file: File path"
+        # Add ID column if not present in previous edits file
+        """
+        if additional_join_column not in previous_possibly_edited_df.columns:
+            from clerkai.location_history.parse import location_history_ids
+
+            previous_possibly_edited_df[additional_join_column] = location_history_ids(
+                previous_possibly_edited_df
+            )
+        """
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
 
@@ -565,3 +581,12 @@ def list_files_in_clerk_input_subfolder(folder_path, clerkai_input_folder_path):
         # ignore *_editable_data.csv
         _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]
     return _
+
+
+def is_nan(x):
+    import math
+
+    try:
+        return math.isnan(x)
+    except TypeError:
+        return False

@@ -1,11 +1,13 @@
 import os
 
+import geopy.distance
 import pandas as pd
+import reverse_geocoder as rg
 
 
 def location_history_flow(
     location_history_files_editable_columns,
-    location_history_editable_columns,
+    location_history_by_date_editable_columns,
     list_location_history_files_in_location_history_folder,
     possibly_edited_df,
     location_history_folder_path,
@@ -87,40 +89,112 @@ def location_history_flow(
             suffixes=(False, False),
         )
         # print("all_parsed_location_history_df.columns", all_parsed_location_history_df.columns)
-
-        location_history_df = (
-            all_parsed_location_history_df
+        have_timestamp_and_coordinates_mask = (
+            ~all_parsed_location_history_df["Timestamp"].isnull()
+            & ~all_parsed_location_history_df["Latitude"].isnull()
+            & ~all_parsed_location_history_df["Longitude"].isnull()
+        )
+        location_history_df = all_parsed_location_history_df[
+            have_timestamp_and_coordinates_mask
+        ].sort_values(
+            ["Timestamp"]
         )  # .drop_duplicates(subset=["ID"])
 
-        # export all location_history to xlsx
-        record_type = "location_history"
+        # TODO: only in-memory location history, then editable day-by-day summary
 
-        location_history_first_columns = [
-            "Timestamp",
-            *location_history_editable_columns,
-        ]
-        location_history_export_columns = [
-            *location_history_first_columns,
-            *location_history_df.columns.difference(
-                location_history_first_columns, sort=False
-            ),
-        ]
-        # print("location_history_export_columns", location_history_export_columns)
-        location_history_export_df = location_history_df.reindex(
-            location_history_export_columns, axis=1
+        # reverse geo-coding
+        location_history_df["coordinates"] = location_history_df.apply(
+            lambda df: (df["Latitude"], df["Longitude"]), axis=1
+        )
+        unique_coordinates = list(set(list(location_history_df["coordinates"])))
+
+        results = rg.search(unique_coordinates)  # default mode = 2
+        reverse_geocoded_coordinates_df = pd.DataFrame(results)
+        reverse_geocoded_coordinates_df["coordinates"] = unique_coordinates
+
+        location_history_with_geonames_df = location_history_df.merge(
+            reverse_geocoded_coordinates_df, on="coordinates"
         )
 
-        possibly_edited_location_history_df = possibly_edited_df(
-            location_history_export_df,
+        location_history_with_geonames_df["date"] = location_history_with_geonames_df[
+            "Timestamp"
+        ].apply(lambda ts: ts.strftime("%Y-%m-%d"))
+        location_history_with_geonames_df[
+            "datehour"
+        ] = location_history_with_geonames_df["Timestamp"].apply(
+            lambda ts: ts.strftime("%Y-%m-%d %H")
+        )
+        groupby_date = location_history_with_geonames_df.groupby(["date"])
+        groupby_datehour = location_history_with_geonames_df.groupby(["datehour"])
+
+        def geo_group_attributes(group):
+            df = group.size().reset_index(name="counts")
+            df["different_geonames"] = (
+                group["name"]
+                .apply(set)
+                .reset_index(name="different_geonames")["different_geonames"]
+            )
+            df["different_countries"] = (
+                group["cc"]
+                .apply(set)
+                .reset_index(name="different_countries")["different_countries"]
+            )
+            df["coordinates"] = (
+                group["coordinates"]
+                .apply(list)
+                .reset_index(name="coordinates")["coordinates"]
+            )
+            # df["last_known_datehour"] = df["datehour"].shift(1)
+            df["last_known_coordinates"] = df["coordinates"].shift(1)
+            return df
+
+        location_history_by_date_df = geo_group_attributes(groupby_date)
+        location_history_by_datehour_df = geo_group_attributes(groupby_datehour)
+
+        def km_distance_since_last(row):
+            # print(row["coordinates"], row["last_known_coordinates"])
+            if row["last_known_coordinates"] != row["last_known_coordinates"]:
+                return None
+            return geopy.distance.distance(
+                row["coordinates"][-1], row["last_known_coordinates"][-1]
+            ).km
+
+        location_history_by_date_df[
+            "km_distance_since_last"
+        ] = location_history_by_date_df.apply(km_distance_since_last, axis=1)
+        location_history_by_datehour_df[
+            "km_distance_since_last"
+        ] = location_history_by_datehour_df.apply(km_distance_since_last, axis=1)
+
+        # export location_history_by_date to xlsx
+        record_type = "location_history_by_date"
+
+        location_history_by_date_first_columns = [
+            "Timestamp",
+            *location_history_by_date_editable_columns,
+        ]
+        location_history_by_date_export_columns = [
+            *location_history_by_date_first_columns,
+            *location_history_by_date_df.columns.difference(
+                location_history_by_date_first_columns, sort=False
+            ),
+        ]
+        # print("location_history_by_date_export_columns", location_history_by_date_export_columns)
+        location_history_by_date_export_df = location_history_by_date_df.reindex(
+            location_history_by_date_export_columns, axis=1
+        )
+
+        possibly_edited_location_history_by_date_df = possibly_edited_df(
+            location_history_by_date_export_df,
             record_type,
-            location_history_editable_columns,
+            location_history_by_date_editable_columns,
             keep_unmerged_previous_edits=False,
         )
 
     else:
         all_parsed_location_history_df = []
         location_history_df = []
-        possibly_edited_location_history_df = []
+        possibly_edited_location_history_by_date_df = []
 
     return (
         location_history_files_df,
@@ -129,7 +203,7 @@ def location_history_flow(
         successfully_parsed_location_history_files,
         all_parsed_location_history_df,
         location_history_df,
-        possibly_edited_location_history_df,
+        possibly_edited_location_history_by_date_df,
     )
 
 

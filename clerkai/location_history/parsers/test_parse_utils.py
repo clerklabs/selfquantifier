@@ -22,3 +22,16 @@ def test_exiftool_date_to_datetime_obj():
         )
         == "2017-08-26 22:09:57"
     )
+    assert (
+        exiftool_date_to_datetime_obj("2017:08:26 22:09:57+02:00").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        == "2017-08-26 20:09:57"
+    )
+    assert (
+        exiftool_date_to_datetime_obj("2017:08:26 22:09:57-08:00").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        == "2017-08-27 06:09:57"
+    )
+    assert exiftool_date_to_datetime_obj("0000:00:00 00:00:00") is None

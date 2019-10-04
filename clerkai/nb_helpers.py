@@ -133,7 +133,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         "Content type",
     ]
 
-    location_history_editable_columns = []
+    location_history_by_date_editable_columns = []
 
     """
     travel_reports_editable_columns = [
@@ -180,7 +180,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         )
         return location_history_flow(
             location_history_files_editable_columns=location_history_files_editable_columns,
-            location_history_editable_columns=location_history_editable_columns,
+            location_history_by_date_editable_columns=location_history_by_date_editable_columns,
             list_location_history_files_in_location_history_folder=list_lh_files_in_lh_folder,
             possibly_edited_df=possibly_edited_df,
             location_history_folder_path=location_history_folder_path,
