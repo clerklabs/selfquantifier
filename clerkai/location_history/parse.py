@@ -1,12 +1,15 @@
 import pandas as pd
 
+from clerkai.location_history.parsers.exiftool.csv import \
+    exiftool_csv_location_history_parser
 from clerkai.location_history.parsers.google.takeout.json import \
     google_takeout_location_history_json_location_history_parser
 
 parser_by_content_type = {
+    "exported-location-history-file/exiftool-output.csv": exiftool_csv_location_history_parser,
     (
         "exported-location-history-file/google-takeout.location-history.json"
-    ): google_takeout_location_history_json_location_history_parser
+    ): google_takeout_location_history_json_location_history_parser,
 }
 
 
