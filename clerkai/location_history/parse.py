@@ -4,6 +4,7 @@ from clerkai.location_history.parsers.exiftool.csv import \
     exiftool_csv_location_history_parser
 from clerkai.location_history.parsers.google.takeout.json import \
     google_takeout_location_history_json_location_history_parser
+from clerkai.utils import clerkai_input_file_path
 
 parser_by_content_type = {
     "exported-location-history-file/exiftool-output.csv": exiftool_csv_location_history_parser,
@@ -14,7 +15,7 @@ parser_by_content_type = {
 
 
 def parse_location_history_files(
-    location_history_files, clerkai_input_file_path, keepraw=False, failfast=False
+    location_history_files, clerkai_input_folder_path, keepraw=False, failfast=False
 ):
     class ContentTypeNotSetError(Exception):
         pass
@@ -23,7 +24,9 @@ def parse_location_history_files(
         pass
 
     def parse_location_history_file_row(location_history_file):
-        location_history_file_path = clerkai_input_file_path(location_history_file)
+        location_history_file_path = clerkai_input_file_path(
+            clerkai_input_folder_path, location_history_file
+        )
         results = None
         error = None
 

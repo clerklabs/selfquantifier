@@ -2,19 +2,40 @@ import os
 
 import pandas as pd
 
+from clerkai.utils import list_files_in_clerk_input_subfolder
+
 
 def transactions_flow(
     transaction_files_editable_columns,
     transactions_editable_columns,
-    list_transactions_files_in_transactions_folder,
+    clerkai_input_folder_path,
     possibly_edited_df,
     transactions_folder_path,
     acknowledge_changes_in_clerkai_input_folder,
-    clerkai_input_file_path,
     current_history_reference,
     keep_unmerged_previous_edits=False,
     failfast=False,
 ):
+    def list_transactions_files_in_transactions_folder():
+        _ = list_files_in_clerk_input_subfolder(
+            transactions_folder_path,
+            clerkai_input_folder_path=clerkai_input_folder_path,
+        )
+        if len(_) == 0:
+            return _
+        for column in transaction_files_editable_columns:
+            _[column] = None
+        _["History reference"] = current_history_reference()
+        return _[
+            [
+                "File name",
+                "File path",
+                *transaction_files_editable_columns,
+                "File metadata",
+                "History reference",
+            ]
+        ]
+
     transaction_files_df = list_transactions_files_in_transactions_folder()
     record_type = "transaction_files"
     transaction_files_first_columns = [
@@ -54,7 +75,7 @@ def transactions_flow(
     from clerkai.transactions.parse import parse_transaction_files
 
     parsed_transaction_files = parse_transaction_files(
-        included_transaction_files, clerkai_input_file_path, failfast
+        included_transaction_files, clerkai_input_folder_path, failfast
     )
 
     unsuccessfully_parsed_transaction_files = parsed_transaction_files[

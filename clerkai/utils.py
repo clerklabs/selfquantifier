@@ -53,6 +53,12 @@ def current_gitcommit_datetime(repo):
     return datetime.fromtimestamp(repo.head.commit.authored_date)
 
 
+def clerkai_input_file_path(clerkai_input_folder_path, file):
+    return os.path.join(
+        file["File path"].replace("@", clerkai_input_folder_path), file["File name"]
+    )
+
+
 def possibly_edited_df_util(
     current_commit_df,
     record_type,

@@ -4,19 +4,40 @@ import geopy.distance
 import pandas as pd
 import reverse_geocoder as rg
 
+from clerkai.utils import list_files_in_clerk_input_subfolder
+
 
 def location_history_flow(
     location_history_files_editable_columns,
     location_history_by_date_editable_columns,
-    list_location_history_files_in_location_history_folder,
+    clerkai_input_folder_path,
     possibly_edited_df,
     location_history_folder_path,
     acknowledge_changes_in_clerkai_input_folder,
-    clerkai_input_file_path,
     current_history_reference,
     keep_unmerged_previous_edits=False,
     failfast=False,
 ):
+    def list_location_history_files_in_location_history_folder():
+        _ = list_files_in_clerk_input_subfolder(
+            location_history_folder_path,
+            clerkai_input_folder_path=clerkai_input_folder_path,
+        )
+        for column in location_history_files_editable_columns:
+            _[column] = None
+        _["History reference"] = current_history_reference()
+        if len(_) == 0:
+            return _
+        return _[
+            [
+                "File name",
+                "File path",
+                *location_history_files_editable_columns,
+                "File metadata",
+                "History reference",
+            ]
+        ]
+
     location_history_files_df = list_location_history_files_in_location_history_folder()
     record_type = "location_history_files"
     location_history_files_first_columns = [
@@ -34,6 +55,14 @@ def location_history_flow(
     location_history_files_export_df = location_history_files_df.reindex(
         location_history_files_export_columns, axis=1
     )
+
+    # Todo
+    """
+    def guess_content_type_based_on_filename():
+        pass
+    """
+    # location_history_files_export_df[""]
+
     possibly_edited_location_history_files_df = possibly_edited_df(
         location_history_files_export_df,
         record_type,
@@ -58,7 +87,7 @@ def location_history_flow(
     from clerkai.location_history.parse import parse_location_history_files
 
     parsed_location_history_files = parse_location_history_files(
-        included_location_history_files, clerkai_input_file_path, failfast
+        included_location_history_files, clerkai_input_folder_path, failfast
     )
 
     unsuccessfully_parsed_location_history_files = parsed_location_history_files[

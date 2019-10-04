@@ -11,7 +11,7 @@ def timestamp_ms_to_datetime_obj(timestamp_ms):
     if type(timestamp_ms) is str:
         timestamp_ms = float(timestamp_ms)
     datetime_obj = datetime.fromtimestamp(timestamp_ms / 1000)
-    return datetime_obj
+    return pytz.utc.localize(datetime_obj)
 
 
 def exiftool_date_to_datetime_obj(exiftool_date):
@@ -20,7 +20,8 @@ def exiftool_date_to_datetime_obj(exiftool_date):
     if exiftool_date == "0000:00:00 00:00:00":
         return None
     try:
-        parsed_datetime = datetime.strptime(exiftool_date, "%Y:%m:%d %H:%M:%S")
+        naive_parsed_datetime = datetime.strptime(exiftool_date, "%Y:%m:%d %H:%M:%S")
+        parsed_datetime = pytz.utc.localize(naive_parsed_datetime)
     except ValueError:
         parsed_datetime = datetime.strptime(
             exiftool_date, "%Y:%m:%d %H:%M:%S%z"

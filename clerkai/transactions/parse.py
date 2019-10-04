@@ -17,6 +17,7 @@ from clerkai.transactions.parsers.se.danskebank.personal.csv import \
     danskebank_se_csv_transactions_parser
 from clerkai.transactions.parsers.se.nordea.personal.xlsx import \
     nordea_se_xlsx_transactions_parser
+from clerkai.utils import clerkai_input_file_path
 
 nordea_fi_lang_fi_txt_transactions_parser = None
 
@@ -104,7 +105,7 @@ def transaction_ids(transactions):
 
 
 def parse_transaction_files(
-    transaction_files, clerkai_input_file_path, keepraw=False, failfast=False
+    transaction_files, clerkai_input_folder_path, keepraw=False, failfast=False
 ):
     class ContentTypeNotSetError(Exception):
         pass
@@ -113,7 +114,9 @@ def parse_transaction_files(
         pass
 
     def parse_transaction_file_row(transaction_file):
-        transaction_file_path = clerkai_input_file_path(transaction_file)
+        transaction_file_path = clerkai_input_file_path(
+            clerkai_input_folder_path, transaction_file
+        )
         results = None
         error = None
 

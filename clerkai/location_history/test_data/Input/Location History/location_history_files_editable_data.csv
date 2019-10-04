@@ -1,0 +1,3 @@
+Ignore,Location history provider,Content type,File metadata
+,,exported-location-history-file/google-takeout.location-history.json,"{'size': 3777, 'sha1sum': '374a0217f0137a281cb1377759276ac80f7f500c', 'sha256sum': 'a09cc392e8dca9b1c17b522c76ab19d8f188dd7fcc5048abaabf5032c1e2affb'}"
+,,exported-location-history-file/exiftool-output.csv,"{'size': 2555, 'sha1sum': '8421c9b420a164bb578bf5988dde0fe51a7840df', 'sha256sum': 'b5cd54f05ff523ba3defdb1323a0f74666e444e4c8a0f21645ea48b59130e732'}"

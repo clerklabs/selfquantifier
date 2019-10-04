@@ -1,6 +1,11 @@
 import os
 
+from clerkai.location_history.defaults import (
+    location_history_by_date_editable_columns,
+    location_history_files_editable_columns)
 from clerkai.location_history.flow import location_history_flow
+from clerkai.transactions.defaults import (transaction_files_editable_columns,
+                                           transactions_editable_columns)
 from clerkai.transactions.flow import transactions_flow
 from clerkai.utils import (add_all_untracked_and_changed_files,
                            current_gitsha1, ensure_clerkai_folder_versioning,
@@ -49,63 +54,14 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
     # transactions
 
-    transaction_files_editable_columns = [
-        "Ignore",
-        "Account provider",
-        "Account",
-        "Content type",
-        "Account currency",
-    ]
-
-    transactions_editable_columns = [
-        "Include in expense report",
-        "Expense report receiver",
-        "Expense report",
-        "Expense report accounting period",
-        "Walletsharing",
-        "Real Date (Corrected)",
-        "Days between real and bank dates",
-        "Doc Source",
-        "Doc Status",
-        "Doc",
-        "Clarification",
-    ]
-
-    # Account	Date initiated	Date settled	Source text	Merchant	Hash	Transaction id	Amount (Incl. VAT)
-    # Balance	Original amount (In local currency)	Local currency	Account Owner	Comments / Notes	Doc notes
-    # Doc filename	Doc link	Doc inbox search	Sorting ordinal	Legacy Id	Date initiated value
-    # Date settled value	Absolute amount	Absolute original amount	Vendor	Category	Description	Status
-    # Invoice date	Paid date	Source	Amount	Currency	Status
-
-    def list_transactions_files_in_transactions_folder():
-        _ = list_files_in_clerk_input_subfolder(
-            transactions_folder_path,
-            clerkai_input_folder_path=clerkai_input_folder_path,
-        )
-        if len(_) == 0:
-            return _
-        for column in transaction_files_editable_columns:
-            _[column] = None
-        _["History reference"] = current_history_reference()
-        return _[
-            [
-                "File name",
-                "File path",
-                *transaction_files_editable_columns,
-                "File metadata",
-                "History reference",
-            ]
-        ]
-
     def transactions(keep_unmerged_previous_edits=False, failfast=False):
         return transactions_flow(
             transaction_files_editable_columns=transaction_files_editable_columns,
             transactions_editable_columns=transactions_editable_columns,
-            list_transactions_files_in_transactions_folder=list_transactions_files_in_transactions_folder,
+            clerkai_input_folder_path=clerkai_input_folder_path,
             possibly_edited_df=possibly_edited_df,
             transactions_folder_path=transactions_folder_path,
             acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
-            clerkai_input_file_path=clerkai_input_file_path,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             failfast=failfast,
@@ -127,65 +83,14 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
     # location_history
 
-    location_history_files_editable_columns = [
-        "Ignore",
-        "Location history provider",
-        "Content type",
-    ]
-
-    location_history_by_date_editable_columns = []
-
-    """
-    travel_reports_editable_columns = [
-        "Include in expense report",
-        "Expense report receiver",
-        "Expense report",
-        "Expense report accounting period",
-        "Destination",
-        "Travel purpose",
-        "Left date & time",
-        "Returned date & time",
-        "Other comment",
-        "Days Of Personal Vacation",
-        "Private Car Kilometers",
-        "Days With Paid Breakfast",
-        "Days With Paid Lunch",
-        "Days With Paid Dinner",
-    ]
-    """
-
-    def list_location_history_files_in_location_history_folder():
-        _ = list_files_in_clerk_input_subfolder(
-            location_history_folder_path,
-            clerkai_input_folder_path=clerkai_input_folder_path,
-        )
-        for column in location_history_files_editable_columns:
-            _[column] = None
-        _["History reference"] = current_history_reference()
-        if len(_) == 0:
-            return _
-        return _[
-            [
-                "File name",
-                "File path",
-                *location_history_files_editable_columns,
-                "File metadata",
-                "History reference",
-            ]
-        ]
-
     def location_history(keep_unmerged_previous_edits=False, failfast=False):
-        list_lh_files_in_lh_folder = (
-            list_location_history_files_in_location_history_folder
-        )
         return location_history_flow(
             location_history_files_editable_columns=location_history_files_editable_columns,
             location_history_by_date_editable_columns=location_history_by_date_editable_columns,
-            list_location_history_files_in_location_history_folder=list_lh_files_in_lh_folder,
+            clerkai_input_folder_path=clerkai_input_folder_path,
             possibly_edited_df=possibly_edited_df,
             location_history_folder_path=location_history_folder_path,
             acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
-            clerkai_input_file_path=clerkai_input_file_path,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             failfast=failfast,
@@ -231,11 +136,6 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             if "Transaktioner" in file_name:
                 transaction_files.append(file_name)
         return transaction_files
-
-    def clerkai_input_file_path(file):
-        return os.path.join(
-            file["File path"].replace("@", clerkai_input_folder_path), file["File name"]
-        )
 
     # ensure_directories_are_in_place()
     if not os.path.isdir(transactions_folder_path):
