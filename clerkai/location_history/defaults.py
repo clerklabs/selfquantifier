@@ -6,7 +6,7 @@ location_history_files_editable_columns: List[str] = [
     "Content type",
 ]
 
-location_history_by_date_editable_columns: List[str] = []
+location_history_by_date_editable_columns: List[str] = ["Trip"]
 
 """
 travel_reports_editable_columns = [

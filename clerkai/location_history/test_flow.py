@@ -42,6 +42,7 @@ def test_location_history_flow():
         successfully_parsed_location_history_files,
         all_parsed_location_history_df,
         location_history_df,
+        location_history_with_geonames_df,
         possibly_edited_location_history_by_date_df,
     ) = location_history_flow(
         location_history_files_editable_columns=location_history_files_editable_columns,
@@ -53,16 +54,6 @@ def test_location_history_flow():
         current_history_reference=current_history_reference,
         keep_unmerged_previous_edits=False,
         failfast=True,
-    )
-
-    print(
-        location_history_files_df,
-        possibly_edited_location_history_files_df,
-        unsuccessfully_parsed_location_history_files,
-        successfully_parsed_location_history_files,
-        all_parsed_location_history_df,
-        location_history_df,
-        possibly_edited_location_history_by_date_df,
     )
 
     assert len(unsuccessfully_parsed_location_history_files) == 0

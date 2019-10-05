@@ -156,29 +156,51 @@ def location_history_flow(
         groupby_date = location_history_with_geonames_df.groupby(["date"])
         groupby_datehour = location_history_with_geonames_df.groupby(["datehour"])
 
+        def drop_duplicates_retain_order(a_list):
+            return pd.Series(a_list).drop_duplicates().tolist()
+
         def geo_group_attributes(group):
             df = group.size().reset_index(name="counts")
-            df["different_geonames"] = (
+            df["different_geo_names"] = (
                 group["name"]
-                .apply(set)
-                .reset_index(name="different_geonames")["different_geonames"]
+                .apply(drop_duplicates_retain_order)
+                .reset_index(name="different_geo_names")["different_geo_names"]
+            )
+            df["different_geo_admin1"] = (
+                group["admin1"]
+                .apply(drop_duplicates_retain_order)
+                .reset_index(name="different_geo_admin1")["different_geo_admin1"]
+            )
+            df["different_geo_admin2"] = (
+                group["admin2"]
+                .apply(drop_duplicates_retain_order)
+                .reset_index(name="different_geo_admin2")["different_geo_admin2"]
             )
             df["different_countries"] = (
                 group["cc"]
-                .apply(set)
+                .apply(drop_duplicates_retain_order)
                 .reset_index(name="different_countries")["different_countries"]
             )
             df["coordinates"] = (
                 group["coordinates"]
-                .apply(list)
+                .apply(drop_duplicates_retain_order)
                 .reset_index(name="coordinates")["coordinates"]
             )
-            # df["last_known_datehour"] = df["datehour"].shift(1)
             df["last_known_coordinates"] = df["coordinates"].shift(1)
+            df["last_known_different_geo_names"] = df["different_geo_names"].shift(1)
+            df["last_known_different_geo_admin1"] = df["different_geo_admin1"].shift(1)
+            df["last_known_different_geo_admin2"] = df["different_geo_admin2"].shift(1)
+            df["last_known_different_countries"] = df["different_countries"].shift(1)
             return df
 
         location_history_by_date_df = geo_group_attributes(groupby_date)
+        location_history_by_date_df["last_known_date"] = location_history_by_date_df[
+            "date"
+        ].shift(1)
         location_history_by_datehour_df = geo_group_attributes(groupby_datehour)
+        location_history_by_datehour_df[
+            "last_known_datehour"
+        ] = location_history_by_datehour_df["datehour"].shift(1)
 
         def km_distance_since_last(row):
             # print(row["coordinates"], row["last_known_coordinates"])
@@ -199,8 +221,18 @@ def location_history_flow(
         record_type = "location_history_by_date"
 
         location_history_by_date_first_columns = [
-            "Timestamp",
+            "last_known_date",
+            "date",
+            "km_distance_since_last",
             *location_history_by_date_editable_columns,
+            "last_known_different_geo_names",
+            "last_known_different_geo_admin1",
+            "last_known_different_geo_admin2",
+            "last_known_different_countries",
+            "different_geo_names",
+            "different_geo_admin1",
+            "different_geo_admin2",
+            "different_countries",
         ]
         location_history_by_date_export_columns = [
             *location_history_by_date_first_columns,
@@ -213,6 +245,23 @@ def location_history_flow(
             location_history_by_date_export_columns, axis=1
         )
 
+        # index by date
+        dates = pd.to_datetime(location_history_by_date_export_df["date"])
+        location_history_by_date_export_df = location_history_by_date_export_df.set_index(
+            dates
+        )
+
+        # include all dates, so that the edit file can be used to fill in locations for missing dates as well
+        all_days = pd.date_range(
+            location_history_by_date_export_df.index.min(),
+            location_history_by_date_export_df.index.max(),
+            freq="D",
+        )
+        location_history_by_date_export_df = location_history_by_date_export_df.reindex(
+            all_days
+        )
+        location_history_by_date_export_df["date"] = all_days
+
         possibly_edited_location_history_by_date_df = possibly_edited_df(
             location_history_by_date_export_df,
             record_type,
@@ -220,9 +269,16 @@ def location_history_flow(
             keep_unmerged_previous_edits=False,
         )
 
+        # index by date again after reading from edit file
+        dates = pd.to_datetime(possibly_edited_location_history_by_date_df["date"])
+        possibly_edited_location_history_by_date_df = possibly_edited_location_history_by_date_df.set_index(
+            dates
+        )
+
     else:
         all_parsed_location_history_df = []
         location_history_df = []
+        location_history_with_geonames_df = []
         possibly_edited_location_history_by_date_df = []
 
     return (
@@ -232,6 +288,7 @@ def location_history_flow(
         successfully_parsed_location_history_files,
         all_parsed_location_history_df,
         location_history_df,
+        location_history_with_geonames_df,
         possibly_edited_location_history_by_date_df,
     )
 
