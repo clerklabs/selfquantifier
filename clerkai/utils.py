@@ -53,10 +53,46 @@ def current_gitcommit_datetime(repo):
     return datetime.fromtimestamp(repo.head.commit.authored_date)
 
 
+def commits_by_short_gitsha1(repo_path, repo):
+    from pydriller import RepositoryMining
+
+    commits_iterator = RepositoryMining(repo_path, filepath=".").traverse_commits()
+    commits = {}
+    for commit in commits_iterator:
+        history_reference = short_gitsha1(repo, commit.hash)
+        commits[history_reference] = commit
+
+    return commits
+
+
+def commit_datetime_from_history_reference(history_reference, commits):
+    first_matching_commit_history_reference_key = next(
+        filter(lambda _: _.startswith(history_reference), commits.keys()), False
+    )
+    return commits[first_matching_commit_history_reference_key].author_date
+
+
 def clerkai_input_file_path(clerkai_input_folder_path, file):
     return os.path.join(
         file["File path"].replace("@", clerkai_input_folder_path), file["File name"]
     )
+
+
+def export_file_name_by_record_type(record_type, suffix=""):
+    file_extension = "xlsx"
+    if record_type == "transaction_files":
+        export_file_name = "Transaction files"
+    elif record_type == "transactions":
+        export_file_name = "Transactions"
+    elif record_type == "receipt_files":
+        export_file_name = "Receipt files"
+    elif record_type == "location_history_files":
+        export_file_name = "Location history files"
+    elif record_type == "location_history_by_date":
+        export_file_name = "Location history day-by-day"
+    else:
+        raise ValueError("record_type '%s' not recognized" % record_type)
+    return "%s%s.%s" % (export_file_name, suffix, file_extension)
 
 
 def possibly_edited_df_util(
@@ -71,18 +107,7 @@ def possibly_edited_df_util(
     clerkai_input_folder_repo,
 ):
     # set config based on record type
-    if record_type == "transaction_files":
-        export_file_name = "Transaction files.xlsx"
-    elif record_type == "transactions":
-        export_file_name = "Transactions.xlsx"
-    elif record_type == "receipt_files":
-        export_file_name = "Receipt files.xlsx"
-    elif record_type == "location_history_files":
-        export_file_name = "Location history files.xlsx"
-    elif record_type == "location_history_by_date":
-        export_file_name = "Location history day-by-day.xlsx"
-    else:
-        raise ValueError("record_type '%s' not recognized" % record_type)
+    export_file_name = export_file_name_by_record_type(record_type)
 
     # if edit for the head commit already exists - use it
     existing = possibly_edited_commit_specific_df(
@@ -179,6 +204,7 @@ def possibly_edited_commit_specific_df(
     commit_datetime,
     history_reference,
     create_if_not_exists,
+    create_if_exists=False,
 ):
     (
         exists,
@@ -188,25 +214,25 @@ def possibly_edited_commit_specific_df(
     ) = edited_commit_specific_df_exists(
         export_file_name, edits_folder_path, commit_datetime, history_reference
     )
-    if not exists:
-        if create_if_not_exists:
-            save_edited_commit_specific_df(
-                df,
-                commit_specific_directory,
-                commit_specific_directory_path,
-                export_file_name,
-                record_type,
-                xlsx_path,
-            )
-        else:
-            return False
+    if not exists and not create_if_not_exists:
+        return False
+    if create_if_exists or (not exists and create_if_not_exists):
+        save_edited_commit_specific_df(
+            df,
+            commit_specific_directory,
+            commit_specific_directory_path,
+            export_file_name,
+            record_type,
+            xlsx_path,
+        )
     return pd.read_excel(xlsx_path)
 
 
 def edited_commit_specific_df_exists(
-    export_file_name, edits_folder_path, commit_datetime, history_reference
+    unsanitized_export_file_name, edits_folder_path, commit_datetime, history_reference
 ):
     import pytz
+    from pathvalidate import sanitize_filename
 
     utc_commit_datetime = commit_datetime.astimezone(pytz.utc)
 
@@ -217,6 +243,7 @@ def edited_commit_specific_df_exists(
     commit_specific_directory_path = os.path.join(
         edits_folder_path, commit_specific_directory
     )
+    export_file_name = sanitize_filename(unsanitized_export_file_name)
     xlsx_path = os.path.join(commit_specific_directory_path, export_file_name)
 
     # print("Checking if '%s/%s' exists" % (commit_specific_directory, export_file_name))

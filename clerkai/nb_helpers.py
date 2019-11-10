@@ -8,9 +8,13 @@ from clerkai.transactions.defaults import (transaction_files_editable_columns,
                                            transactions_editable_columns)
 from clerkai.transactions.flow import transactions_flow
 from clerkai.utils import (add_all_untracked_and_changed_files,
-                           current_gitsha1, ensure_clerkai_folder_versioning,
+                           commit_datetime_from_history_reference,
+                           commits_by_short_gitsha1, current_gitsha1,
+                           ensure_clerkai_folder_versioning,
+                           export_file_name_by_record_type,
                            list_files_in_clerk_input_subfolder,
                            list_files_in_clerk_subfolder,
+                           possibly_edited_commit_specific_df,
                            possibly_edited_df_util, short_gitsha1)
 
 
@@ -104,27 +108,14 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         )
         if len(_) == 0:
             return _
-        from pydriller import RepositoryMining
-
-        commits_iterator = RepositoryMining(
-            clerkai_input_folder_path, filepath="."
-        ).traverse_commits()
-        commits = {}
-        for commit in commits_iterator:
-            history_reference = short_gitsha1(clerkai_input_folder_repo, commit.hash)
-            commits[history_reference] = commit
+        commits = commits_by_short_gitsha1(
+            clerkai_input_folder_path, clerkai_input_folder_repo
+        )
         _["Related history reference"] = _["File path"].apply(
             extract_commit_sha_from_edit_subfolder_path
         )
-
-        def commit_datetime_from_history_reference(history_reference):
-            first_matching_commit_history_reference_key = next(
-                filter(lambda _: _.startswith(history_reference), commits.keys()), False
-            )
-            return commits[first_matching_commit_history_reference_key].author_date
-
         _["Related history reference date"] = _["Related history reference"].apply(
-            commit_datetime_from_history_reference
+            commit_datetime_from_history_reference, commits=commits
         )
         _ = _.sort_values(by="Related history reference date")
         return _
@@ -167,10 +158,51 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             clerkai_input_folder_repo,
         )
 
+    def store_gsheets_edits(gsheets_title, gsheets_sheet_name, edits_df, record_type):
+        """
+        print(
+            gsheets_title,
+            gsheets_sheet_name,
+            edits_df.columns,
+            edits_df["History reference"].unique(),
+        )
+        """
+
+        history_references = edits_df["History reference"].unique()
+
+        if len(history_references) > 1:
+            raise Exception("Edited data should only contain rows from a single export")
+
+        history_reference = str(history_references[0])
+
+        suffix = ".gsheets.%s.%s" % (gsheets_title, gsheets_sheet_name)
+        export_file_name = export_file_name_by_record_type(record_type, suffix=suffix)
+
+        commits = commits_by_short_gitsha1(
+            clerkai_input_folder_path, clerkai_input_folder_repo
+        )
+        commit_datetime = commit_datetime_from_history_reference(
+            history_reference, commits=commits
+        )
+
+        edit_folder_stored_edits_df = possibly_edited_commit_specific_df(
+            df=edits_df,
+            record_type=record_type,
+            export_file_name=export_file_name,
+            edits_folder_path=edits_folder_path,
+            commit_datetime=commit_datetime,
+            history_reference=history_reference,
+            create_if_not_exists=True,
+            create_if_exists=True,
+        )
+
+        return edit_folder_stored_edits_df
+
     return (
         transactions,
         list_receipt_files_in_receipts_folder,
         location_history,
         list_transactions_files_in_downloads_folder,
         acknowledge_changes_in_clerkai_input_folder,
+        store_gsheets_edits,
     )

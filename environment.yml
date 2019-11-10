@@ -120,6 +120,7 @@ dependencies:
     - dateparser==0.7.2
     - invoice2data==0.3.5
     - lizard==1.16.6
+    - pathvalidate==0.29.0
     - pdftotext==2.1.2
     - pyannotate==1.2.0
     - pydriller==1.9.2
