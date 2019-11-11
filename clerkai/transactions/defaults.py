@@ -20,6 +20,8 @@ transactions_editable_columns: List[str] = [
     "Doc Status",
     "Doc",
     "Clarification",
+    "Type",
+    "Income/Expense Category",
 ]
 
 # Account	Date initiated	Date settled	Source text	Merchant	Hash	Transaction id	Amount (Incl. VAT)
