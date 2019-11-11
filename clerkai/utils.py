@@ -81,18 +81,19 @@ def clerkai_input_file_path(clerkai_input_folder_path, file):
 def export_file_name_by_record_type(record_type, suffix=""):
     file_extension = "xlsx"
     if record_type == "transaction_files":
-        export_file_name = "Transaction files"
+        export_file_name_base = "Transaction files"
     elif record_type == "transactions":
-        export_file_name = "Transactions"
+        export_file_name_base = "Transactions"
     elif record_type == "receipt_files":
-        export_file_name = "Receipt files"
+        export_file_name_base = "Receipt files"
     elif record_type == "location_history_files":
-        export_file_name = "Location history files"
+        export_file_name_base = "Location history files"
     elif record_type == "location_history_by_date":
-        export_file_name = "Location history day-by-day"
+        export_file_name_base = "Location history day-by-day"
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
-    return "%s%s.%s" % (export_file_name, suffix, file_extension)
+    export_file_name = "%s%s.%s" % (export_file_name_base, suffix, file_extension)
+    return (export_file_name, export_file_name_base)
 
 
 def possibly_edited_df_util(
@@ -107,9 +108,30 @@ def possibly_edited_df_util(
     clerkai_input_folder_repo,
 ):
     # set config based on record type
-    export_file_name = export_file_name_by_record_type(record_type)
+    (export_file_name, export_file_name_base) = export_file_name_by_record_type(
+        record_type
+    )
 
-    # if edit for the head commit already exists - use it
+    # list of edit files
+    edit_files_df = list_edit_files_in_edits_folder()
+    # print("edit_files_df", edit_files_df)
+
+    # include earlier edits
+    previous_main_edit_files_mask = (edit_files_df["File name"] == export_file_name) & (
+        edit_files_df["Related history reference"] != current_history_reference()
+    )
+
+    # include gsheets edits
+    gsheets_edit_files_mask = edit_files_df["File name"].str.contains(
+        "%s.gsheets." % export_file_name_base
+    )
+
+    unmerged_edit_files = edit_files_df[
+        previous_main_edit_files_mask | gsheets_edit_files_mask
+    ]
+    # print("unmerged_edit_files", unmerged_edit_files)
+
+    # if edit for the head commit already exists and no other edit files are available - use it
     existing = possibly_edited_commit_specific_df(
         df=None,
         record_type=record_type,
@@ -119,45 +141,25 @@ def possibly_edited_df_util(
         history_reference=current_history_reference(),
         create_if_not_exists=False,
     )
-    if type(existing) is not bool:
+    if type(existing) is not bool and len(unmerged_edit_files) == 0:
         return existing
-
-    # include earlier edits
-    _edit_files_df = list_edit_files_in_edits_folder()
-    edit_files_df = _edit_files_df[_edit_files_df["File name"] == export_file_name]
-    _previous_edit_files = edit_files_df[
-        edit_files_df["Related history reference"] != current_history_reference()
-    ]
-
-    # all earlier edits should have been incorporated in the
-    # most recent previous edit file, so we can restrict to only merge edits
-    # from that file
-    previous_edit_files = _previous_edit_files.tail(1)
-
-    def possibly_edited_commit_specific_df_by_edit_file_row(edit_file):
-        edit_file["previous_possibly_edited_df"] = possibly_edited_commit_specific_df(
-            df=None,
-            record_type=record_type,
-            export_file_name=export_file_name,
-            edits_folder_path=edits_folder_path,
-            commit_datetime=edit_file["Related history reference date"],
-            history_reference=edit_file["Related history reference"],
-            create_if_not_exists=False,
-        )
-        return edit_file
-
-    edit_files_with_previous_possibly_edited_df = previous_edit_files.apply(
-        possibly_edited_commit_specific_df_by_edit_file_row, axis=1
-    )
 
     df_with_previous_edits_across_columns = current_commit_df
     columns_to_drop_after_propagation_of_previous_edits = []
-    for index, edit_file in edit_files_with_previous_possibly_edited_df.iterrows():
+    for index, edit_file in unmerged_edit_files.iterrows():
+        previous_possibly_edited_df_xlsx_path = os.path.join(
+            edit_file["File path"].replace("@/Edits", edits_folder_path),
+            edit_file["File name"],
+        )
+        previous_possibly_edited_df = pd.read_excel(
+            previous_possibly_edited_df_xlsx_path
+        )
         (
             df_with_previous_edits_across_columns,
             additional_columns_to_drop_after_propagation_of_previous_edits,
         ) = merge_changes_from_previous_possibly_edited_df(
-            df=df_with_previous_edits_across_columns,
+            accumulating_df=df_with_previous_edits_across_columns,
+            previous_possibly_edited_df=previous_possibly_edited_df,
             edit_file=edit_file,
             record_type=record_type,
             clerkai_input_folder_path=clerkai_input_folder_path,
@@ -170,7 +172,7 @@ def possibly_edited_df_util(
         ]
 
     df_with_previous_edits = propagate_previous_edits_from_across_columns(
-        df_with_previous_edits_across_columns, previous_edit_files, editable_columns
+        df_with_previous_edits_across_columns, unmerged_edit_files, editable_columns
     )
 
     # clean up irrelevant old columns (should have been merged and propagated already)
@@ -192,6 +194,27 @@ def possibly_edited_df_util(
         history_reference=current_history_reference(),
         create_if_not_exists=True,
     )
+
+    # at this point, we have incorporated the information from the edit files that were used here
+    # thus, we move them to the archive folder
+    def archive_edit_file(edit_file_to_archive):
+        import shutil
+
+        from_folder = edit_file_to_archive["File path"].replace(
+            "@/Edits", edits_folder_path
+        )
+        to_folder = (
+            edit_file_to_archive["File path"]
+            .replace("@/Edits", "@/Edits/Archive")
+            .replace("@/Edits", edits_folder_path)
+        )
+        os.makedirs(to_folder, exist_ok=True)
+        shutil.move(
+            os.path.join(from_folder, edit_file_to_archive["File name"]),
+            os.path.join(to_folder, edit_file_to_archive["File name"]),
+        )
+
+    unmerged_edit_files.apply(archive_edit_file, axis=1)
 
     return possibly_edited_df_with_previous_edits
 
@@ -363,14 +386,20 @@ def changes_between_two_commits(repo_base_path, from_commit, to_commit):
 
 
 def merge_changes_from_previous_possibly_edited_df(
-    df,
+    accumulating_df,
+    previous_possibly_edited_df,
     edit_file,
     record_type,
     clerkai_input_folder_path,
     current_history_reference,
     keep_unmerged_previous_edits,
 ):
-    previous_possibly_edited_df = edit_file["previous_possibly_edited_df"]
+
+    if type(previous_possibly_edited_df) is bool and not previous_possibly_edited_df:
+        print("Context: edit_file", edit_file)
+        raise Exception(
+            "There is no previous possibly edited dataframe to merge changes from"
+        )
 
     # set config based on record type
     if (
@@ -394,13 +423,13 @@ def merge_changes_from_previous_possibly_edited_df(
             )
     elif record_type == "location_history_by_date":
         # for now simply return the current df, ignoring the previously possibly edited df
-        return (df, [])
+        return (accumulating_df, [])
+        """
         # TODO: Support editing location history
         additional_join_column = "ID"
         file_name_column_name = "Source location history file: File name"
         file_path_column_name = "Source location history file: File path"
         # Add ID column if not present in previous edits file
-        """
         if additional_join_column not in previous_possibly_edited_df.columns:
             from clerkai.location_history.parse import location_history_ids
 
@@ -421,7 +450,7 @@ def merge_changes_from_previous_possibly_edited_df(
     def joined_path(record):
         return "%s/%s" % (record[file_path_column_name], record[file_name_column_name])
 
-    df["clerkai_path"] = df.apply(joined_path, axis=1)
+    accumulating_df["clerkai_path"] = accumulating_df.apply(joined_path, axis=1)
     left_on = ["clerkai_path"]
 
     if from_commit != to_commit:
@@ -458,7 +487,7 @@ def merge_changes_from_previous_possibly_edited_df(
         )
         right_on = ["clerkai_path"]
 
-    suffix = " (%s)" % from_commit
+    suffix = " (%s - %s)" % (from_commit, edit_file["File name"])
 
     def add_suffix(column_name):
         return "%s%s" % (column_name, suffix)
@@ -476,7 +505,7 @@ def merge_changes_from_previous_possibly_edited_df(
     import pandas as pd
 
     merged_possibly_edited_df = pd.merge(
-        df,
+        accumulating_df,
         suffixed_previous_possibly_edited_df,
         how="left" if not keep_unmerged_previous_edits else "outer",
         left_on=left_on,
@@ -503,13 +532,18 @@ def set_where_nan():
 
 
 def propagate_previous_edits_from_across_columns(
-    df_with_previous_edits_across_columns, previous_edit_files, editable_columns
+    df_with_previous_edits_across_columns, unmerged_edit_files, editable_columns
 ):
 
-    for history_reference in previous_edit_files["Related history reference"]:
-        # print("history_reference", history_reference)
-        suffix = " (%s)" % history_reference
+    for index, edit_file in unmerged_edit_files.iterrows():
+        suffix = " (%s - %s)" % (
+            edit_file["Related history reference"],
+            edit_file["File name"],
+        )
         for column_name in editable_columns:
+            if column_name not in df_with_previous_edits_across_columns.columns:
+                # the editable column has not been seen before, make sure to initiate it
+                df_with_previous_edits_across_columns[column_name] = None
             suffixed_column_name = "%s%s" % (column_name, suffix)
             if (
                 suffixed_column_name
@@ -600,6 +634,8 @@ def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path):
         )
         # ignore *_editable_data.csv
         _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]
+        # ignore .~lock files
+        _ = _[~_["File name"].str.contains(".~lock")]
     return _
 
 
@@ -613,6 +649,8 @@ def list_files_in_clerk_input_subfolder(folder_path, clerkai_input_folder_path):
         )
         # ignore *_editable_data.csv
         _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]
+        # ignore .~lock files
+        _ = _[~_["File name"].str.contains(".~lock")]
     return _
 
 

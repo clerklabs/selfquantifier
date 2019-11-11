@@ -108,6 +108,9 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         )
         if len(_) == 0:
             return _
+        # ignore those in the archive subfolder
+        _ = _[~_["File path"].str.contains("\/Archive\/", regex=True)]
+        # add commit-metadata to list
         commits = commits_by_short_gitsha1(
             clerkai_input_folder_path, clerkai_input_folder_repo
         )
@@ -159,6 +162,8 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         )
 
     def store_gsheets_edits(gsheets_title, gsheets_sheet_name, edits_df, record_type):
+        from datetime import datetime
+
         """
         print(
             gsheets_title,
@@ -175,8 +180,13 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
         history_reference = str(history_references[0])
 
-        suffix = ".gsheets.%s.%s" % (gsheets_title, gsheets_sheet_name)
-        export_file_name = export_file_name_by_record_type(record_type, suffix=suffix)
+        (dt, micro) = datetime.utcnow().strftime("%Y-%m-%d %H%M%S.%f").split(".")
+        timestamp = "%s%03d" % (dt, int(micro) / 1000)
+
+        suffix = ".gsheets.%s.%s.%s" % (gsheets_title, gsheets_sheet_name, timestamp)
+        (export_file_name, export_file_name_base) = export_file_name_by_record_type(
+            record_type, suffix=suffix
+        )
 
         commits = commits_by_short_gitsha1(
             clerkai_input_folder_path, clerkai_input_folder_repo
