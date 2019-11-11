@@ -23,11 +23,11 @@ def location_history_flow(
             location_history_folder_path,
             clerkai_input_folder_path=clerkai_input_folder_path,
         )
+        if len(_) == 0:
+            return _
         for column in location_history_files_editable_columns:
             _[column] = None
         _["History reference"] = current_history_reference()
-        if len(_) == 0:
-            return _
         return _[
             [
                 "File name",
@@ -75,7 +75,7 @@ def location_history_flow(
     ]
 
     # make sure that the edited column values yields new commits
-    # so that edit-files are dependent on the editable values
+    # so that edit-files are dependent on the editable columns of file metadata
     location_history_files_editable_data_df = included_location_history_files[
         location_history_files_editable_columns + ["File metadata"]
     ]

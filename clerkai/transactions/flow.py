@@ -51,6 +51,13 @@ def transactions_flow(
     transaction_files_export_df = transaction_files_df.reindex(
         transaction_files_export_columns, axis=1
     )
+
+    # Todo
+    """
+    def guess_content_type_based_on_filename():
+        pass
+    """
+
     possibly_edited_transaction_files_df = possibly_edited_df(
         transaction_files_export_df,
         record_type,
@@ -63,7 +70,7 @@ def transactions_flow(
     ]
 
     # make sure that the edited column values yields new commits
-    # so that edit-files are dependent on the editable values
+    # so that edit-files are dependent on the editable columns of file metadata
     transaction_files_editable_data_df = included_transaction_files[
         transaction_files_editable_columns + ["File metadata"]
     ]
