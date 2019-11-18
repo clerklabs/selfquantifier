@@ -1,0 +1,6 @@
+# for location history analysis
+cartopy
+
+# for receipts parsing
+pdftotext
+invoice2data

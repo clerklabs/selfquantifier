@@ -1,17 +1,14 @@
 # general
 pandas
 jellyfish
-gspread-pandas
 matplotlib
 
 # for location history analysis
 reverse_geocoder
 geopy
-cartopy
-
-# for receipts parsing
-pdftotext
-invoice2data
+calmap
+# TODO: Use the later version from the a bit more maintained fork:
+# --editable=git+https://github.com/MarvinT/calmap@dev#egg=calmap
 
 # for panda's df.to_excel()
 openpyxl
