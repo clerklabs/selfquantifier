@@ -60,3 +60,4 @@ dependencies:
     - pydriller==1.9.2
     - reverse-geocoder==1.5.1
     - typing==3.7.4.1
+

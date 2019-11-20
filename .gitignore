@@ -1,6 +1,6 @@
 .idea
 .pytest_cache
-venv
+venv*
 __pycache__
 .eggs
 clerkai.egg-info
