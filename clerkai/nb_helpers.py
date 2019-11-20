@@ -109,7 +109,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         if len(_) == 0:
             return _
         # ignore those in the archive subfolder
-        _ = _[~_["File path"].str.contains("\/Archive\/", regex=True)]
+        _ = _[~_["File path"].str.contains("\\/Archive\\/", regex=True)]
         # add commit-metadata to list
         commits = commits_by_short_gitsha1(
             clerkai_input_folder_path, clerkai_input_folder_repo
