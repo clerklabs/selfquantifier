@@ -9,7 +9,7 @@ from clerkai.location_history.parsers.parse_utils import \
 
 
 def import_google_takeout_location_history_json_location_history_file(
-    location_history_file
+    location_history_file,
 ):
     with open(location_history_file, "r") as f:
         data = json.load(f)
@@ -38,7 +38,7 @@ def import_google_takeout_location_history_json_location_history_file(
 
 
 def google_takeout_location_history_json_location_history_to_general_clerk_format(
-    locations_df
+    locations_df,
 ):
     # type: (DataFrame) -> DataFrame
     normalized_df = pd.DataFrame()

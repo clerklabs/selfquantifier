@@ -15,7 +15,7 @@ from clerkai.utils import (add_all_untracked_and_changed_files,
                            list_files_in_clerk_input_subfolder,
                            list_files_in_clerk_subfolder,
                            possibly_edited_commit_specific_df,
-                           possibly_edited_df_util, short_gitsha1)
+                           possibly_edited_df_util)
 
 
 def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
