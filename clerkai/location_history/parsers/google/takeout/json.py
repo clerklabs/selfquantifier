@@ -5,7 +5,7 @@ from pandas.core.frame import DataFrame
 from pandas.io.json import json_normalize
 
 from clerkai.location_history.parsers.parse_utils import \
-    timestamp_ms_to_datetime_obj
+    timestamp_ms_to_utc_datetime_obj
 
 
 def import_google_takeout_location_history_json_location_history_file(
@@ -51,7 +51,7 @@ def google_takeout_location_history_json_location_history_to_general_clerk_forma
     normalized_df["Raw Altitude"] = locations_df["altitude"]
     normalized_df["Raw Vertical Accuracy"] = locations_df["verticalAccuracy"]
     normalized_df["Timestamp"] = normalized_df["Raw Timestamp"].apply(
-        timestamp_ms_to_datetime_obj
+        timestamp_ms_to_utc_datetime_obj
     )
     normalized_df["Latitude"] = normalized_df["Raw Latitude"] / 1e7
     normalized_df["Longitude"] = normalized_df["Raw Longitude"] / 1e7

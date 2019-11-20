@@ -4,7 +4,7 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 
 from clerkai.transactions.parsers.parse_utils import (
-    amount_to_rounded_decimal, ymd_date_to_datetime_obj)
+    amount_to_rounded_decimal, ymd_date_to_naive_datetime_obj)
 
 
 def lhv_ee_description_to_datetime_obj(description_str):
@@ -38,7 +38,7 @@ def lhv_ee_csv_transactions_to_general_clerk_format(df):
         lhv_ee_description_to_datetime_obj
     )
     normalized_df["Bank Date"] = normalized_df["Raw Bank Date"].apply(
-        ymd_date_to_datetime_obj
+        ymd_date_to_naive_datetime_obj
     )
     normalized_df["Payee"] = normalized_df["Raw Payee"]
     normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]

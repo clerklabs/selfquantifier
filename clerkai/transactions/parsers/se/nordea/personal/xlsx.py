@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 
 from clerkai.transactions.parsers.parse_utils import (
-    convert_european_amount_to_decimal, ymd_date_to_datetime_obj)
+    convert_european_amount_to_decimal, ymd_date_to_naive_datetime_obj)
 
 
 def import_nordea_se_xlsx_transaction_file(transaction_file):
@@ -36,7 +36,7 @@ def nordea_se_xlsx_transactions_to_general_clerk_format(df):
         nordea_se_transaction_text_to_datetime_obj
     )
     normalized_df["Bank Date"] = normalized_df["Raw Bank Date"].apply(
-        ymd_date_to_datetime_obj
+        ymd_date_to_naive_datetime_obj
     )
     normalized_df["Payee"] = normalized_df["Raw Payee"]
     normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]

@@ -2,7 +2,7 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 
 from clerkai.location_history.parsers.parse_utils import \
-    exiftool_date_to_datetime_obj
+    exiftool_date_to_utc_datetime_obj
 from clerkai.utils import is_nan
 
 
@@ -14,7 +14,7 @@ def either_date_time_original_or_create_date(raw_dates):
         exiftool_date = raw_dates["CreateDate"]
     if not exiftool_date:
         return None
-    return exiftool_date_to_datetime_obj(exiftool_date)
+    return exiftool_date_to_utc_datetime_obj(exiftool_date)
 
 
 def import_exiftool_csv_location_history_file(location_history_file):

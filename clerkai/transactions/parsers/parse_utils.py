@@ -29,7 +29,7 @@ def strip_whitespace_if_not_is_nan(x):
     return x.strip()
 
 
-def ymd_date_to_datetime_obj(datetime_str):
+def ymd_date_to_naive_datetime_obj(datetime_str):
     if is_nan(datetime_str):
         return None
     datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%d")

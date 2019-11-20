@@ -5,16 +5,16 @@ import pytz
 from clerkai.utils import is_nan
 
 
-def timestamp_ms_to_datetime_obj(timestamp_ms):
+def timestamp_ms_to_utc_datetime_obj(timestamp_ms):
     if is_nan(timestamp_ms):
         return None
     if type(timestamp_ms) is str:
         timestamp_ms = float(timestamp_ms)
     datetime_obj = datetime.fromtimestamp(timestamp_ms / 1000)
-    return pytz.utc.localize(datetime_obj)
+    return datetime_obj.astimezone(pytz.utc)
 
 
-def exiftool_date_to_datetime_obj(exiftool_date):
+def exiftool_date_to_utc_datetime_obj(exiftool_date):
     if is_nan(exiftool_date):
         return None
     if exiftool_date == "0000:00:00 00:00:00":
