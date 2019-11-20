@@ -9,7 +9,7 @@ setup(
     # Meta
     author="Clerk.ai Developers",
     author_email="info@clerk.ai",
-    description="Tools for extracting transaction, receipt, travel and time information from local files",
+    description="Tools for extracting and transforming transaction, receipt, travel and time information from local files",
     name="clerkai",
     license="ISC",
     url="https://github.com/clerk/python-clerkai",
@@ -30,7 +30,7 @@ setup(
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: ISC License (ISCL)",
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
