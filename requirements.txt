@@ -17,6 +17,9 @@ xlsxwriter
 # for panda's df.read_excel()
 xlrd
 
+# for gsheets import/export
+gspread-dataframe
+
 # for git-related util functions
 GitPython
 pydriller
