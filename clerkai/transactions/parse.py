@@ -17,6 +17,8 @@ from clerkai.transactions.parsers.se.danskebank.personal.csv import \
     danskebank_se_csv_transactions_parser
 from clerkai.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx import \
     nordea_se_personal_internetbanken_privat_xlsx_transactions_parser
+from clerkai.transactions.parsers.se.nordea.personal.netbank.csv import \
+    nordea_se_personal_netbank_csv_transactions_parser
 from clerkai.utils import clerkai_input_file_path
 
 nordea_fi_lang_fi_txt_transactions_parser = None
@@ -28,6 +30,7 @@ parser_by_content_type = {
     "exported-transaction-file/nordea.se.internetbanken-privat.xls": (
         nordea_se_personal_internetbanken_privat_xlsx_transactions_parser
     ),
+    "exported-transaction-file/nordea.se.personal.netbank.csv": nordea_se_personal_netbank_csv_transactions_parser,
     "exported-transaction-file/danskebank.se.csv": danskebank_se_csv_transactions_parser,
     "exported-transaction-file/xolo.io.expenses.csv": xolo_csv_transactions_parser,
     "exported-transaction-file/n26.com.csv": n26_csv_transactions_parser,
