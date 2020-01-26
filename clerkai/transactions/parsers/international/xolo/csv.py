@@ -3,6 +3,7 @@ from pandas.core.frame import DataFrame
 
 from clerkai.transactions.parsers.parse_utils import (
     amount_to_rounded_decimal, ymd_date_to_naive_datetime_obj)
+from clerkai.utils import is_nan
 
 
 def import_xolo_csv_transaction_file(transaction_file):
@@ -11,6 +12,8 @@ def import_xolo_csv_transaction_file(transaction_file):
 
 
 def xolo_expenses_vendor_category_bug_fixer(xolo_csv_record):
+    if is_nan(xolo_csv_record["Category"]):
+        return xolo_csv_record["Vendor"]
     # todo: make only remove from the end
     return xolo_csv_record["Vendor"].replace(xolo_csv_record["Category"], "")
 
