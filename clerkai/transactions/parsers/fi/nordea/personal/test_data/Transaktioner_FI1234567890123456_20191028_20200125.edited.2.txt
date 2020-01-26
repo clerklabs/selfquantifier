@@ -1,0 +1,9 @@
+Kontonummer	FI5814703500919322
+
+Bokningsdag	Valutadag	Betalningsdag	Belopp	Mottagare/Betalare	Kontonummer	BIC	Kontotransaktion	Referens	Betalarens referens	Meddelande	Kortets nummer	Kvitto	
+
+28.10.2019	28.10.2019	28.10.2019	-3,08	IZ *RIITAN HERKKU			Visa Electron-köp	191025035608		MUSTASAARI 	4920109027999687
+
+28.10.2019	28.10.2019	28.10.2019	175,90	KESKO OYJ			e-återbetalning	152800021220564
+
+30.10.2019	30.10.2019	30.10.2019	-8,76	PRISMA JUMBO			Visa Electron-köp	191029830310		VANTAA 	4920109027881992

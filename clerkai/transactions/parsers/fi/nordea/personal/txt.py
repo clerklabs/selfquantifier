@@ -18,6 +18,8 @@ def nordea_fi_reference_number_to_datetime_obj(reference_number):
     reference_number_str = str(reference_number)
     if not reference_number_str.isdigit():
         return None
+    if not len(reference_number_str) == 12:
+        return None
     datetime_str = reference_number_str[0:6]
     datetime_obj = datetime.strptime(datetime_str, "%y%m%d")
     return datetime_obj
