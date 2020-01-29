@@ -4,8 +4,9 @@ from clerkai.location_history.defaults import (
     location_history_by_date_editable_columns,
     location_history_files_editable_columns)
 from clerkai.location_history.flow import location_history_flow
-from clerkai.transactions.defaults import (transaction_files_editable_columns,
-                                           transactions_editable_columns)
+from clerkai.transactions.defaults import (
+    default_transaction_files_editable_columns,
+    default_transactions_editable_columns)
 from clerkai.transactions.flow import transactions_flow
 from clerkai.utils import (add_all_untracked_and_changed_files,
                            commit_datetime_from_history_reference,
@@ -58,7 +59,28 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
     # transactions
 
-    def transactions(keep_unmerged_previous_edits=False, failfast=False):
+    def transactions(
+        keep_unmerged_previous_edits=False,
+        failfast=False,
+        additional_transaction_files_editable_columns=None,
+        additional_transactions_editable_columns=None,
+    ):
+        if additional_transaction_files_editable_columns:
+            transaction_files_editable_columns = [
+                *additional_transaction_files_editable_columns,
+                *default_transaction_files_editable_columns,
+            ]
+        else:
+            transaction_files_editable_columns = (
+                default_transaction_files_editable_columns
+            )
+        if additional_transactions_editable_columns:
+            transactions_editable_columns = [
+                *additional_transactions_editable_columns,
+                *default_transactions_editable_columns,
+            ]
+        else:
+            transactions_editable_columns = default_transactions_editable_columns
         return transactions_flow(
             transaction_files_editable_columns=transaction_files_editable_columns,
             transactions_editable_columns=transactions_editable_columns,

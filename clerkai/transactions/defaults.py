@@ -1,6 +1,6 @@
 from typing import List
 
-transaction_files_editable_columns: List[str] = [
+default_transaction_files_editable_columns: List[str] = [
     "Ignore",
     "Account provider",
     "Account",
@@ -8,7 +8,7 @@ transaction_files_editable_columns: List[str] = [
     "Account currency",
 ]
 
-transactions_editable_columns: List[str] = [
+default_transactions_editable_columns: List[str] = [
     "Include in expense report",
     "Expense report receiver",
     "Expense report",
