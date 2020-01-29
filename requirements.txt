@@ -19,6 +19,8 @@ xlrd
 
 # for gsheets import/export
 gspread-dataframe
+pathvalidate
+gspread-formatting
 
 # for git-related util functions
 GitPython
