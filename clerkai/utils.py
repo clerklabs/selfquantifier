@@ -126,13 +126,13 @@ def possibly_edited_df_util(
         "%s.gsheets." % export_file_name_base
     )
 
-    unmerged_edit_files = edit_files_df[
+    unmerged_non_current_main_edit_files = edit_files_df[
         previous_main_edit_files_mask | gsheets_edit_files_mask
     ]
-    # print("unmerged_edit_files", unmerged_edit_files)
+    print("unmerged_non_current_main_edit_files", unmerged_non_current_main_edit_files)
 
-    # if edit for the head commit already exists and no other edit files are available - use it
-    existing = possibly_edited_commit_specific_df(
+    # check if edit for the head commit already exists
+    main_edit_file_df = possibly_edited_commit_specific_df(
         df=None,
         record_type=record_type,
         export_file_name=export_file_name,
@@ -141,12 +141,24 @@ def possibly_edited_df_util(
         history_reference=current_history_reference(),
         create_if_not_exists=False,
     )
-    if type(existing) is not bool and len(unmerged_edit_files) == 0:
-        return existing
+    main_edit_file_for_the_head_commit_exists = type(main_edit_file_df) is not bool
 
-    df_with_previous_edits_across_columns = current_commit_df
+    # if edit for the head commit already exists and no other edit files are available - use it
+    if main_edit_file_for_the_head_commit_exists and len(unmerged_non_current_main_edit_files) == 0:
+        print("Returning existing %s.xlsx (ignoring currently parsed data)" % (export_file_name_base))
+        return main_edit_file_df
+
+    # include the current main edit file df if exists and a merge is
+    # imminent - or else all changes only in the main edit file will be lost
+    if main_edit_file_for_the_head_commit_exists:
+        print("Merging edits from %s edit file(s) and %s.xlsx into a new %s.xlsx (ignoring currently parsed data)" % (len(unmerged_non_current_main_edit_files), export_file_name_base, export_file_name_base))
+        df_with_previous_edits_across_columns = main_edit_file_df
+    else:
+        print("Merging edits from %s edit file(s) and the currently parsed data into %s.xlsx" % (len(unmerged_non_current_main_edit_files), export_file_name_base))
+        df_with_previous_edits_across_columns = current_commit_df
+
     columns_to_drop_after_propagation_of_previous_edits = []
-    for index, edit_file in unmerged_edit_files.iterrows():
+    for index, edit_file in unmerged_non_current_main_edit_files.iterrows():
         previous_possibly_edited_df_xlsx_path = os.path.join(
             edit_file["File path"].replace("@/Edits", edits_folder_path),
             edit_file["File name"],
@@ -172,7 +184,7 @@ def possibly_edited_df_util(
         ]
 
     df_with_previous_edits = propagate_previous_edits_from_across_columns(
-        df_with_previous_edits_across_columns, unmerged_edit_files, editable_columns
+        df_with_previous_edits_across_columns, unmerged_non_current_main_edit_files, editable_columns
     )
 
     # clean up irrelevant old columns (should have been merged and propagated already)
@@ -184,19 +196,6 @@ def possibly_edited_df_util(
         print("Keeping potential old edits and columns for reference")
         clean_df_with_previous_edits = df_with_previous_edits
 
-    # make sure that the merged editable df file is available in the most current location
-    possibly_edited_df_with_previous_edits = possibly_edited_commit_specific_df(
-        df=clean_df_with_previous_edits,
-        record_type=record_type,
-        export_file_name=export_file_name,
-        edits_folder_path=edits_folder_path,
-        commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
-        history_reference=current_history_reference(),
-        create_if_not_exists=True,
-    )
-
-    # at this point, we have incorporated the information from the edit files that were used here
-    # thus, we move them to the archive folder
     def archive_edit_file(edit_file_to_archive):
         import shutil
 
@@ -214,7 +213,30 @@ def possibly_edited_df_util(
             os.path.join(to_folder, edit_file_to_archive["File name"]),
         )
 
-    unmerged_edit_files.apply(archive_edit_file, axis=1)
+    # if the main edit file existed before the merging, archive it before
+    # TODO: possibly add a datetime to the archived file, so that multiple copies can be archived
+    main_edit_file_for_the_head_commit_mask = (edit_files_df["File name"] == export_file_name) & (
+        edit_files_df["Related history reference"] == current_history_reference()
+    )
+    main_edit_file_for_the_head_commit = edit_files_df[
+        main_edit_file_for_the_head_commit_mask
+    ]
+    main_edit_file_for_the_head_commit.apply(archive_edit_file, axis=1)
+
+    # make sure that the merged editable df file is available in the most current location
+    possibly_edited_df_with_previous_edits = possibly_edited_commit_specific_df(
+        df=clean_df_with_previous_edits,
+        record_type=record_type,
+        export_file_name=export_file_name,
+        edits_folder_path=edits_folder_path,
+        commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
+        history_reference=current_history_reference(),
+        create_if_not_exists=True,
+    )
+
+    # at this point, we have incorporated the information from the edit files that were used here
+    # thus, we move them to the archive folder
+    unmerged_non_current_main_edit_files.apply(archive_edit_file, axis=1)
 
     return possibly_edited_df_with_previous_edits
 
