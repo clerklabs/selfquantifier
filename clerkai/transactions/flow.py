@@ -135,12 +135,12 @@ def transactions_flow(
 
         transactions_first_columns = [
             "Account",
-            *transactions_editable_columns,
-            "Real Date",
-            "Bank Date",
             "Date",
             "Year",
             "Month",
+            *transactions_editable_columns,
+            "Real Date",
+            "Bank Date",
         ]
         transactions_export_columns = [
             *transactions_first_columns,
