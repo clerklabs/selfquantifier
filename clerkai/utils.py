@@ -318,57 +318,72 @@ def save_edited_commit_specific_df(
             )
 
 
+def set_export_transactions_formulas(df, eu_locale=False):
+    from xlsxwriter.utility import xl_col_to_name
+    import numpy as np
+    def col_letter(column_name):
+        return xl_col_to_name(df.columns.get_loc(column_name))
+
+    # set formulas
+    df["Account"] = '=%s[ROW]&" - "&%s[ROW]' % (
+    col_letter("Source transaction file: Account provider"), col_letter("Source transaction file: Account"))
+    if eu_locale:
+        df["Date"] = '=IF(%s[ROW]<>"";%s[ROW];%s[ROW])' % (
+        col_letter("Real Date"), col_letter("Real Date"), col_letter("Bank Date"))
+        df["Year"] = '=IF(%s[ROW]="";"";TEXT(%s[ROW]; "yyyy"))' % (col_letter("Date"), col_letter("Date"))
+        df["Month"] = '=IF(%s[ROW]="";"";TEXT(%s[ROW]; "yyyy-mm"))' % (col_letter("Date"), col_letter("Date"))
+    else:
+        df["Date"] = '=IF(%s[ROW]<>"",%s[ROW],%s[ROW])' % (
+        col_letter("Real Date"), col_letter("Real Date"), col_letter("Bank Date"))
+        df["Year"] = '=IF(%s[ROW]="","",TEXT(%s[ROW], "yyyy"))' % (col_letter("Date"), col_letter("Date"))
+        df["Month"] = '=IF(%s[ROW]="","",TEXT(%s[ROW), "yyyy-mm"))' % (col_letter("Date"), col_letter("Date"))
+
+    df["Row number at export"] = np.arange(len(df)) + 2
+
+    # make formulas row-specific
+    def insert_row_numbers(df_row, colname):
+        return df_row[colname].replace("[ROW]", str(df_row["Row number at export"]))
+
+    df["Account"] = df.apply(insert_row_numbers, axis=1, colname="Account")
+    df["Date"] = df.apply(insert_row_numbers, axis=1, colname="Date")
+    df["Year"] = df.apply(insert_row_numbers, axis=1, colname="Year")
+    df["Month"] = df.apply(insert_row_numbers, axis=1, colname="Month")
+
+    return df
+
+
 def export_transactions_xlsx(export_df, writer):
     from xlsxwriter.utility import xl_col_to_name
 
-    export_df["Account"] = (
-        '=INDIRECT("R[0]C[%s]", 0)&" - "&INDIRECT("R[0]C[%s]", 0)'
-        % (
-            export_df.columns.get_loc("Source transaction file: Account provider"),
-            export_df.columns.get_loc("Source transaction file: Account"),
-        )
-    )
-    date_formula = '=IF(INDIRECT("R[0]C[-2]", FALSE)<>"",INDIRECT("R[0]C[-2]", FALSE),INDIRECT("R[0]C[-1]", FALSE))'
-    export_df["Date"] = date_formula
-    export_df[
-        "Year"
-    ] = '=IF(INDIRECT("R[0]C[-1]", FALSE)="","",Text(INDIRECT("R[0]C[-1]", FALSE), "yyyy"))'
-    export_df[
-        "Month"
-    ] = '=IF(INDIRECT("R[0]C[-2]", FALSE)="","",Text(INDIRECT("R[0]C[-2]", FALSE), "yyyy-mm"))'
+    export_df = set_export_transactions_formulas(export_df)
     export_df.to_excel(writer, sheet_name="Data", index=False, freeze_panes=(1, 0))
+
     # adjust styles etc
     workbook = writer.book
     worksheet = workbook.get_worksheet_by_name("Data")
+    # set default column width
     default_column_width = 10
-    account_column_index = export_df.columns.get_loc("Account")
-    date_column_index = export_df.columns.get_loc("Date")
-    # account column
-    account_column_letter = xl_col_to_name(account_column_index)
-    worksheet.set_column("%s:%s" % (account_column_letter, account_column_letter), 30)
-    # columns between account column and date column
+    last_column_index = len(export_df.columns) - 1
     worksheet.set_column(
         "%s:%s"
         % (
-            xl_col_to_name(account_column_index + 1),
-            xl_col_to_name(date_column_index - 1),
+            xl_col_to_name(0),
+            xl_col_to_name(last_column_index),
         ),
         default_column_width,
     )
+    # account column
+    account_column_index = export_df.columns.get_loc("Account")
+    account_column_letter = xl_col_to_name(account_column_index)
+    worksheet.set_column("%s:%s" % (account_column_letter, account_column_letter), 30)
     # date column
+    date_column_index = export_df.columns.get_loc("Date")
     date_format = workbook.add_format({"num_format": "yyyy-mm-dd"})
     date_column_letter = xl_col_to_name(date_column_index)
-    last_row_number = len(export_df) + 2
-    for row in range(2, last_row_number):
-        worksheet.write("%s%s" % (date_column_letter, row), date_formula, date_format)
+    worksheet.set_column("%s:%s" % (date_column_letter, date_column_letter), None, date_format)
     worksheet.set_column("%s:%s" % (date_column_letter, date_column_letter), 20)
-    # columns from date column to end
-    last_column_index = len(export_df.columns) - 1
-    last_column_letter = xl_col_to_name(last_column_index)
-    worksheet.set_column(
-        "%s:%s" % (xl_col_to_name(date_column_index + 1), last_column_letter),
-        default_column_width,
-    )
+    # TODO: possibly pre-calculate values of formulas to avoid LibreOffice issue
+    # see https://stackoverflow.com/questions/32205927/xlsxwriter-and-libreoffice-not-showing-formulas-result
 
 
 def changes_between_two_commits(repo_base_path, from_commit, to_commit):
