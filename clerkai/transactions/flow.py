@@ -177,7 +177,7 @@ def transactions_flow(
             transactions_export_df,
             record_type,
             transactions_editable_columns,
-            keep_unmerged_previous_edits=False,
+            keep_unmerged_previous_edits=keep_unmerged_previous_edits,
         )
 
     else:
