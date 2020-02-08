@@ -145,6 +145,7 @@ def transactions_flow(
         transactions_export_columns = [
             *transactions_first_columns,
             *transactions_df.columns.difference(transactions_first_columns, sort=False),
+            "Row number at export",
         ]
         # print("transactions_export_columns", transactions_export_columns)
         transactions_export_df = transactions_df.reindex(
