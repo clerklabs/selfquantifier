@@ -5,7 +5,7 @@ from os.path import getsize, join
 import pandas as pd
 from gspread import SpreadsheetNotFound, WorksheetNotFound
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
-from gspread_formatting import Color, set_frozen
+from gspread_formatting import CellFormat, Color
 from gspread_formatting.dataframe import BasicFormatter, format_with_dataframe
 
 
@@ -434,6 +434,7 @@ def export_to_gsheets(
     gsheets_sheet_name,
     create_if_not_exists=False,
     eu_locale=False,
+    editable_columns=None,
 ):
     # open target gsheet
     try:
@@ -473,25 +474,42 @@ def export_to_gsheets(
         df = set_export_transactions_formulas(df, eu_locale)
 
     # export to gsheets
-    if len(df) == 0:
-        set_frozen(worksheet, rows=0)
+    # if len(df) == 0:
+    #     set_frozen(worksheet, rows=0)
     set_with_dataframe(worksheet, df, resize=True)
-    if len(df) > 0:
-        set_frozen(worksheet, rows=1)
+    # if len(df) > 0:
+    #     set_frozen(worksheet, rows=1)
 
-    # uses DEFAULT_FORMATTER
-    format_with_dataframe(
-        worksheet, df, include_index=False, include_column_header=True
-    )
+    dark_purple = Color(56 / 255, 40 / 255, 54 / 255)
+    orange = Color(252 / 255, 142 / 255, 30 / 255)
+    white = Color(255 / 255, 255 / 255, 255 / 255)
+    light_orange_3 = Color(255 / 255, 229 / 255, 227 / 255)
+    light_grey = Color(240 / 255, 240 / 255, 240 / 255)
 
-    """
+    editable_column_cell_format = CellFormat(backgroundColor=white,)
+    non_editable_column_cell_format = CellFormat(backgroundColor=light_grey,)
+
+    column_formats = {}
+    print("editable_columns", editable_columns)
+    if editable_columns:
+        non_editable_columns = df.columns.difference(editable_columns, sort=False)
+        print("non_editable_columns", non_editable_columns)
+        for non_editable_column_name in non_editable_columns:
+            column_formats[non_editable_column_name] = non_editable_column_cell_format
+        for editable_column_name in editable_columns:
+            column_formats[editable_column_name] = editable_column_cell_format
+
     formatter = BasicFormatter(
-        header_background_color=Color(0,0,0),
-        header_text_color=Color(1,1,1),
-        decimal_format='#,##0.00'
+        header_background_color=dark_purple,
+        header_text_color=white,
+        decimal_format="#,##0.00",
+        date_format="YYYY-MM-DD",
+        freeze_headers=True,
+        column_formats=column_formats,
     )
-    format_with_dataframe(worksheet, df, formatter, include_index=False, include_column_header=True)
-    """
+    format_with_dataframe(
+        worksheet, df, formatter, include_index=False, include_column_header=True
+    )
 
     spreadsheet_url = "https://docs.google.com/spreadsheets/d/%s" % sh.id
     return spreadsheet_url

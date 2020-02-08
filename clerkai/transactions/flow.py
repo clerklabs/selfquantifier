@@ -194,6 +194,8 @@ def transactions_flow(
         all_parsed_transactions_df,
         transactions_df,
         possibly_edited_transactions_df,
+        transaction_files_editable_columns,
+        transactions_editable_columns,
     )
 
 
