@@ -642,8 +642,6 @@ def merge_changes_from_previous_possibly_edited_df(
 
     if additional_join_column:
         left_on.append(additional_join_column)
-
-    if additional_join_column:
         right_on.append(additional_join_column)
 
     suffixed_previous_possibly_edited_df = previous_possibly_edited_df.add_suffix(
