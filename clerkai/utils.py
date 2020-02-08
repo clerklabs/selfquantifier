@@ -336,7 +336,7 @@ def set_export_transactions_formulas(df, eu_locale=False):
         df["Date"] = '=IF(%s[ROW]<>"",%s[ROW],%s[ROW])' % (
         col_letter("Real Date"), col_letter("Real Date"), col_letter("Bank Date"))
         df["Year"] = '=IF(%s[ROW]="","",TEXT(%s[ROW], "yyyy"))' % (col_letter("Date"), col_letter("Date"))
-        df["Month"] = '=IF(%s[ROW]="","",TEXT(%s[ROW), "yyyy-mm"))' % (col_letter("Date"), col_letter("Date"))
+        df["Month"] = '=IF(%s[ROW]="","",TEXT(%s[ROW], "yyyy-mm"))' % (col_letter("Date"), col_letter("Date"))
 
     df["Row number at export"] = np.arange(len(df)) + 2
 
