@@ -9,16 +9,6 @@ default_transaction_files_editable_columns: List[str] = [
 ]
 
 default_transactions_editable_columns: List[str] = [
-    "Include in expense report",
-    "Expense report receiver",
-    "Expense report",
-    "Expense report accounting period",
-    "Walletsharing",
-    "Real Date (Corrected)",
-    "Days between real and bank dates",
-    "Doc Source",
-    "Doc Status",
-    "Doc",
     "Clarification",
     "Type",
     "Income/Expense Category",
