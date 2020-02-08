@@ -144,17 +144,33 @@ def possibly_edited_df_util(
     main_edit_file_for_the_head_commit_exists = type(main_edit_file_df) is not bool
 
     # if edit for the head commit already exists and no other edit files are available - use it
-    if main_edit_file_for_the_head_commit_exists and len(unmerged_non_current_main_edit_files) == 0:
-        print("Returning existing %s.xlsx (ignoring currently parsed data)" % (export_file_name_base))
+    if (
+        main_edit_file_for_the_head_commit_exists
+        and len(unmerged_non_current_main_edit_files) == 0
+    ):
+        print(
+            "Returning existing %s.xlsx (ignoring currently parsed data)"
+            % (export_file_name_base)
+        )
         return main_edit_file_df
 
     # include the current main edit file df if exists and a merge is
     # imminent - or else all changes only in the main edit file will be lost
     if main_edit_file_for_the_head_commit_exists:
-        print("Merging edits from %s edit file(s) and %s.xlsx into a new %s.xlsx (ignoring currently parsed data)" % (len(unmerged_non_current_main_edit_files), export_file_name_base, export_file_name_base))
+        print(
+            "Merging edits from %s edit file(s) and %s.xlsx into a new %s.xlsx (ignoring currently parsed data)"
+            % (
+                len(unmerged_non_current_main_edit_files),
+                export_file_name_base,
+                export_file_name_base,
+            )
+        )
         df_with_previous_edits_across_columns = main_edit_file_df
     else:
-        print("Merging edits from %s edit file(s) and the currently parsed data into %s.xlsx" % (len(unmerged_non_current_main_edit_files), export_file_name_base))
+        print(
+            "Merging edits from %s edit file(s) and the currently parsed data into %s.xlsx"
+            % (len(unmerged_non_current_main_edit_files), export_file_name_base)
+        )
         df_with_previous_edits_across_columns = current_commit_df
 
     columns_to_drop_after_propagation_of_previous_edits = []
@@ -184,7 +200,9 @@ def possibly_edited_df_util(
         ]
 
     df_with_previous_edits = propagate_previous_edits_from_across_columns(
-        df_with_previous_edits_across_columns, unmerged_non_current_main_edit_files, editable_columns
+        df_with_previous_edits_across_columns,
+        unmerged_non_current_main_edit_files,
+        editable_columns,
     )
 
     # clean up irrelevant old columns (should have been merged and propagated already)
@@ -215,9 +233,9 @@ def possibly_edited_df_util(
 
     # if the main edit file existed before the merging, archive it before
     # TODO: possibly add a datetime to the archived file, so that multiple copies can be archived
-    main_edit_file_for_the_head_commit_mask = (edit_files_df["File name"] == export_file_name) & (
-        edit_files_df["Related history reference"] == current_history_reference()
-    )
+    main_edit_file_for_the_head_commit_mask = (
+        edit_files_df["File name"] == export_file_name
+    ) & (edit_files_df["Related history reference"] == current_history_reference())
     main_edit_file_for_the_head_commit = edit_files_df[
         main_edit_file_for_the_head_commit_mask
     ]
@@ -321,22 +339,43 @@ def save_edited_commit_specific_df(
 def set_export_transactions_formulas(df, eu_locale=False):
     from xlsxwriter.utility import xl_col_to_name
     import numpy as np
+
     def col_letter(column_name):
         return xl_col_to_name(df.columns.get_loc(column_name))
 
     # set formulas
     df["Account"] = '=%s[ROW]&" - "&%s[ROW]' % (
-    col_letter("Source transaction file: Account provider"), col_letter("Source transaction file: Account"))
+        col_letter("Source transaction file: Account provider"),
+        col_letter("Source transaction file: Account"),
+    )
     if eu_locale:
         df["Date"] = '=IF(%s[ROW]<>"";%s[ROW];%s[ROW])' % (
-        col_letter("Real Date"), col_letter("Real Date"), col_letter("Bank Date"))
-        df["Year"] = '=IF(%s[ROW]="";"";TEXT(%s[ROW]; "yyyy"))' % (col_letter("Date"), col_letter("Date"))
-        df["Month"] = '=IF(%s[ROW]="";"";TEXT(%s[ROW]; "yyyy-mm"))' % (col_letter("Date"), col_letter("Date"))
+            col_letter("Real Date"),
+            col_letter("Real Date"),
+            col_letter("Bank Date"),
+        )
+        df["Year"] = '=IF(%s[ROW]="";"";TEXT(%s[ROW]; "yyyy"))' % (
+            col_letter("Date"),
+            col_letter("Date"),
+        )
+        df["Month"] = '=IF(%s[ROW]="";"";TEXT(%s[ROW]; "yyyy-mm"))' % (
+            col_letter("Date"),
+            col_letter("Date"),
+        )
     else:
         df["Date"] = '=IF(%s[ROW]<>"",%s[ROW],%s[ROW])' % (
-        col_letter("Real Date"), col_letter("Real Date"), col_letter("Bank Date"))
-        df["Year"] = '=IF(%s[ROW]="","",TEXT(%s[ROW], "yyyy"))' % (col_letter("Date"), col_letter("Date"))
-        df["Month"] = '=IF(%s[ROW]="","",TEXT(%s[ROW], "yyyy-mm"))' % (col_letter("Date"), col_letter("Date"))
+            col_letter("Real Date"),
+            col_letter("Real Date"),
+            col_letter("Bank Date"),
+        )
+        df["Year"] = '=IF(%s[ROW]="","",TEXT(%s[ROW], "yyyy"))' % (
+            col_letter("Date"),
+            col_letter("Date"),
+        )
+        df["Month"] = '=IF(%s[ROW]="","",TEXT(%s[ROW], "yyyy-mm"))' % (
+            col_letter("Date"),
+            col_letter("Date"),
+        )
 
     df["Row number at export"] = np.arange(len(df)) + 2
 
@@ -365,11 +404,7 @@ def export_transactions_xlsx(export_df, writer):
     default_column_width = 10
     last_column_index = len(export_df.columns) - 1
     worksheet.set_column(
-        "%s:%s"
-        % (
-            xl_col_to_name(0),
-            xl_col_to_name(last_column_index),
-        ),
+        "%s:%s" % (xl_col_to_name(0), xl_col_to_name(last_column_index),),
         default_column_width,
     )
     # account column
@@ -380,7 +415,9 @@ def export_transactions_xlsx(export_df, writer):
     date_column_index = export_df.columns.get_loc("Date")
     date_format = workbook.add_format({"num_format": "yyyy-mm-dd"})
     date_column_letter = xl_col_to_name(date_column_index)
-    worksheet.set_column("%s:%s" % (date_column_letter, date_column_letter), None, date_format)
+    worksheet.set_column(
+        "%s:%s" % (date_column_letter, date_column_letter), None, date_format
+    )
     worksheet.set_column("%s:%s" % (date_column_letter, date_column_letter), 20)
     # TODO: possibly pre-calculate values of formulas to avoid LibreOffice issue
     # see https://stackoverflow.com/questions/32205927/xlsxwriter-and-libreoffice-not-showing-formulas-result
