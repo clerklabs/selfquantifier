@@ -3,6 +3,10 @@ import os
 from os.path import getsize, join
 
 import pandas as pd
+from gspread import SpreadsheetNotFound, WorksheetNotFound
+from gspread_dataframe import get_as_dataframe, set_with_dataframe
+from gspread_formatting import Color, set_frozen
+from gspread_formatting.dataframe import BasicFormatter, format_with_dataframe
 
 
 def ensure_clerkai_folder_versioning(clerkai_input_folder_path):
@@ -421,6 +425,76 @@ def export_transactions_xlsx(export_df, writer):
     worksheet.set_column("%s:%s" % (date_column_letter, date_column_letter), 20)
     # TODO: possibly pre-calculate values of formulas to avoid LibreOffice issue
     # see https://stackoverflow.com/questions/32205927/xlsxwriter-and-libreoffice-not-showing-formulas-result
+
+
+def export_to_gsheets(
+    gsheets_client,
+    export_df,
+    gsheets_title,
+    gsheets_sheet_name,
+    create_if_not_exists=False,
+    eu_locale=False,
+):
+    # open target gsheet
+    try:
+        sh = gsheets_client.open(gsheets_title)
+    except SpreadsheetNotFound as e:
+        if create_if_not_exists:
+            sh = gsheets_client.create(gsheets_title)
+        else:
+            raise e
+
+    try:
+        worksheet = sh.worksheet(gsheets_sheet_name)
+    except WorksheetNotFound as e:
+        if create_if_not_exists:
+            worksheet = sh.add_worksheet(title=gsheets_sheet_name, rows=1, cols=1)
+        else:
+            raise e
+
+    # set what to export
+    df = export_df.copy()
+
+    if len(worksheet.row_values(1)) > 0:
+        # get existing worksheet contents
+        existing_df = get_as_dataframe(worksheet)
+        if len(existing_df.columns) > 0:
+            # re-index columns to match the existing data + add any new columns (since the latest export/edit round)
+            columns_not_in_existing_df = export_df.columns.difference(
+                existing_df.columns, sort=False
+            )
+            df = df.reindex(
+                existing_df.columns.tolist() + columns_not_in_existing_df.tolist(),
+                axis=1,
+            )
+
+    # set formulas for export
+    if len(df) > 0:
+        df = set_export_transactions_formulas(df, eu_locale)
+
+    # export to gsheets
+    if len(df) == 0:
+        set_frozen(worksheet, rows=0)
+    set_with_dataframe(worksheet, df, resize=True)
+    if len(df) > 0:
+        set_frozen(worksheet, rows=1)
+
+    # uses DEFAULT_FORMATTER
+    format_with_dataframe(
+        worksheet, df, include_index=False, include_column_header=True
+    )
+
+    """
+    formatter = BasicFormatter(
+        header_background_color=Color(0,0,0),
+        header_text_color=Color(1,1,1),
+        decimal_format='#,##0.00'
+    )
+    format_with_dataframe(worksheet, df, formatter, include_index=False, include_column_header=True)
+    """
+
+    spreadsheet_url = "https://docs.google.com/spreadsheets/d/%s" % sh.id
+    return spreadsheet_url
 
 
 def changes_between_two_commits(repo_base_path, from_commit, to_commit):
