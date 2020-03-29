@@ -220,14 +220,15 @@ def possibly_edited_df_util(
 
     def archive_edit_file(edit_file_to_archive):
         import shutil
+        from datetime import datetime
 
         from_folder = edit_file_to_archive["File path"].replace(
             "@/Edits", edits_folder_path
         )
-        to_folder = (
-            edit_file_to_archive["File path"]
-            .replace("@/Edits", "@/Edits/Archive")
-            .replace("@/Edits", edits_folder_path)
+        to_folder = edit_file_to_archive["File path"].replace(
+            "@/Edits", "@/Edits/Archive"
+        ).replace("@/Edits", edits_folder_path) + (
+            "/Archived %s" % datetime.today().strftime("%Y-%m-%d %H%M%S")
         )
         os.makedirs(to_folder, exist_ok=True)
         shutil.move(
@@ -236,7 +237,6 @@ def possibly_edited_df_util(
         )
 
     # if the main edit file existed before the merging, archive it before
-    # TODO: possibly add a datetime to the archived file, so that multiple copies can be archived
     main_edit_file_for_the_head_commit_mask = (
         edit_files_df["File name"] == export_file_name
     ) & (edit_files_df["Related history reference"] == current_history_reference())
