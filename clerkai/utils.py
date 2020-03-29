@@ -133,7 +133,7 @@ def possibly_edited_df_util(
     unmerged_non_current_main_edit_files = edit_files_df[
         previous_main_edit_files_mask | gsheets_edit_files_mask
     ]
-    print("unmerged_non_current_main_edit_files", unmerged_non_current_main_edit_files)
+    # print("unmerged_non_current_main_edit_files", unmerged_non_current_main_edit_files)
 
     # check if edit for the head commit already exists
     main_edit_file_df = possibly_edited_commit_specific_df(
@@ -490,10 +490,8 @@ def export_to_gsheets(
     non_editable_column_cell_format = CellFormat(backgroundColor=light_grey,)
 
     column_formats = {}
-    print("editable_columns", editable_columns)
     if editable_columns:
         non_editable_columns = df.columns.difference(editable_columns, sort=False)
-        print("non_editable_columns", non_editable_columns)
         for non_editable_column_name in non_editable_columns:
             column_formats[non_editable_column_name] = non_editable_column_cell_format
         for editable_column_name in editable_columns:

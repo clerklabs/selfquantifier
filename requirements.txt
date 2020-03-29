@@ -20,7 +20,7 @@ xlrd
 # for gsheets import/export
 gspread-dataframe
 pathvalidate
-gspread-formatting
+gspread-formatting==0.0.8
 
 # for git-related util functions
 GitPython
