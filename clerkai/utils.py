@@ -94,6 +94,10 @@ def export_file_name_by_record_type(record_type, suffix=""):
         export_file_name_base = "Location history files"
     elif record_type == "location_history_by_date":
         export_file_name_base = "Location history day-by-day"
+    elif record_type == "time_tracking_files":
+        export_file_name_base = "Time tracking files"
+    elif record_type == "time_tracking_entries":
+        export_file_name_base = "Time tracking entries"
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
     export_file_name = "%s%s.%s" % (export_file_name_base, suffix, file_extension)

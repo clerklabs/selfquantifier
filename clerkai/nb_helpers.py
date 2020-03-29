@@ -4,6 +4,10 @@ from clerkai.location_history.defaults import (
     location_history_by_date_editable_columns,
     location_history_files_editable_columns)
 from clerkai.location_history.flow import location_history_flow
+from clerkai.time_tracking.defaults import (
+    default_time_tracking_entries_editable_columns,
+    default_time_tracking_files_editable_columns)
+from clerkai.time_tracking.flow import time_tracking_flow
 from clerkai.transactions.defaults import (
     default_transaction_files_editable_columns,
     default_transactions_editable_columns)
@@ -37,6 +41,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
     clerkai_input_folder_path = os.path.join(clerkai_folder_path, "Input")
     transactions_folder_path = os.path.join(clerkai_input_folder_path, "Transactions")
     receipts_folder_path = os.path.join(clerkai_input_folder_path, "Receipts")
+    time_tracking_folder_path = os.path.join(clerkai_input_folder_path, "Time Tracking")
     location_history_folder_path = os.path.join(
         clerkai_input_folder_path, "Location History"
     )
@@ -117,6 +122,44 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
             clerkai_input_folder_path=clerkai_input_folder_path,
             possibly_edited_df=possibly_edited_df,
             location_history_folder_path=location_history_folder_path,
+            acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
+            current_history_reference=current_history_reference,
+            keep_unmerged_previous_edits=keep_unmerged_previous_edits,
+            failfast=failfast,
+        )
+
+    # time_tracking_entries
+
+    def time_tracking_entries(
+        keep_unmerged_previous_edits=False,
+        failfast=False,
+        additional_time_tracking_files_editable_columns=None,
+        additional_time_tracking_entries_editable_columns=None,
+    ):
+        if additional_time_tracking_files_editable_columns:
+            time_tracking_files_editable_columns = [
+                *additional_time_tracking_files_editable_columns,
+                *default_time_tracking_files_editable_columns,
+            ]
+        else:
+            time_tracking_files_editable_columns = (
+                default_time_tracking_files_editable_columns
+            )
+        if additional_time_tracking_entries_editable_columns:
+            time_tracking_entries_editable_columns = [
+                *additional_time_tracking_entries_editable_columns,
+                *default_time_tracking_entries_editable_columns,
+            ]
+        else:
+            time_tracking_entries_editable_columns = (
+                default_time_tracking_entries_editable_columns
+            )
+        return time_tracking_flow(
+            time_tracking_files_editable_columns=time_tracking_files_editable_columns,
+            time_tracking_entries_editable_columns=time_tracking_entries_editable_columns,
+            clerkai_input_folder_path=clerkai_input_folder_path,
+            possibly_edited_df=possibly_edited_df,
+            time_tracking_folder_path=time_tracking_folder_path,
             acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
@@ -243,6 +286,7 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         transactions,
         list_receipt_files_in_receipts_folder,
         location_history,
+        time_tracking_entries,
         list_transactions_files_in_downloads_folder,
         acknowledge_changes_in_clerkai_input_folder,
         store_gsheets_edits,
