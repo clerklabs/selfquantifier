@@ -7,3 +7,4 @@ clerkai.egg-info
 .mypy_cache
 pyannotations.json
 *.actual.csv
+legacy

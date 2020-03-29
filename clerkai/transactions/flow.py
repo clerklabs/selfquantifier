@@ -16,7 +16,7 @@ def transactions_flow(
     keep_unmerged_previous_edits=False,
     failfast=False,
 ):
-    def list_transactions_files_in_transactions_folder():
+    def list_transaction_files_in_transactions_folder():
         _ = list_files_in_clerk_input_subfolder(
             transactions_folder_path,
             clerkai_input_folder_path=clerkai_input_folder_path,
@@ -36,7 +36,7 @@ def transactions_flow(
             ]
         ]
 
-    transaction_files_df = list_transactions_files_in_transactions_folder()
+    transaction_files_df = list_transaction_files_in_transactions_folder()
     record_type = "transaction_files"
     transaction_files_first_columns = [
         "File name",
@@ -154,7 +154,7 @@ def transactions_flow(
 
         # convert Decimal columns to float prior to export or excel will treat them as strings
         # todo: less hacky conversion of Decimal-columns
-        from clerkai.transactions.parsers.parse_utils import is_nan
+        from clerkai.utils import is_nan
 
         def float_if_not_nan(number):
             if is_nan(number) or number is None:

@@ -10,7 +10,6 @@ from clerkai.transactions.parsers.international.n26.csv import \
     n26_csv_transactions_parser
 from clerkai.transactions.parsers.international.xolo.csv import \
     xolo_csv_transactions_parser
-from clerkai.transactions.parsers.parse_utils import is_nan
 from clerkai.transactions.parsers.se.banknorwegian.xlsx import \
     banknorwegian_se_xlsx_transactions_parser
 from clerkai.transactions.parsers.se.danskebank.personal.csv import \
@@ -19,7 +18,7 @@ from clerkai.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx 
     nordea_se_personal_internetbanken_privat_xlsx_transactions_parser
 from clerkai.transactions.parsers.se.nordea.personal.netbank.csv import \
     nordea_se_personal_netbank_csv_transactions_parser
-from clerkai.utils import clerkai_input_file_path
+from clerkai.utils import clerkai_input_file_path, is_nan
 
 nordea_fi_lang_fi_txt_transactions_parser = None
 
