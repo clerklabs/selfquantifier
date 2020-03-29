@@ -513,6 +513,14 @@ def export_to_gsheets(
     return spreadsheet_url
 
 
+def fetch_gsheets_worksheet_as_df(gsheets_client, gsheets_title, gsheets_sheet_name):
+    sh = gsheets_client.open(gsheets_title)
+    # spreadsheet_url = "https://docs.google.com/spreadsheets/d/%s" % sh.id
+    # print(spreadsheet_url)
+    worksheet = sh.worksheet(gsheets_sheet_name)
+    return get_as_dataframe(worksheet)
+
+
 def changes_between_two_commits(repo_base_path, from_commit, to_commit):
     from pydriller import RepositoryMining
 

@@ -13,6 +13,7 @@ from clerkai.utils import (add_all_untracked_and_changed_files,
                            commits_by_short_gitsha1, current_gitsha1,
                            ensure_clerkai_folder_versioning,
                            export_file_name_by_record_type,
+                           fetch_gsheets_worksheet_as_df,
                            list_files_in_clerk_input_subfolder,
                            list_files_in_clerk_subfolder,
                            possibly_edited_commit_specific_df,
@@ -230,6 +231,14 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
 
         return edit_folder_stored_edits_df
 
+    def download_and_store_gsheets_edits(
+        gsheets_client, gsheets_title, gsheets_sheet_name, record_type
+    ):
+        edits_df = fetch_gsheets_worksheet_as_df(
+            gsheets_client, gsheets_title, gsheets_sheet_name
+        )
+        store_gsheets_edits(gsheets_title, gsheets_sheet_name, edits_df, record_type)
+
     return (
         transactions,
         list_receipt_files_in_receipts_folder,
@@ -237,4 +246,5 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         list_transactions_files_in_downloads_folder,
         acknowledge_changes_in_clerkai_input_folder,
         store_gsheets_edits,
+        download_and_store_gsheets_edits,
     )
