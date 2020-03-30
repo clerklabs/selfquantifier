@@ -744,6 +744,10 @@ def propagate_previous_edits_from_across_columns(
 def is_ignored_file(filename):
     if ".DS_Store" in filename:
         return True
+    if ".gitignore" in filename:
+        return True
+    if "Icon_x000D_" in filename:
+        return True
     if ".~lock" in filename:
         return True
 
