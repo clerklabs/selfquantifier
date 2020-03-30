@@ -582,6 +582,7 @@ def merge_changes_from_previous_possibly_edited_df(
         record_type == "transaction_files"
         or record_type == "receipt_files"
         or record_type == "location_history_files"
+        or record_type == "time_tracking_files"
     ):
         additional_join_column = None
         file_name_column_name = "File name"
@@ -613,6 +614,17 @@ def merge_changes_from_previous_possibly_edited_df(
                 previous_possibly_edited_df
             )
         """
+    elif record_type == "time_tracking_entries":
+        additional_join_column = "ID"
+        file_name_column_name = "Source time tracking file: File name"
+        file_path_column_name = "Source time tracking file: File path"
+        # Add ID column if not present in previous edits file
+        if additional_join_column not in previous_possibly_edited_df.columns:
+            from clerkai.transactions.parse import transaction_ids
+
+            previous_possibly_edited_df[additional_join_column] = transaction_ids(
+                previous_possibly_edited_df
+            )
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
 
