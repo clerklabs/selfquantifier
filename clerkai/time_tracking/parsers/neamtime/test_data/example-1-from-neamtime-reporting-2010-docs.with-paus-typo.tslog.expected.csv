@@ -1,0 +1,8 @@
+gmtTimestamp,category,date,dateRaw,hours,hoursRounded,lineWithoutDate,text,ts,tz,sessionMeta.session_ref,sessionMeta.tzFirst
+2010-04-03 07:45,Uncategorized,2010-04-03,	2010-04-03 07:45,0.13333333333333333,0.13," 8min ok, everything in order to start coding.."," ok, everything in order to start coding..",1270280700,UTC,start 2010-04-03 7:37,UTC
+2010-04-03 07:55,Uncategorized,2010-04-03,	2010-04-03 07:55,0.16666666666666666,0.17, 10min not getting anywhere because of some bug in rendering, not getting anywhere because of some bug in rendering,1270281300,UTC,start 2010-04-03 7:37,UTC
+2010-04-03 08:03,Uncategorized,2010-04-03,	2010-04-03 08:03,0.08333333333333333,0.08, 5min hmm i really need to dig deeper into foo to understand this bug., hmm i really need to dig deeper into foo to understand this bug.,1270281780,UTC,start 2010-04-03 7:37,UTC
+2010-04-03 08:16,Uncategorized,2010-04-03,	2010-04-03 08:16,0.16666666666666666,0.17," 10min a, just a typo. fixed.."," a, just a typo. fixed..",1270282560,UTC,start 2010-04-03 7:37,UTC
+2010-04-03 08:31,Uncategorized,2010-04-03,	2010-04-03 08:31,0.25,0.25, 15min done with t-class. hmm whats next? ah b-class ok, done with t-class. hmm whats next? ah b-class ok,1270283460,UTC,start 2010-04-03 7:37,UTC
+2010-04-03 08:46,Uncategorized,2010-04-03,	2010-04-03 08:46,0.18333333333333332,0.18, 11min ok on-track again., ok on-track again.,1270284360,UTC,start 2010-04-03 7:37,UTC
+2010-04-03 09:25,Uncategorized,2010-04-03,	2010-04-03 09:25,0.65,0.65," 39min b-class pseudo-coded, will continue tomorrow"," b-class pseudo-coded, will continue tomorrow",1270286700,UTC,start 2010-04-03 7:37,UTC

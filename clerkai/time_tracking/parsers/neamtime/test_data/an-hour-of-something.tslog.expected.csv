@@ -1,0 +1,2 @@
+gmtTimestamp,category,date,dateRaw,hours,hoursRounded,lineWithoutDate,text,ts,tz,sessionMeta.session_ref,sessionMeta.tzFirst
+2018-04-14 15:00,Uncategorized,2018-04-14,	2018-04-14 15:00,1,1, 1h0min foo, foo,1523718000,UTC,start 2018-04-14 14:00ca,UTC

@@ -1,0 +1,8 @@
+gmtTimestamp,category,date,dateRaw,hours,hoursRounded,lineWithoutDate,text,ts,tz,sessionMeta.session_ref,sessionMeta.tzFirst
+2018-01-23 14:58,Uncategorized,2018-01-23,	2018-01-23 14:58,4.8,4.8," 4h48min 16:58, <just before paus>"," 16:58, <just before paus>",1516719480,Europe/Helsinki,"start 2018-01-23, 12:10ca",Europe/Helsinki
+2018-01-23 17:36,Uncategorized,2018-01-23,	2018-01-23 17:36,0.9833333333333333,0.98," 59min 19:36, <just before paus>"," 19:36, <just before paus>",1516728960,Europe/Helsinki,"start 2018-01-23, 12:10ca",Europe/Helsinki
+2018-01-23 17:52,Uncategorized,2018-01-23,	2018-01-23 17:52,0.11666666666666667,0.12," 7min 19:52, foo"," 19:52, foo",1516729920,Europe/Helsinki,"start 2018-01-23, 12:10ca",Europe/Helsinki
+2018-01-23 17:55,Uncategorized,2018-01-23,	2018-01-23 17:55,0.03333333333333333,0.03," 2min 19:55, <just before paus>"," 19:55, <just before paus>",1516730100,Europe/Helsinki,"start 2018-01-23, 12:10ca",Europe/Helsinki
+2018-01-23 18:38,Uncategorized,2018-01-23,	2018-01-23 18:38,0.6333333333333333,0.63," 38min 20:38, commit: | foo"," 20:38, commit: | foo",1516732680,Europe/Helsinki,"start 2018-01-23, 12:10ca",Europe/Helsinki
+2018-01-26 20:49,Uncategorized,2018-01-26,	2018-01-26 20:49,0.18333333333333332,0.18," 11min 22:49, foo"," 22:49, foo",1516999740,Europe/Helsinki,"start 2018-01-26, 22:36",Europe/Helsinki
+2018-01-26 23:20,Uncategorized,2018-01-26,	2018-01-26 23:20,0.03333333333333333,0.03," 2min 01:20, foo"," 01:20, foo",1517008800,Europe/Helsinki,"start 2018-01-27, 01:18ca",Europe/Helsinki
