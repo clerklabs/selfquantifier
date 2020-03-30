@@ -17,7 +17,11 @@ def neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path):
         print("Neamtime log parsing failed: %s" % result.stderr.decode("utf-8"))
         raise Exception("Neamtime log parsing failed")
 
+    print("result", result)
+
     json_str = result.stdout.decode("utf-8")
+    print("json_str", json_str)
+
     parse_results = json.loads(json_str)
     print("parse_results", parse_results)
 
