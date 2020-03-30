@@ -758,8 +758,9 @@ def is_ignored_file(filename):
         return True
     if ".gitignore" in filename:
         return True
-    if "Icon_x000D_" in filename:
-        return True
+    if "Icon" in filename:
+        if filename.encode("utf-8").hex() == "49636f6e0d":
+            return True
     if ".~lock" in filename:
         return True
 
