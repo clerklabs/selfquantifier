@@ -183,9 +183,9 @@ def time_tracking_flow(
                 return None
             return float(number)
 
-        time_tracking_entries_export_df[
-            "Hours Rounded"
-        ] = time_tracking_entries_export_df["Hours Rounded"].apply(float_if_not_nan)
+        # time_tracking_entries_export_df[
+        #     "Foo"
+        # ] = time_tracking_entries_export_df["Foo"].apply(float_if_not_nan)
 
         possibly_edited_time_tracking_entries_df = possibly_edited_df(
             time_tracking_entries_export_df,

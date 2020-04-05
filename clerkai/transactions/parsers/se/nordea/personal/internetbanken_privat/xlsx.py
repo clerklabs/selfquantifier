@@ -2,8 +2,9 @@ from datetime import datetime
 
 import pandas as pd
 
-from clerkai.transactions.parsers.parse_utils import (
-    convert_european_amount_to_decimal, ymd_date_to_naive_datetime_obj)
+from clerkai.transactions.parsers.parse_utils import \
+    convert_european_amount_to_decimal
+from clerkai.utils import ymd_date_to_naive_datetime_obj
 
 
 def import_nordea_se_personal_internetbanken_privat_xlsx_transaction_file(

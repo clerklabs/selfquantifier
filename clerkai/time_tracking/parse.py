@@ -82,8 +82,7 @@ def parse_time_tracking_files(
 
         if failfast:
             print(
-                "time_tracking_file",
-                "%s/%s"
+                "* Processing time tracking file with path: \"%s/%s\""
                 % (time_tracking_file["File path"], time_tracking_file["File name"]),
             )
 
@@ -119,6 +118,7 @@ def parse_time_tracking_files(
                 time_tracking_entries = time_tracking_entries.drop(
                     [
                         "Raw Ignore",
+                        "Raw Source Line Numbers",
                         "Raw Source Lines Summary",
                         "Raw Session",
                         "Raw UTC Timestamp",

@@ -1,8 +1,8 @@
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from clerkai.transactions.parsers.parse_utils import (
-    amount_to_rounded_decimal, ymd_date_to_naive_datetime_obj)
+from clerkai.transactions.parsers.parse_utils import amount_to_rounded_decimal
+from clerkai.utils import ymd_date_to_naive_datetime_obj
 
 
 def import_nordea_se_personal_netbank_csv_transaction_file(transaction_file):

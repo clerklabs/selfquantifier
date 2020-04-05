@@ -1,5 +1,6 @@
 import hashlib
 import os
+from datetime import datetime
 from os.path import getsize, join
 
 import pandas as pd
@@ -852,6 +853,13 @@ def is_nan(x):
         return math.isnan(x)
     except TypeError:
         return False
+
+
+def ymd_date_to_naive_datetime_obj(datetime_str):
+    if is_nan(datetime_str):
+        return None
+    datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%d")
+    return datetime_obj
 
 
 def raw_if_available(field_name, entry):

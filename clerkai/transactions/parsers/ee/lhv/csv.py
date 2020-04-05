@@ -3,8 +3,8 @@ from datetime import datetime
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from clerkai.transactions.parsers.parse_utils import (
-    amount_to_rounded_decimal, ymd_date_to_naive_datetime_obj)
+from clerkai.transactions.parsers.parse_utils import amount_to_rounded_decimal
+from clerkai.utils import ymd_date_to_naive_datetime_obj
 
 
 def lhv_ee_description_to_datetime_obj(description_str):
