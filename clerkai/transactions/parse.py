@@ -18,7 +18,7 @@ from clerkai.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx 
     nordea_se_personal_internetbanken_privat_xlsx_transactions_parser
 from clerkai.transactions.parsers.se.nordea.personal.netbank.csv import \
     nordea_se_personal_netbank_csv_transactions_parser
-from clerkai.utils import clerkai_input_file_path, is_nan
+from clerkai.utils import clerkai_input_file_path, is_nan, raw_if_available
 
 nordea_fi_lang_fi_txt_transactions_parser = None
 
@@ -52,18 +52,6 @@ def naive_transaction_ids(transactions):
                 return None
             else:
                 return x
-
-        def raw_if_available(field_name, transaction):
-            raw_field_name = "Raw %s" % field_name
-            if (
-                raw_field_name in transaction
-                and transaction[raw_field_name] is not None
-            ):
-                return transaction[raw_field_name]
-            if field_name in transaction:
-                return transaction[field_name]
-            else:
-                return None
 
         id_key_dict = {}
         id_key_dict["real_date"] = none_if_nan(

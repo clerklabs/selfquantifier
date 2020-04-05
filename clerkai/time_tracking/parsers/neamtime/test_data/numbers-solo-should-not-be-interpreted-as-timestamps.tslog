@@ -1,0 +1,30 @@
+|tz:Europe/Helsinki
+
+start 2016-05-13 17:00
+
+2016-05-13 17:00, starting
+
+2016-05-13 17:03, three minutes in
+
+2016-05-13 17:04, some results
+
+neamtime
+36.3833333333
+
+csv med fel rounding
+36.53
+
+csv med rätt intern rounding
+36.37
+
+csv utan rounding
+36.3833333333
+
+something that looks like a timestamp
+12.30
+
+2016-05-13 17:04, still four minutes in
+
+2016-05-13 17:06, some minutes later
+
+paus->

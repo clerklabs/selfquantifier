@@ -4,7 +4,7 @@ import pandas as pd
 
 from clerkai.time_tracking.parsers.neamtime.tslog import \
     neamtime_tslog_time_tracking_entries_parser
-from clerkai.utils import clerkai_input_file_path, is_nan
+from clerkai.utils import clerkai_input_file_path, is_nan, raw_if_available
 
 parser_by_content_type = {
     "exported-time-tracking-file/neamtime-tslog": neamtime_tslog_time_tracking_entries_parser,
@@ -21,20 +21,21 @@ def naive_time_tracking_entry_ids(time_tracking_entries):
             else:
                 return x
 
-        def raw_if_available(field_name, time_tracking_entry):
-            raw_field_name = "Raw %s" % field_name
-            if (
-                raw_field_name in time_tracking_entry
-                and time_tracking_entry[raw_field_name] is not None
-            ):
-                return time_tracking_entry[raw_field_name]
-            if field_name in time_tracking_entry:
-                return time_tracking_entry[field_name]
-            else:
-                return None
-
         id_key_dict = {}
-        id_key_dict["foo"] = "bar"
+        id_key_dict["timestamp_before_parsing"] = none_if_nan(
+            raw_if_available("Timestamp Before Parsing", time_tracking_entry)
+        )
+        source_lines_summary = none_if_nan(
+            raw_if_available("Source Lines Summary", time_tracking_entry)
+        )
+        id_key_dict["source_lines_summary"] = (
+            jellyfish.soundex(source_lines_summary)
+            if type(source_lines_summary) is str
+            else source_lines_summary
+        )
+        id_key_dict["session"] = none_if_nan(
+            raw_if_available("Session", time_tracking_entry)
+        )
         return json.dumps(id_key_dict, sort_keys=True, default=str, allow_nan=False)
 
     return time_tracking_entries.apply(generate_naive_time_tracking_entry_id, axis=1)
@@ -105,13 +106,40 @@ def parse_time_tracking_files(
             time_tracking_entries[
                 "Source time tracking file index"
             ] = time_tracking_file.name
-            # add future join/merge index
-            time_tracking_entries["ID"] = time_tracking_entry_ids(time_tracking_entries)
+            if len(time_tracking_entries) > 0:
+                # add future join/merge index
+                time_tracking_entries["ID"] = time_tracking_entry_ids(
+                    time_tracking_entries
+                )
+            else:
+                time_tracking_entries["ID"] = None
+
             # drop raw columns
             if not keepraw:
                 time_tracking_entries = time_tracking_entries.drop(
                     [
-                        "Raw Foo",
+                        "Raw Ignore",
+                        "Raw Source Lines Summary",
+                        "Raw Session",
+                        "Raw UTC Timestamp",
+                        "Raw Work Date",
+                        "Raw Date Before Parsing",
+                        "Raw Timezone",
+                        "Raw Time-annotated Source Lines Summary",
+                        "Raw Hours",
+                        "Raw Hours Rounded",
+                        "Raw Annotation",
+                        "Raw Year",
+                        "Raw Year-half",
+                        "Raw Month",
+                        "Raw Week",
+                        "Raw Client",
+                        "Raw Invoice",
+                        "Raw Invoice row ordinal",
+                        "Raw Invoice row item",
+                        "Raw Invoice row item category",
+                        "Raw Invoice row item reference",
+                        "Raw Invoice hours",
                     ],
                     axis=1,
                     errors="ignore",

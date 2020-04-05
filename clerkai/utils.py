@@ -852,3 +852,13 @@ def is_nan(x):
         return math.isnan(x)
     except TypeError:
         return False
+
+
+def raw_if_available(field_name, entry):
+    raw_field_name = "Raw %s" % field_name
+    if raw_field_name in entry and entry[raw_field_name] is not None:
+        return entry[raw_field_name]
+    if field_name in entry:
+        return entry[field_name]
+    else:
+        return None

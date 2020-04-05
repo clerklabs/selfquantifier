@@ -124,9 +124,9 @@ def time_tracking_flow(
         all_parsed_time_tracking_entries_df = pd.merge(
             all_parsed_time_tracking_entries_df,
             included_time_tracking_files.drop(["Ignore"], axis=1).add_prefix(
-                "Source transaction file: "
+                "Source time tracking file: "
             ),
-            left_on="Source transaction file index",
+            left_on="Source time tracking file index",
             right_index=True,
             suffixes=(False, False),
         )
@@ -138,10 +138,12 @@ def time_tracking_flow(
         )
 
         # ensure that empty currency values is filled with source file currency if available
+        """
         time_tracking_entries_df_where_currency_column_is_null_mask = time_tracking_entries_df[
             "Currency"
         ].isnull()
-        time_tracking_entries_df_where_source_transaction_file_account_currency_column_is_null_mask = time_tracking_entries_df[
+        time_tracking_entries_df_where_source_transaction_file_account_currency_column_is_null_mask = \
+            time_tracking_entries_df[
             "Source transaction file: Account currency"
         ].isnull()
         time_tracking_entries_df.loc[
@@ -150,18 +152,15 @@ def time_tracking_flow(
             ~time_tracking_entries_df_where_source_transaction_file_account_currency_column_is_null_mask,
             "Source transaction file: Account currency",
         ]
+        """
 
         # export all time_tracking_entries to xlsx
         record_type = "time_tracking_entries"
 
         time_tracking_entries_first_columns = [
-            "Account",
-            "Date",
-            "Year",
-            "Month",
+            "Source time tracking file: File name",
+            "Source time tracking file: File path",
             *time_tracking_entries_editable_columns,
-            "Real Date",
-            "Bank Date",
         ]
         time_tracking_entries_export_columns = [
             *time_tracking_entries_first_columns,
@@ -177,7 +176,6 @@ def time_tracking_flow(
 
         # convert Decimal columns to float prior to export or excel will treat them as strings
         # todo: less hacky conversion of Decimal-columns
-        """
         from clerkai.utils import is_nan
 
         def float_if_not_nan(number):
@@ -185,19 +183,9 @@ def time_tracking_flow(
                 return None
             return float(number)
 
-        time_tracking_entries_export_df["Amount"] = time_tracking_entries_export_df["Amount"].apply(
-            float_if_not_nan
-        )
-        time_tracking_entries_export_df["Balance"] = time_tracking_entries_export_df["Balance"].apply(
-            float_if_not_nan
-        )
-        time_tracking_entries_export_df["Foreign Currency Amount"] = time_tracking_entries_export_df[
-            "Foreign Currency Amount"
-        ].apply(float_if_not_nan)
-        time_tracking_entries_export_df["Foreign Currency Rate"] = time_tracking_entries_export_df[
-            "Foreign Currency Rate"
-        ].apply(float_if_not_nan)
-        """
+        time_tracking_entries_export_df[
+            "Hours Rounded"
+        ] = time_tracking_entries_export_df["Hours Rounded"].apply(float_if_not_nan)
 
         possibly_edited_time_tracking_entries_df = possibly_edited_df(
             time_tracking_entries_export_df,
