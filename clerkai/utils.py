@@ -443,6 +443,7 @@ def export_to_gsheets(
     export_df,
     gsheets_title,
     gsheets_sheet_name,
+    record_type,
     create_if_not_exists=False,
     eu_locale=False,
     editable_columns=None,
@@ -482,7 +483,21 @@ def export_to_gsheets(
 
     # set formulas for export
     if len(df) > 0:
-        df = set_export_transactions_formulas(df, eu_locale)
+        if (
+            record_type == "transaction_files"
+            or record_type == "receipt_files"
+            or record_type == "location_history_files"
+            or record_type == "time_tracking_files"
+        ):
+            pass
+        elif record_type == "transactions":
+            df = set_export_transactions_formulas(df, eu_locale)
+        elif record_type == "location_history_by_date":
+            pass
+        elif record_type == "time_tracking_entries":
+            pass
+        else:
+            raise ValueError("record_type '%s' not recognized" % record_type)
 
     # export to gsheets
     # if len(df) == 0:
