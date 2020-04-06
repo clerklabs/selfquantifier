@@ -161,6 +161,12 @@ def possibly_edited_df_util(
             "Returning existing %s.xlsx (ignoring currently parsed data)"
             % (export_file_name_base)
         )
+        # just one adjustment: make sure the currently configured editable
+        # columns are available on the returned dataframe (despite them not being in the xlsx)
+        for editable_column in editable_columns:
+            if editable_column not in main_edit_file_df:
+                main_edit_file_df[editable_column] = None
+
         return main_edit_file_df
 
     # include the current main edit file df if exists and a merge is

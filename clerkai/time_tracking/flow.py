@@ -29,7 +29,7 @@ def time_tracking_flow(
         "Timelog comment",
     ]
 
-    def list_transaction_files_in_time_tracking_folder():
+    def list_time_tracking_files_in_time_tracking_folder():
         _ = list_files_in_clerk_input_subfolder(
             time_tracking_folder_path,
             clerkai_input_folder_path=clerkai_input_folder_path,
@@ -52,7 +52,7 @@ def time_tracking_flow(
             ]
         ]
 
-    time_tracking_files_df = list_transaction_files_in_time_tracking_folder()
+    time_tracking_files_df = list_time_tracking_files_in_time_tracking_folder()
     record_type = "time_tracking_files"
     time_tracking_files_first_columns = [
         "File name",

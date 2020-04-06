@@ -82,7 +82,7 @@ def parse_time_tracking_files(
 
         if failfast:
             print(
-                "* Processing time tracking file with path: \"%s/%s\""
+                '* Processing time tracking file with path: "%s/%s"'
                 % (time_tracking_file["File path"], time_tracking_file["File name"]),
             )
 
