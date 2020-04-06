@@ -81,7 +81,7 @@ def parse_neamtime_tslog_time_tracking_file(time_tracking_file_path):
     # print("time_tracking_file_path", time_tracking_file_path)
 
     result = subprocess.run(
-        ["neamtime-log-parser", "--filePath", time_tracking_file_path, ],
+        ["neamtime-log-parser", "--filePath", time_tracking_file_path],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -103,13 +103,42 @@ def parse_neamtime_tslog_time_tracking_file(time_tracking_file_path):
     )
     del parse_results["timeLogEntriesWithMetadata"]
 
-    processing_errors = json_normalize(parse_results["processingErrors"])
+    # summarize processing errors - only pick out the most relevant ones
+    processing_errors = pd.DataFrame()
+    processing_errors_with_fluff = json_normalize(parse_results["processingErrors"])
     del parse_results["processingErrors"]
+    if (
+        "thrownException" in parse_results
+        and "processedTimeSpendingLog" in parse_results["thrownException"]
+    ):
+        del parse_results["thrownException"]["processedTimeSpendingLog"]
 
+    if "ref" in processing_errors_with_fluff:
+        issues_during_initial_parsing_df = processing_errors_with_fluff[
+            processing_errors_with_fluff["ref"] == "issues-during-initial-parsing"
+        ]
+        if len(issues_during_initial_parsing_df) > 0:
+            issues_during_initial_parsing = issues_during_initial_parsing_df.iloc[0]
+            # print("issues_during_initial_parsing.columns", issues_during_initial_parsing.columns)
+            issues_during_initial_parsing_data = issues_during_initial_parsing["data"]
+            # print("issues_during_initial_parsing_data", issues_during_initial_parsing_data)
+            processing_errors = json_normalize(issues_during_initial_parsing_data)
+
+    # print("tslog.py - processing_errors_with_fluff.columns", processing_errors_with_fluff.columns)
     # print("tslog.py - processing_errors", processing_errors)
-    print("tslog.py - processing_errors.columns", processing_errors.columns)
+    # print("tslog.py - processing_errors.columns", processing_errors.columns)
 
+    # TODO: use time_report_data? currently ignoring
+    # time_report_data = parse_results["timeReportData"]
+    # print("time_report_data", time_report_data)
+    del parse_results["timeReportData"]
     parsing_metadata = json_normalize(parse_results)
+
+    # print("tslog.py - parsing_metadata", parsing_metadata)
+    # print("tslog.py - parsing_metadata.columns", parsing_metadata.columns)
+
+    # parsing_metadata["timeReportData"] = None
+    # parsing_metadata["timeReportData"].iloc[0] = time_report_data
 
     # print("tslog.py - parsed_time_log_entries", parsed_time_log_entries)
     # print("tslog.py - parsed_time_log_entries.columns", parsed_time_log_entries.columns)
@@ -219,6 +248,12 @@ def neamtime_tslog_parsing_metadata_to_general_clerk_format(parsing_metadata):
     return parsing_metadata
 
 
+def neamtime_tslog_processing_errors_to_general_clerk_format(processing_errors):
+    # print("tslog.py - processing_errors", processing_errors)
+    print("tslog.py - processing_errors.columns", processing_errors.columns)
+    return processing_errors
+
+
 def neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path):
     # type: (str) -> DataFrame
     df, parsing_metadata, processing_errors = parse_neamtime_tslog_time_tracking_file(
@@ -227,5 +262,5 @@ def neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path):
     return (
         neamtime_tslog_time_tracking_entries_to_general_clerk_format(df),
         neamtime_tslog_parsing_metadata_to_general_clerk_format(parsing_metadata),
-        processing_errors,
+        neamtime_tslog_processing_errors_to_general_clerk_format(processing_errors),
     )

@@ -143,3 +143,11 @@ def test_neamtime_tslog_time_tracking_entries_parser_incorrect_1():
     assert_actual_vs_expected_via_csvs(
         time_tracking_entries_df, time_tracking_file_path
     )
+    assert not parsing_metadata_df.empty
+    assert_actual_vs_expected_via_csvs(
+        parsing_metadata_df, time_tracking_file_path + ".parsing_metadata_df"
+    )
+    assert not processing_errors_df.empty
+    assert_actual_vs_expected_via_csvs(
+        processing_errors_df, time_tracking_file_path + ".processing_errors_df"
+    )

@@ -1,0 +1,2 @@
+totalReportedTime,sessionCount,nonEmptyPreprocessedLinesCount,troubleshootingInfo.logMetadata.hoursLeadTime,troubleshootingInfo.logMetadata.hoursTotal,troubleshootingInfo.logMetadata.lastTs,troubleshootingInfo.logMetadata.name,troubleshootingInfo.logMetadata.nonHours,troubleshootingInfo.logMetadata.startTs
+2.6166666666666663,1,20,55.83,2.6166666666666663,1270481220,start 2010-04-03 07:37,53.21,1270280220
