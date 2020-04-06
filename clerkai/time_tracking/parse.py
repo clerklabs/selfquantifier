@@ -22,8 +22,8 @@ def naive_time_tracking_entry_ids(time_tracking_entries):
                 return x
 
         id_key_dict = {}
-        id_key_dict["timestamp_before_parsing"] = none_if_nan(
-            raw_if_available("Timestamp Before Parsing", time_tracking_entry)
+        id_key_dict["utc_timestamp"] = none_if_nan(
+            raw_if_available("UTC Timestamp", time_tracking_entry)
         )
         source_lines_summary = none_if_nan(
             raw_if_available("Source Lines Summary", time_tracking_entry)
