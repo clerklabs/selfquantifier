@@ -21,9 +21,11 @@ def test_neamtime_datetime_to_naive_datetime_obj():
 def test_neamtime_tslog_time_tracking_entries_parser():
     # type: () -> None
     time_tracking_file_path = join(test_data_dir_path, "an-hour-of-something.tslog")
-    time_tracking_entries_df = neamtime_tslog_time_tracking_entries_parser(
-        time_tracking_file_path
-    )
+    (
+        time_tracking_entries_df,
+        parsing_metadata,
+        processing_errors,
+    ) = neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path)
     assert not time_tracking_entries_df.empty
     actual = time_tracking_entries_df.to_csv(index=False)
     actual_file_path = "%s%s" % (time_tracking_file_path, ".actual.csv")
@@ -41,9 +43,11 @@ def test_neamtime_tslog_time_tracking_entries_parser_2():
         test_data_dir_path,
         "example-1-from-neamtime-reporting-2010-docs.with-paus-typo.tslog",
     )
-    time_tracking_entries_df = neamtime_tslog_time_tracking_entries_parser(
-        time_tracking_file_path
-    )
+    (
+        time_tracking_entries_df,
+        parsing_metadata,
+        processing_errors,
+    ) = neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path)
     assert not time_tracking_entries_df.empty
     actual = time_tracking_entries_df.to_csv(index=False)
     actual_file_path = "%s%s" % (time_tracking_file_path, ".actual.csv")
@@ -58,9 +62,11 @@ def test_neamtime_tslog_time_tracking_entries_parser_2():
 def test_neamtime_tslog_time_tracking_entries_parser_3():
     # type: () -> None
     time_tracking_file_path = join(test_data_dir_path, "newly-cycled.tslog")
-    time_tracking_entries_df = neamtime_tslog_time_tracking_entries_parser(
-        time_tracking_file_path
-    )
+    (
+        time_tracking_entries_df,
+        parsing_metadata,
+        processing_errors,
+    ) = neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path)
     assert time_tracking_entries_df.empty
     actual = time_tracking_entries_df.to_csv(index=False)
     actual_file_path = "%s%s" % (time_tracking_file_path, ".actual.csv")
@@ -75,9 +81,11 @@ def test_neamtime_tslog_time_tracking_entries_parser_3():
 def test_neamtime_tslog_time_tracking_entries_parser_4():
     # type: () -> None
     time_tracking_file_path = join(test_data_dir_path, "pause-handling.tslog")
-    time_tracking_entries_df = neamtime_tslog_time_tracking_entries_parser(
-        time_tracking_file_path
-    )
+    (
+        time_tracking_entries_df,
+        parsing_metadata,
+        processing_errors,
+    ) = neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path)
     assert not time_tracking_entries_df.empty
     actual = time_tracking_entries_df.to_csv(index=False)
     actual_file_path = "%s%s" % (time_tracking_file_path, ".actual.csv")
@@ -94,9 +102,11 @@ def test_neamtime_tslog_time_tracking_entries_parser_5():
     time_tracking_file_path = join(
         test_data_dir_path, "multiple-entries-with-the-same-timestamp.tslog"
     )
-    time_tracking_entries_df = neamtime_tslog_time_tracking_entries_parser(
-        time_tracking_file_path
-    )
+    (
+        time_tracking_entries_df,
+        parsing_metadata,
+        processing_errors,
+    ) = neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path)
     assert not time_tracking_entries_df.empty
     actual = time_tracking_entries_df.to_csv(index=False)
     actual_file_path = "%s%s" % (time_tracking_file_path, ".actual.csv")
@@ -113,9 +123,11 @@ def test_neamtime_tslog_time_tracking_entries_parser_6():
     time_tracking_file_path = join(
         test_data_dir_path, "numbers-solo-should-not-be-interpreted-as-timestamps.tslog"
     )
-    time_tracking_entries_df = neamtime_tslog_time_tracking_entries_parser(
-        time_tracking_file_path
-    )
+    (
+        time_tracking_entries_df,
+        parsing_metadata,
+        processing_errors,
+    ) = neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path)
     assert not time_tracking_entries_df.empty
     actual = time_tracking_entries_df.to_csv(index=False)
     actual_file_path = "%s%s" % (time_tracking_file_path, ".actual.csv")

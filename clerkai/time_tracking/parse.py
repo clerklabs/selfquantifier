@@ -73,11 +73,18 @@ def parse_time_tracking_files(
     class ParserNotAvailableError(Exception):
         pass
 
+    class ProcessingErrorsEncountered(Exception):
+        pass
+
     def parse_time_tracking_file_row(time_tracking_file):
         time_tracking_file_path = clerkai_input_file_path(
             clerkai_input_folder_path, time_tracking_file
         )
-        results = None
+        results = {
+            "time_tracking_entries": None,
+            "parsing_metadata": None,
+            "processing_errors": None,
+        }
         error = None
 
         if failfast:
@@ -101,16 +108,24 @@ def parse_time_tracking_files(
                 )
             parser = parser_by_content_type[content_type]
             # print(parser, time_tracking_file_path)
-            time_tracking_entries = parser(time_tracking_file_path)
+            time_tracking_entries, parsing_metadata, processing_errors = parser(
+                time_tracking_file_path
+            )
+
+            # time tracking entries
             time_tracking_entries[
                 "Source time tracking file index"
             ] = time_tracking_file.name
             if len(time_tracking_entries) > 0:
+                time_tracking_entries[
+                    "Source time tracking file index"
+                ] = time_tracking_file.name
                 # add future join/merge index
                 time_tracking_entries["ID"] = time_tracking_entry_ids(
                     time_tracking_entries
                 )
             else:
+                time_tracking_entries["Source time tracking file index"] = None
                 time_tracking_entries["ID"] = None
 
             # drop raw columns
@@ -144,7 +159,11 @@ def parse_time_tracking_files(
                     axis=1,
                     errors="ignore",
                 )
-            return time_tracking_entries
+            return {
+                "time_tracking_entries": time_tracking_entries,
+                "parsing_metadata": parsing_metadata,
+                "processing_errors": processing_errors,
+            }
 
         # failfast raises errors except expected/benign value errors
         if failfast:
@@ -157,7 +176,29 @@ def parse_time_tracking_files(
                 results = parse()
             except Exception as e:
                 error = e
-        return pd.Series([results, error], index=["Parse results", "Error"])
+
+        # check for processing errors stemming from invalid/non-understood
+        # time tracking files (rather than errors in the parser)
+        if (
+            results["processing_errors"] is not None
+            and len(results["processing_errors"]) > 0
+        ):
+            error = ProcessingErrorsEncountered("Processing errors encountered")
+
+        return pd.Series(
+            [
+                results["time_tracking_entries"],
+                results["parsing_metadata"],
+                results["processing_errors"],
+                error,
+            ],
+            index=[
+                "Parsed time tracking entries",
+                "Parsing metadata",
+                "Processing errors",
+                "Error",
+            ],
+        )
 
     if len(time_tracking_files) == 0:
         raise Exception("No time tracking files to parse")

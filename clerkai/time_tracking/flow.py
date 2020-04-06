@@ -106,7 +106,7 @@ def time_tracking_flow(
 
     unsuccessfully_parsed_time_tracking_files = parsed_time_tracking_files[
         ~parsed_time_tracking_files["Error"].isnull()
-    ].drop(["File metadata", "Parse results"], axis=1)
+    ].drop(["File metadata", "Parsed time tracking entries"], axis=1)
 
     successfully_parsed_time_tracking_files = parsed_time_tracking_files[
         parsed_time_tracking_files["Error"].isnull()
@@ -115,7 +115,10 @@ def time_tracking_flow(
     if len(successfully_parsed_time_tracking_files) > 0:
         # concat all time_tracking_entries
         all_parsed_time_tracking_entries_df = pd.concat(
-            successfully_parsed_time_tracking_files["Parse results"].values, sort=False
+            successfully_parsed_time_tracking_files[
+                "Parsed time tracking entries"
+            ].values,
+            sort=False,
         ).reset_index(drop=True)
         all_parsed_time_tracking_entries_df[
             "History reference"

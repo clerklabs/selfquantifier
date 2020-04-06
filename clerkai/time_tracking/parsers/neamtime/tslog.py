@@ -98,20 +98,23 @@ def parse_neamtime_tslog_time_tracking_file(time_tracking_file_path):
     parse_results = json.loads(json_str)
     # print("parse_results", parse_results)
 
-    parsing_metadata = json_normalize(parse_results)
     parsed_time_log_entries = json_normalize(
         parse_results["timeLogEntriesWithMetadata"]
     )
+    del parse_results["timeLogEntriesWithMetadata"]
 
-    # print("tslog.py - parsing_metadata", parsing_metadata)
-    # print("tslog.py - parsing_metadata.columns", parsing_metadata.columns)
-    # print("tslog.py - time_log_entries", parsed_time_log_entries)
-    # print("tslog.py - time_log_entries.columns", parsed_time_log_entries.columns)
+    processing_errors = json_normalize(parse_results["processingErrors"])
+    del parse_results["processingErrors"]
 
-    if len(parsed_time_log_entries) == 0:
-        return pd.DataFrame(columns=return_columns)
+    # print("tslog.py - processing_errors", processing_errors)
+    print("tslog.py - processing_errors.columns", processing_errors.columns)
 
-    return parsed_time_log_entries
+    parsing_metadata = json_normalize(parse_results)
+
+    # print("tslog.py - parsed_time_log_entries", parsed_time_log_entries)
+    # print("tslog.py - parsed_time_log_entries.columns", parsed_time_log_entries.columns)
+
+    return parsed_time_log_entries, parsing_metadata, processing_errors
 
 
 def neamtime_tslog_time_tracking_entries_to_general_clerk_format(df):
@@ -210,7 +213,19 @@ def neamtime_tslog_time_tracking_entries_to_general_clerk_format(df):
     return normalized_df[return_columns]
 
 
+def neamtime_tslog_parsing_metadata_to_general_clerk_format(parsing_metadata):
+    # print("tslog.py - parsing_metadata", parsing_metadata)
+    print("tslog.py - parsing_metadata.columns", parsing_metadata.columns)
+    return parsing_metadata
+
+
 def neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path):
     # type: (str) -> DataFrame
-    df = parse_neamtime_tslog_time_tracking_file(time_tracking_file_path)
-    return neamtime_tslog_time_tracking_entries_to_general_clerk_format(df)
+    df, parsing_metadata, processing_errors = parse_neamtime_tslog_time_tracking_file(
+        time_tracking_file_path
+    )
+    return (
+        neamtime_tslog_time_tracking_entries_to_general_clerk_format(df),
+        neamtime_tslog_parsing_metadata_to_general_clerk_format(parsing_metadata),
+        processing_errors,
+    )
