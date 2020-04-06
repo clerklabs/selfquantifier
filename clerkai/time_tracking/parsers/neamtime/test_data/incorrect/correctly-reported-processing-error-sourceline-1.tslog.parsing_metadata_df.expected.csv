@@ -1,2 +1,2 @@
-totalReportedTime,sessionCount,nonEmptyPreprocessedLinesCount,troubleshootingInfo.logMetadata.hoursLeadTime,troubleshootingInfo.logMetadata.hoursTotal,troubleshootingInfo.logMetadata.lastTs,troubleshootingInfo.logMetadata.name,troubleshootingInfo.logMetadata.nonHours,troubleshootingInfo.logMetadata.startTs
-2.6166666666666663,1,20,55.83,2.6166666666666663,1270481220,start 2010-04-03 07:37,53.21,1270280220
+Parse status,Tracked Hours,Calendar Time in Hours,Sessions,Processed lines,Last modified,Oldest timestamp,Most recent timestamp,Timelog comment
+1 Errors,2.6166666666666663,55.83,1,20,TODO,2010-04-03 10:37:00,2010-04-05 18:27:00,start 2010-04-03 07:37

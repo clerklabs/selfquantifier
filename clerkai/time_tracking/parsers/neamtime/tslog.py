@@ -242,16 +242,97 @@ def neamtime_tslog_time_tracking_entries_to_general_clerk_format(df):
     return normalized_df[return_columns]
 
 
-def neamtime_tslog_parsing_metadata_to_general_clerk_format(parsing_metadata):
+def neamtime_tslog_parsing_metadata_to_general_clerk_format(
+    parsing_metadata, processing_errors_count
+):
     # print("tslog.py - parsing_metadata", parsing_metadata)
-    print("tslog.py - parsing_metadata.columns", parsing_metadata.columns)
-    return parsing_metadata
+    # print("tslog.py - parsing_metadata.columns", parsing_metadata.columns)
+    parsing_metadata_row = parsing_metadata.iloc[0]
+    # print("tslog.py - parsing_metadata_row", parsing_metadata_row)
+
+    if "troubleshootingInfo.logMetadata.hoursTotal" in parsing_metadata_row:
+        """
+        Case 1
+        """
+        normalized_parsing_metadata = {
+            "Parse status": [
+                "OK"
+                if processing_errors_count == 0
+                else "%s Error%s"
+                % (processing_errors_count, "s" if processing_errors_count > 0 else "")
+            ],
+            "Tracked Hours": [
+                parsing_metadata_row["troubleshootingInfo.logMetadata.hoursTotal"]
+            ],
+            "Calendar Time in Hours": [
+                parsing_metadata_row["troubleshootingInfo.logMetadata.hoursLeadTime"]
+            ],
+            "Sessions": [parsing_metadata_row["sessionCount"]],
+            "Processed lines": [parsing_metadata_row["nonEmptyPreprocessedLinesCount"]],
+            "Last modified": ["TODO"],
+            "Oldest timestamp": [
+                datetime.fromtimestamp(
+                    parsing_metadata_row["troubleshootingInfo.logMetadata.startTs"]
+                )
+            ],
+            "Most recent timestamp": [
+                datetime.fromtimestamp(
+                    parsing_metadata_row["troubleshootingInfo.logMetadata.lastTs"]
+                )
+            ],
+            "Timelog comment": [
+                parsing_metadata_row["troubleshootingInfo.logMetadata.name"]
+            ],
+        }
+    else:
+        """
+        Case 2
+        'totalReportedTime', 'sessionCount', 'nonEmptyPreprocessedLinesCount',
+           'troubleshootingInfo.logMetadata.error'
+        """
+        normalized_parsing_metadata = {
+            "Parse status": ["Pending (Empty)"],
+            "Tracked Hours": [parsing_metadata_row["totalReportedTime"]],
+            "Calendar Time in Hours": [None],
+            "Sessions": [parsing_metadata_row["sessionCount"]],
+            "Processed lines": [parsing_metadata_row["nonEmptyPreprocessedLinesCount"]],
+            "Last modified": ["TODO"],
+            "Oldest timestamp": [None],
+            "Most recent timestamp": [None],
+            "Timelog comment": [None],
+        }
+    return pd.DataFrame(normalized_parsing_metadata)
 
 
 def neamtime_tslog_processing_errors_to_general_clerk_format(processing_errors):
     # print("tslog.py - processing_errors", processing_errors)
-    print("tslog.py - processing_errors.columns", processing_errors.columns)
-    return processing_errors
+    # print("tslog.py - processing_errors.columns", processing_errors.columns)
+
+    if len(processing_errors) == 0:
+        return processing_errors
+
+    normalized_processing_errors = pd.DataFrame()
+    normalized_processing_errors["Line number"] = processing_errors["sourceLine"]
+    normalized_processing_errors["Date entry"] = processing_errors["dateRaw"]
+    normalized_processing_errors["Log entry"] = processing_errors["lineWithComment"]
+    normalized_processing_errors["Error log"] = processing_errors["log"]
+    """
+    'date', 'dateRaw', 'formattedUtcDate',
+       'lastInterpretTsAndDateErrorMessage', 'lastKnownTimeZone',
+       'lastParseLogCommentErrorMessage', 'lastSetTsAndDateErrorClass',
+       'lastSetTsAndDateErrorMessage', 'lastUsedTimeZone', 'line',
+       'lineWithComment', 'log', 'preprocessedContentsSourceLineIndex',
+       'rowsWithTimeMarkersHandled', 'sourceLine', 'ts',
+       'parseLogCommentDetectTimeStampMetadata.log',
+       'parseLogCommentDetectTimeStampMetadata.lastKnownsBeforeDetectTimeStamp.lastKnownDate',
+       'parseLogCommentDetectTimeStampMetadata.lastKnownsBeforeDetectTimeStamp.lastKnownTimeZone',
+       'parseLogCommentDetectTimeStampMetadata.lastKnownsBeforeDetectTimeStamp.lastUsedTimeZone',
+       'parseLogCommentDetectTimeStampMetadata.dateRawFormat',
+       'parseLogCommentDetectTimeStampMetadata.timeZoneRaw',
+       'parseLogCommentDetectTimeStampMetadata.timeRaw',
+       'parseLogCommentDetectTimeStampMetadata.dateRaw'
+    """
+    return normalized_processing_errors
 
 
 def neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path):
@@ -261,6 +342,8 @@ def neamtime_tslog_time_tracking_entries_parser(time_tracking_file_path):
     )
     return (
         neamtime_tslog_time_tracking_entries_to_general_clerk_format(df),
-        neamtime_tslog_parsing_metadata_to_general_clerk_format(parsing_metadata),
+        neamtime_tslog_parsing_metadata_to_general_clerk_format(
+            parsing_metadata, len(processing_errors)
+        ),
         neamtime_tslog_processing_errors_to_general_clerk_format(processing_errors),
     )

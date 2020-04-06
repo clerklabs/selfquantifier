@@ -112,20 +112,24 @@ def parse_time_tracking_files(
                 time_tracking_file_path
             )
 
-            # time tracking entries
+            # mark which source file was parsed, for later merging of the data
             time_tracking_entries[
                 "Source time tracking file index"
             ] = time_tracking_file.name
+            parsing_metadata[
+                "Source time tracking file index"
+            ] = time_tracking_file.name
+            processing_errors[
+                "Source time tracking file index"
+            ] = time_tracking_file.name
+
+            # time tracking entries ids
             if len(time_tracking_entries) > 0:
-                time_tracking_entries[
-                    "Source time tracking file index"
-                ] = time_tracking_file.name
                 # add future join/merge index
                 time_tracking_entries["ID"] = time_tracking_entry_ids(
                     time_tracking_entries
                 )
             else:
-                time_tracking_entries["Source time tracking file index"] = None
                 time_tracking_entries["ID"] = None
 
             # drop raw columns

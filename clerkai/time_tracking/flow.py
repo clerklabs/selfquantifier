@@ -104,9 +104,53 @@ def time_tracking_flow(
         failfast=failfast,
     )
 
+    # concat all processing errors into a single dataframe
+    if len(parsed_time_tracking_files) > 0:
+        all_time_tracking_processing_errors_df = pd.concat(
+            parsed_time_tracking_files["Processing errors"].values, sort=False,
+        ).reset_index(drop=True)
+        all_time_tracking_processing_errors_df[
+            "History reference"
+        ] = current_history_reference()
+        # include time_tracking_files data
+        all_time_tracking_processing_errors_df = pd.merge(
+            all_time_tracking_processing_errors_df,
+            included_time_tracking_files.drop(["Ignore"], axis=1).add_prefix(
+                "Source time tracking file: "
+            ),
+            left_on="Source time tracking file index",
+            right_index=True,
+            suffixes=(False, False),
+        )
+
+        time_tracking_processing_errors_first_columns = [
+            "Source time tracking file: File name",
+            "Source time tracking file: File path",
+        ]
+        time_tracking_processing_errors_export_columns = [
+            *time_tracking_processing_errors_first_columns,
+            *all_time_tracking_processing_errors_df.columns.difference(
+                time_tracking_processing_errors_first_columns, sort=False
+            ),
+            "Row number at export",
+        ]
+        all_time_tracking_processing_errors_df = all_time_tracking_processing_errors_df.reindex(
+            time_tracking_processing_errors_export_columns, axis=1
+        )
+    else:
+        all_time_tracking_processing_errors_df = []
+
     unsuccessfully_parsed_time_tracking_files = parsed_time_tracking_files[
         ~parsed_time_tracking_files["Error"].isnull()
-    ].drop(["File metadata", "Parsed time tracking entries"], axis=1)
+    ].drop(
+        [
+            "File metadata",
+            "Parsed time tracking entries",
+            "Parsing metadata",
+            "Processing errors",
+        ],
+        axis=1,
+    )
 
     successfully_parsed_time_tracking_files = parsed_time_tracking_files[
         parsed_time_tracking_files["Error"].isnull()
