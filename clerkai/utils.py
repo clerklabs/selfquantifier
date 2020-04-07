@@ -507,9 +507,9 @@ def export_to_gsheets(
     #     set_frozen(worksheet, rows=1)
 
     dark_purple = Color(56 / 255, 40 / 255, 54 / 255)
-    orange = Color(252 / 255, 142 / 255, 30 / 255)
+    # orange = Color(252 / 255, 142 / 255, 30 / 255)
     white = Color(255 / 255, 255 / 255, 255 / 255)
-    light_orange_3 = Color(255 / 255, 229 / 255, 227 / 255)
+    # light_orange_3 = Color(255 / 255, 229 / 255, 227 / 255)
     light_grey = Color(240 / 255, 240 / 255, 240 / 255)
 
     editable_column_cell_format = CellFormat(backgroundColor=white,)

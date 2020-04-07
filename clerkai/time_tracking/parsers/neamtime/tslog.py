@@ -5,8 +5,8 @@ from typing import List
 
 import pandas as pd
 import pytz
+from pandas import json_normalize
 from pandas.core.frame import DataFrame
-from pandas.io.json import json_normalize
 
 from clerkai.utils import is_nan, ymd_date_to_naive_datetime_obj
 

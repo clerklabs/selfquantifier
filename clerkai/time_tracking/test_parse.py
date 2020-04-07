@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from clerkai.time_tracking.parse import (
@@ -6,10 +7,10 @@ from clerkai.time_tracking.parse import (
 
 time_tracking_entries_df = pd.DataFrame(
     {
-        "Raw Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+        "Raw UTC Timestamp": ["2020-04-05 09:37"],
         "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
         "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-        "Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+        "UTC Timestamp": ["2020-04-05 09:37"],
         "Source Lines Summary": ["foo | bar | 123 | zoo"],
         "Session": ["start 2020-04-05 (+0300) 09:00"],
     }
@@ -17,10 +18,10 @@ time_tracking_entries_df = pd.DataFrame(
 
 time_tracking_entries_with_none_df = pd.DataFrame(
     {
-        "Raw Timestamp Before Parsing": [None],
+        "Raw UTC Timestamp": [None],
         "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
         "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-        "Timestamp Before Parsing": [None],
+        "UTC Timestamp": [None],
         "Source Lines Summary": ["foo | bar | 123 | zoo"],
         "Session": ["start 2020-04-05 (+0300) 09:00"],
     }
@@ -28,10 +29,10 @@ time_tracking_entries_with_none_df = pd.DataFrame(
 
 time_tracking_entries_with_nan_df = pd.DataFrame(
     {
-        "Raw Timestamp Before Parsing": [float("NaN")],
+        "Raw UTC Timestamp": [float("NaN")],
         "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
         "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-        "Timestamp Before Parsing": [float("NaN")],
+        "UTC Timestamp": [float("NaN")],
         "Source Lines Summary": ["foo | bar | 123 | zoo"],
         "Session": ["start 2020-04-05 (+0300) 09:00"],
     }
@@ -39,7 +40,7 @@ time_tracking_entries_with_nan_df = pd.DataFrame(
 
 time_tracking_entries_without_raw_columns_df = pd.DataFrame(
     {
-        "Timestamp Before Parsing": [None],
+        "UTC Timestamp": [None],
         "Source Lines Summary": ["foo | bar | 123 | zoo"],
         "Session": ["start 2020-04-05 (+0300) 09:00"],
     }
@@ -58,17 +59,16 @@ def test_naive_time_tracking_entry_ids():
     df["naive_time_tracking_entry_id"] = naive_time_tracking_entry_ids(df)
     expected = pd.DataFrame(
         {
-            "Raw Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+            "Raw UTC Timestamp": ["2020-04-05 09:37"],
             "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-            "Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+            "UTC Timestamp": ["2020-04-05 09:37"],
             "Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Session": ["start 2020-04-05 (+0300) 09:00"],
             "naive_time_tracking_entry_id": [
                 '{"session": "start 2020-04-05 (+0300) '
                 '09:00", "source_lines_summary": "F162", '
-                '"timestamp_before_parsing": "2020-04-05 '
-                '(+0300) 09:37"}',
+                '"utc_timestamp": "2020-04-05 09:37"}',
             ],
         }
     )
@@ -80,20 +80,20 @@ def test_naive_time_tracking_entry_ids_with_none():
     df["naive_time_tracking_entry_id"] = naive_time_tracking_entry_ids(df)
     expected = pd.DataFrame(
         {
-            "Raw Timestamp Before Parsing": [None],
+            "Raw UTC Timestamp": [None],
             "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-            "Timestamp Before Parsing": [None],
+            "UTC Timestamp": [None],
             "Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Session": ["start 2020-04-05 (+0300) 09:00"],
             "naive_time_tracking_entry_id": [
                 '{"session": "start 2020-04-05 (+0300) 09:00", "source_lines_summary": "F162"'
-                ', "timestamp_before_parsing": null}'
+                ', "utc_timestamp": null}'
             ],
         }
     )
-    assert df.replace({pd.np.nan: None}).to_dict(orient="records") == expected.replace(
-        {pd.np.nan: None}
+    assert df.replace({np.nan: None}).to_dict(orient="records") == expected.replace(
+        {np.nan: None}
     ).to_dict(orient="records")
 
 
@@ -102,20 +102,20 @@ def test_naive_time_tracking_entry_ids_with_nan():
     df["naive_time_tracking_entry_id"] = naive_time_tracking_entry_ids(df)
     expected = pd.DataFrame(
         {
-            "Raw Timestamp Before Parsing": [float("NaN")],
+            "Raw UTC Timestamp": [float("NaN")],
             "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-            "Timestamp Before Parsing": [float("NaN")],
+            "UTC Timestamp": [float("NaN")],
             "Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Session": ["start 2020-04-05 (+0300) 09:00"],
             "naive_time_tracking_entry_id": [
                 '{"session": "start 2020-04-05 (+0300) 09:00", "source_lines_summary": "F162"'
-                ', "timestamp_before_parsing": null}'
+                ', "utc_timestamp": null}'
             ],
         }
     )
-    assert df.replace({pd.np.nan: None}).to_dict(orient="records") == expected.replace(
-        {pd.np.nan: None}
+    assert df.replace({np.nan: None}).to_dict(orient="records") == expected.replace(
+        {np.nan: None}
     ).to_dict(orient="records")
 
 
@@ -124,12 +124,12 @@ def test_naive_time_tracking_entry_ids_without_raw_columns():
     df["naive_time_tracking_entry_id"] = naive_time_tracking_entry_ids(df)
     expected = pd.DataFrame(
         {
-            "Timestamp Before Parsing": [None],
+            "UTC Timestamp": [None],
             "Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Session": ["start 2020-04-05 (+0300) 09:00"],
             "naive_time_tracking_entry_id": [
                 '{"session": "start 2020-04-05 (+0300) 09:00", "source_lines_summary": "F162"'
-                ', "timestamp_before_parsing": null}'
+                ', "utc_timestamp": null}'
             ],
         }
     )
@@ -145,7 +145,7 @@ def test_naive_time_tracking_entry_ids_without_raw_columns_and_some_core_columns
             "Session": ["start 2020-04-05 (+0300) 09:00"],
             "naive_time_tracking_entry_id": [
                 '{"session": "start 2020-04-05 (+0300) 09:00", "source_lines_summary": "F162"'
-                ', "timestamp_before_parsing": null}'
+                ', "utc_timestamp": null}'
             ],
         }
     )
@@ -186,17 +186,16 @@ def test_naive_time_tracking_entry_id_duplicate_nums():
     ] = naive_time_tracking_entry_id_duplicate_nums(df2)
     expected = pd.DataFrame(
         {
-            "Raw Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+            "Raw UTC Timestamp": ["2020-04-05 09:37"],
             "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-            "Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+            "UTC Timestamp": ["2020-04-05 09:37"],
             "Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Session": ["start 2020-04-05 (+0300) 09:00"],
             "naive_time_tracking_entry_id": [
                 '{"session": "start 2020-04-05 (+0300) '
                 '09:00", "source_lines_summary": "F162", '
-                '"timestamp_before_parsing": "2020-04-05 '
-                '(+0300) 09:37"}',
+                '"utc_timestamp": "2020-04-05 09:37"}',
             ],
             "naive_time_tracking_entry_id_duplicate_num": [1],
         }
@@ -209,15 +208,15 @@ def test_time_tracking_entry_ids():
     df["ID"] = time_tracking_entry_ids(df)
     expected = pd.DataFrame(
         {
-            "Raw Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+            "Raw UTC Timestamp": ["2020-04-05 09:37"],
             "Raw Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Raw Session": ["start 2020-04-05 (+0300) 09:00"],
-            "Timestamp Before Parsing": ["2020-04-05 (+0300) 09:37"],
+            "UTC Timestamp": ["2020-04-05 09:37"],
             "Source Lines Summary": ["foo | bar | 123 | zoo"],
             "Session": ["start 2020-04-05 (+0300) 09:00"],
             "ID": [
                 '{"ref": {"session": "start 2020-04-05 (+0300) 09:00", "source_lines_summary": "F162"'
-                ', "timestamp_before_parsing": "2020-04-05 (+0300) 09:37"}, "ord": 1}'
+                ', "utc_timestamp": "2020-04-05 09:37"}, "ord": 1}'
             ],
         }
     )

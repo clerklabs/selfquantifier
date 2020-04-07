@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 
 from clerkai.transactions.parse import (naive_transaction_id_duplicate_nums,
@@ -113,8 +114,8 @@ def test_naive_transaction_ids_with_nan():
             ],
         }
     )
-    assert df.replace({pd.np.nan: None}).to_dict(orient="records") == expected.replace(
-        {pd.np.nan: None}
+    assert df.replace({np.nan: None}).to_dict(orient="records") == expected.replace(
+        {np.nan: None}
     ).to_dict(orient="records")
 
 
