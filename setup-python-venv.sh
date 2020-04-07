@@ -36,7 +36,7 @@ if [ "$1" == "dev" ]; then
 
 fi
 
-# Replace the PyPI packages with its own (where possible)
+# Replace the PyPI packages with its conda counterpart (where possible)
 conda update --all --yes
 
 # Update the yml

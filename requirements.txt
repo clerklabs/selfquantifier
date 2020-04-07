@@ -25,3 +25,6 @@ gspread-formatting==0.0.8
 # for git-related util functions
 GitPython
 pydriller
+
+# for caching computational tasks
+joblib
