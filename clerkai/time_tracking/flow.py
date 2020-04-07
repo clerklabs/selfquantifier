@@ -201,6 +201,23 @@ def time_tracking_flow(
         ]
         """
 
+        # add columns that are useful for aggregation / pivoting
+        time_tracking_entries_df["Year"] = time_tracking_entries_df[
+            "Work Date"
+        ].dt.to_period("Y")
+        time_tracking_entries_df["Year-half"] = time_tracking_entries_df[
+            "Work Date"
+        ].apply(lambda date: "%sH%s" % (date.year, 1 if date.quarter < 3 else 2))
+        time_tracking_entries_df["Quarter"] = time_tracking_entries_df[
+            "Work Date"
+        ].dt.to_period("Q")
+        time_tracking_entries_df["Month"] = time_tracking_entries_df[
+            "Work Date"
+        ].dt.to_period("M")
+        time_tracking_entries_df["Week"] = time_tracking_entries_df[
+            "Work Date"
+        ].dt.to_period("W")
+
         # export all time_tracking_entries to xlsx
         record_type = "time_tracking_entries"
 
