@@ -1,10 +1,13 @@
 import json
 
 import pandas as pd
+from joblib import Memory
 
 from clerkai.time_tracking.parsers.neamtime.tslog import \
     neamtime_tslog_time_tracking_entries_parser
 from clerkai.utils import clerkai_input_file_path, is_nan, raw_if_available
+
+memory = Memory(location="/tmp", verbose=0)
 
 parser_by_content_type = {
     "exported-time-tracking-file/neamtime-tslog": neamtime_tslog_time_tracking_entries_parser,
@@ -108,8 +111,13 @@ def parse_time_tracking_files(
                 )
             parser = parser_by_content_type[content_type]
             # print(parser, time_tracking_file_path)
-            time_tracking_entries, parsing_metadata, processing_errors = parser(
-                time_tracking_file_path
+
+            @memory.cache
+            def parse_file(_file_metadata, _content_type):
+                return parser(time_tracking_file_path)
+
+            time_tracking_entries, parsing_metadata, processing_errors = parse_file(
+                time_tracking_file["File metadata"], content_type
             )
 
             # mark which source file was parsed, for later merging of the data
