@@ -69,11 +69,16 @@ def time_tracking_flow(
         time_tracking_files_export_columns, axis=1
     )
 
-    # Todo
-    """
-    def guess_content_type_based_on_filename():
-        pass
-    """
+    def set_guessed_content_types(df):
+        mask1 = df["Content type"].isnull()
+        mask2 = df['File path'].str.contains("/ts")
+        mask3 = df['File name'].str.contains(".md")
+        df.loc[
+            mask1 & mask2 & mask3, "Content type",
+        ] = "exported-time-tracking-file/neamtime-tslog"
+        return df
+
+    time_tracking_files_export_df = set_guessed_content_types(time_tracking_files_export_df)
 
     possibly_edited_time_tracking_files_df = possibly_edited_df(
         time_tracking_files_export_df,
