@@ -657,10 +657,17 @@ def merge_changes_from_previous_possibly_edited_df(
     from_commit = edit_file["Related history reference"]
     to_commit = current_history_reference()
 
-    def joined_path(record):
-        return "%s/%s" % (record[file_path_column_name], record[file_name_column_name])
+    def normalize_encoding(string):
+        import unicodedata as ud
+        normalized = ud.normalize('NFC', string)
+        return normalized
 
-    accumulating_df["clerkai_path"] = accumulating_df.apply(joined_path, axis=1)
+    def joined_normalized_path(record):
+        # normalize encodings to properly join paths that have been encoded differently for whatever reason
+        joined_path = "%s/%s" % (record[file_path_column_name], record[file_name_column_name])
+        return normalize_encoding(joined_path)
+
+    accumulating_df["clerkai_path"] = accumulating_df.apply(joined_normalized_path, axis=1)
     left_on = ["clerkai_path"]
 
     if from_commit != to_commit:
@@ -673,7 +680,7 @@ def merge_changes_from_previous_possibly_edited_df(
         )
 
         previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
-            joined_path, axis=1
+            joined_normalized_path, axis=1
         )
 
         def find_head_commit_corresponding_clerkai_path(clerkai_path):
