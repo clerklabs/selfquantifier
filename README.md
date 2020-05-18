@@ -1,5 +1,12 @@
 # python-clerkai
 
+### Run tests
+
+```
+conda activate ./venvdev
+pytest -vv
+```
+
 ### Add deps
 
 Add the dep to `requirements.txt` or `requirements_dev.txt`
