@@ -7,12 +7,12 @@ with open("requirements_test.txt") as f:
 
 setup(
     # Meta
-    author="Clerk.ai Developers",
+    author="Clerk.ai",
     author_email="info@clerk.ai",
-    description="Tools for extracting and transforming transaction, receipt, travel and time information from local files",
+    description="Tools for extracting, annotating and summarizing transaction, location history and time tracking data from local files",
     name="clerkai",
     license="mpl-2.0",
-    url="https://github.com/clerk/python-clerkai",
+    url="https://github.com/clerkai/python-clerkai",
     version="0.1.0",
     packages=find_packages(),
     # Dependencies
@@ -33,7 +33,6 @@ setup(
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
