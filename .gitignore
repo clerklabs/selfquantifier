@@ -8,3 +8,4 @@ clerkai.egg-info
 pyannotations.json
 *.actual.csv
 legacy
+dist
