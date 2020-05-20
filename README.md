@@ -1,5 +1,13 @@
 # python-clerkai
 
+Tools for extracting, annotating and summarizing transaction, location history and time tracking data from local files
+
+### Setting up the development environment
+
+```
+./setup-python-venv.sh dev
+```
+
 ### Run tests
 
 ```

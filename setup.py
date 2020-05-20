@@ -5,11 +5,16 @@ with open("requirements.txt") as f:
 with open("requirements_test.txt") as f:
     test_requirements = f.read().splitlines()
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     # Meta
     author="Clerk.ai",
     author_email="info@clerk.ai",
     description="Tools for extracting, annotating and summarizing transaction, location history and time tracking data from local files",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     name="clerkai",
     license="mpl-2.0",
     url="https://github.com/clerkai/python-clerkai",
@@ -39,4 +44,5 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Topic :: Scientific/Engineering :: Image Recognition",
     ],
+    python_requires='>=3.7',
 )
