@@ -11,7 +11,7 @@ setup(
     author_email="info@clerk.ai",
     description="Tools for extracting and transforming transaction, receipt, travel and time information from local files",
     name="clerkai",
-    license="ISC",
+    license="mpl-2.0",
     url="https://github.com/clerk/python-clerkai",
     version="0.1.0",
     packages=find_packages(),
