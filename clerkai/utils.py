@@ -125,6 +125,19 @@ def possibly_edited_df_util(
     edit_files_df = list_edit_files_in_edits_folder()
     # print("edit_files_df", edit_files_df)
 
+    # not much to do here if there are no edit files
+    if len(edit_files_df) == 0:
+        # make sure that the merged editable df file is available in the most current location
+        return possibly_edited_commit_specific_df(
+            df=current_commit_df,
+            record_type=record_type,
+            export_file_name=export_file_name,
+            edits_folder_path=edits_folder_path,
+            commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
+            history_reference=current_history_reference(),
+            create_if_not_exists=True,
+        )
+
     # include earlier edits
     previous_main_edit_files_mask = (edit_files_df["File name"] == export_file_name) & (
         edit_files_df["Related history reference"] != current_history_reference()
