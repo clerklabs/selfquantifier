@@ -35,7 +35,7 @@ def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
     return commit_sha
 
 
-def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_folder):
+def init_notebook_and_return_helpers(clerkai_folder):
     # expand given paths to absolute paths
     clerkai_folder_path = os.path.expanduser(clerkai_folder).rstrip(os.sep)
     clerkai_input_folder_path = os.path.join(clerkai_folder_path, "Input")
@@ -46,8 +46,6 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         clerkai_input_folder_path, "Location History"
     )
     edits_folder_path = os.path.join(clerkai_folder_path, "Edits")
-    downloads_folder_path = os.path.expanduser(downloads_folder)
-    pictures_folder_path = os.path.expanduser(pictures_folder)
 
     # set working dir to be the clerk.ai folder
     os.chdir(clerkai_folder_path)
@@ -189,14 +187,6 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         _ = _.sort_values(by="Related history reference date")
         return _
 
-    # TODO: make this guess which ones are transactions
-    def list_transactions_files_in_downloads_folder():
-        transaction_files = []
-        for file_name in os.listdir(downloads_folder_path):
-            if "Transaktioner" in file_name:
-                transaction_files.append(file_name)
-        return transaction_files
-
     # ensure_directories_are_in_place()
     if not os.path.isdir(transactions_folder_path):
         os.mkdir(transactions_folder_path)
@@ -204,10 +194,6 @@ def init_notebook_and_return_helpers(clerkai_folder, downloads_folder, pictures_
         os.mkdir(receipts_folder_path)
     if not os.path.isdir(edits_folder_path):
         os.mkdir(edits_folder_path)
-    if not os.path.isdir(downloads_folder_path):
-        raise Exception("Downloads folder missing")
-    if not os.path.isdir(pictures_folder_path):
-        raise Exception("Pictures folder missing")
 
     def possibly_edited_df(
         current_commit_df,
