@@ -117,18 +117,23 @@ def transactions_flow(
         transactions_df = all_parsed_transactions_df.drop_duplicates(subset=["ID"])
 
         # ensure that empty currency values is filled with source file currency if available
-        transactions_df_where_currency_column_is_null_mask = transactions_df[
-            "Currency"
-        ].isnull()
-        transactions_df_where_source_transaction_file_account_currency_column_is_null_mask = transactions_df[
-            "Source transaction file: Account currency"
-        ].isnull()
-        transactions_df.loc[
-            transactions_df_where_currency_column_is_null_mask, "Currency",
-        ] = transactions_df.loc[
-            ~transactions_df_where_source_transaction_file_account_currency_column_is_null_mask,
-            "Source transaction file: Account currency",
-        ]
+        if "Currency" in transactions_df.columns:
+            transactions_df_where_currency_column_is_null_mask = transactions_df[
+                "Currency"
+            ].isnull()
+            transactions_df_where_source_transaction_file_account_currency_column_is_null_mask = transactions_df[
+                "Source transaction file: Account currency"
+            ].isnull()
+            transactions_df.loc[
+                transactions_df_where_currency_column_is_null_mask, "Currency",
+            ] = transactions_df.loc[
+                ~transactions_df_where_source_transaction_file_account_currency_column_is_null_mask,
+                "Source transaction file: Account currency",
+            ]
+        else:
+            transactions_df["Currency"] = transactions_df[
+                "Source transaction file: Account currency"
+            ]
 
         # export all transactions to xlsx
         record_type = "transactions"

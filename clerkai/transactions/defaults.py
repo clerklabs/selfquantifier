@@ -12,4 +12,5 @@ default_transactions_editable_columns: List[str] = [
     "Clarification",
     "Type",
     "Income/Expense Category",
+    "Currency",
 ]
