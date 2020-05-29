@@ -79,10 +79,10 @@ def parse_time_tracking_files(
     class ProcessingErrorsEncountered(Exception):
         pass
 
+    class InvalidRowEncountered(Exception):
+        pass
+
     def parse_time_tracking_file_row(time_tracking_file):
-        time_tracking_file_path = clerkai_input_file_path(
-            clerkai_input_folder_path, time_tracking_file
-        )
         results = {
             "time_tracking_entries": None,
             "parsing_metadata": None,
@@ -97,6 +97,16 @@ def parse_time_tracking_files(
             )
 
         def parse():
+            if is_nan(time_tracking_file["File path"]):
+                # ignore invalid rows (eg unmerged edit rows without paths)
+                error_msg = (
+                    "Ignoring row %s since it has no file path"
+                    % time_tracking_file.name
+                )
+                raise InvalidRowEncountered(error_msg)
+            time_tracking_file_path = clerkai_input_file_path(
+                clerkai_input_folder_path, time_tracking_file
+            )
             content_type = time_tracking_file["Content type"]
             if not content_type:
                 raise ContentTypeNotSetError(
@@ -181,7 +191,11 @@ def parse_time_tracking_files(
         if failfast:
             try:
                 results = parse()
-            except (ContentTypeNotSetError, ParserNotAvailableError) as e:
+            except (
+                ContentTypeNotSetError,
+                ParserNotAvailableError,
+                InvalidRowEncountered,
+            ) as e:
                 error = e
         else:
             try:
