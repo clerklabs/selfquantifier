@@ -226,7 +226,7 @@ def possibly_edited_df_util(
             columns_to_drop_after_propagation_of_previous_edits, axis=1
         )
     else:
-        print("Keeping potential old edits and columns for reference")
+        print("Warning: Keeping potential old edits and columns for reference")
         clean_df_with_previous_edits = df_with_previous_edits
 
     def archive_edit_file(edit_file_to_archive):
@@ -659,15 +659,21 @@ def merge_changes_from_previous_possibly_edited_df(
 
     def normalize_encoding(string):
         import unicodedata as ud
-        normalized = ud.normalize('NFC', string)
+
+        normalized = ud.normalize("NFC", string)
         return normalized
 
     def joined_normalized_path(record):
         # normalize encodings to properly join paths that have been encoded differently for whatever reason
-        joined_path = "%s/%s" % (record[file_path_column_name], record[file_name_column_name])
+        joined_path = "%s/%s" % (
+            record[file_path_column_name],
+            record[file_name_column_name],
+        )
         return normalize_encoding(joined_path)
 
-    accumulating_df["clerkai_path"] = accumulating_df.apply(joined_normalized_path, axis=1)
+    accumulating_df["clerkai_path"] = accumulating_df.apply(
+        joined_normalized_path, axis=1
+    )
     left_on = ["clerkai_path"]
 
     if from_commit != to_commit:
@@ -700,7 +706,7 @@ def merge_changes_from_previous_possibly_edited_df(
         right_on = ["head_commit_corresponding_clerkai_path"]
     else:
         previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
-            joined_path, axis=1
+            joined_normalized_path, axis=1
         )
         right_on = ["clerkai_path"]
 
@@ -719,12 +725,14 @@ def merge_changes_from_previous_possibly_edited_df(
 
     import pandas as pd
 
+    suffixed_right_on = [add_suffix(column_name) for column_name in right_on]
+
     merged_possibly_edited_df = pd.merge(
         accumulating_df,
         suffixed_previous_possibly_edited_df,
         how="left" if not keep_unmerged_previous_edits else "outer",
         left_on=left_on,
-        right_on=[add_suffix(column_name) for column_name in right_on],
+        right_on=suffixed_right_on,
         suffixes=(False, False),
     )
 

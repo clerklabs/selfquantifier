@@ -190,8 +190,12 @@ def init_notebook_and_return_helpers(clerkai_folder):
     # ensure_directories_are_in_place()
     if not os.path.isdir(transactions_folder_path):
         os.mkdir(transactions_folder_path)
-    if not os.path.isdir(receipts_folder_path):
-        os.mkdir(receipts_folder_path)
+    # if not os.path.isdir(receipts_folder_path):
+    #    os.mkdir(receipts_folder_path)
+    if not os.path.isdir(location_history_folder_path):
+        os.mkdir(location_history_folder_path)
+    if not os.path.isdir(time_tracking_folder_path):
+        os.mkdir(time_tracking_folder_path)
     if not os.path.isdir(edits_folder_path):
         os.mkdir(edits_folder_path)
 
