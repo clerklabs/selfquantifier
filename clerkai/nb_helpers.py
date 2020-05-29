@@ -272,13 +272,12 @@ def init_notebook_and_return_helpers(clerkai_folder):
         )
         store_gsheets_edits(gsheets_title, gsheets_sheet_name, edits_df, record_type)
 
-    return (
-        transactions,
-        list_receipt_files_in_receipts_folder,
-        location_history,
-        time_tracking_entries,
-        list_transactions_files_in_downloads_folder,
-        acknowledge_changes_in_clerkai_input_folder,
-        store_gsheets_edits,
-        download_and_store_gsheets_edits,
-    )
+    return {
+        "transactions": transactions,
+        "list_receipt_files_in_receipts_folder": list_receipt_files_in_receipts_folder,
+        "location_history": location_history,
+        "time_tracking_entries": time_tracking_entries,
+        "acknowledge_changes_in_clerkai_input_folder": acknowledge_changes_in_clerkai_input_folder,
+        "store_gsheets_edits": store_gsheets_edits,
+        "download_and_store_gsheets_edits": download_and_store_gsheets_edits,
+    }
