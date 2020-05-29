@@ -18,8 +18,8 @@ setup(
     name="clerkai",
     license="mpl-2.0",
     url="https://github.com/clerklabs/python-clerkai",
-    version="0.1.1",
-    download_url="https://github.com/clerklabs/python-clerkai/archive/v0.1.1.tar.gz",
+    version="0.1.2",
+    download_url="https://github.com/clerklabs/python-clerkai/archive/v0.1.2.tar.gz",
     packages=find_packages(),
     # Dependencies
     install_requires=requirements,
