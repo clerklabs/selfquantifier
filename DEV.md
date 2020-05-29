@@ -37,3 +37,12 @@ Similarly for the dev env:
 ```
 ./setup-python-venv.sh dev
 ```
+
+### Releasing a new version
+
+Bump version, tag, push and create a new release on Github, then:
+
+```
+python setup.py sdist
+twine upload dist/clerkai-0.1.2.tar.gz # change to the version that is being released
+```
