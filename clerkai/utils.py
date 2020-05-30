@@ -911,6 +911,13 @@ def ymd_date_to_naive_datetime_obj(datetime_str):
     return datetime_obj
 
 
+def fi_dmy_date_to_naive_datetime_obj(datetime_str):
+    if is_nan(datetime_str):
+        return None
+    datetime_obj = datetime.strptime(datetime_str, "%d.%m.%Y")
+    return datetime_obj
+
+
 def raw_if_available(field_name, entry):
     raw_field_name = "Raw %s" % field_name
     if raw_field_name in entry and entry[raw_field_name] is not None:
