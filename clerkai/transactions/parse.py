@@ -111,7 +111,7 @@ def parse_transaction_files(
 
         if failfast:
             print(
-                "transaction_file",
+                "Context (showing since failfast=True) - transaction_file:",
                 "%s/%s"
                 % (transaction_file["File path"], transaction_file["File name"]),
             )

@@ -172,18 +172,16 @@ def transactions_flow(
                 return None
             return float(number)
 
-        transactions_export_df["Amount"] = transactions_export_df["Amount"].apply(
-            float_if_not_nan
-        )
-        transactions_export_df["Balance"] = transactions_export_df["Balance"].apply(
-            float_if_not_nan
-        )
-        transactions_export_df["Foreign Currency Amount"] = transactions_export_df[
-            "Foreign Currency Amount"
-        ].apply(float_if_not_nan)
-        transactions_export_df["Foreign Currency Rate"] = transactions_export_df[
-            "Foreign Currency Rate"
-        ].apply(float_if_not_nan)
+        for column in [
+            "Amount",
+            "Balance",
+            "Foreign Currency Rate",
+            "Foreign Currency Amount",
+        ]:
+            if column in transactions_export_df.columns:
+                transactions_export_df[column] = transactions_export_df[column].apply(
+                    float_if_not_nan
+                )
 
         possibly_edited_transactions_df = possibly_edited_df(
             transactions_export_df,

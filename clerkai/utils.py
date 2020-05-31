@@ -67,6 +67,9 @@ def commits_by_short_gitsha1(repo_path, repo):
         history_reference = short_gitsha1(repo, commit.hash)
         commits[history_reference] = commit
 
+    if len(commits) == 0:
+        raise Exception('No commits found in "%s"' % repo_path)
+
     return commits
 
 
@@ -74,6 +77,8 @@ def commit_datetime_from_history_reference(history_reference, commits):
     first_matching_commit_history_reference_key = next(
         filter(lambda _: _.startswith(history_reference), commits.keys()), False
     )
+    if not first_matching_commit_history_reference_key:
+        raise Exception('No commit matching "%s" found' % history_reference)
     return commits[first_matching_commit_history_reference_key].author_date
 
 
@@ -210,6 +215,13 @@ def possibly_edited_df_util(
         previous_possibly_edited_df = pd.read_excel(
             previous_possibly_edited_df_xlsx_path
         )
+        # Ignore invalid edit files
+        if "File name" not in previous_possibly_edited_df.columns:
+            print(
+                "Warning: Ignoring invalid previous_possibly_edited_df",
+                previous_possibly_edited_df,
+            )
+            continue
         (
             df_with_previous_edits_across_columns,
             additional_columns_to_drop_after_propagation_of_previous_edits,
