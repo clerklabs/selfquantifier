@@ -17,8 +17,6 @@ def nordea_netbank_csv_transactions_to_general_clerk_format(df):
 
     normalized_df["Raw Real Date"] = None
 
-    print("df.columns", df.columns)
-
     # these files are found in three languages: sv, fi, en
     if "Bokföringsdag" in df.columns:
         normalized_df["Raw Bank Date"] = df["Bokföringsdag"]
