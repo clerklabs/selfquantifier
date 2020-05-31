@@ -688,7 +688,10 @@ def merge_changes_from_previous_possibly_edited_df(
         raise InvalidPreviouslyEditedDfException(
             "Missing column: %s" % file_path_column_name
         )
-    if additional_join_column and additional_join_column not in previous_possibly_edited_df.columns:
+    if (
+        additional_join_column
+        and additional_join_column not in previous_possibly_edited_df.columns
+    ):
         raise InvalidPreviouslyEditedDfException(
             "Missing column: %s" % additional_join_column
         )
