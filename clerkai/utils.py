@@ -110,6 +110,10 @@ def export_file_name_by_record_type(record_type, suffix=""):
     return (export_file_name, export_file_name_base)
 
 
+class InvalidPreviouslyEditedDfException(BaseException):
+    pass
+
+
 def possibly_edited_df_util(
     current_commit_df,
     record_type,
@@ -215,25 +219,25 @@ def possibly_edited_df_util(
         previous_possibly_edited_df = pd.read_excel(
             previous_possibly_edited_df_xlsx_path
         )
-        # Ignore invalid edit files
-        if "File name" not in previous_possibly_edited_df.columns:
+        try:
+            (
+                df_with_previous_edits_across_columns,
+                additional_columns_to_drop_after_propagation_of_previous_edits,
+            ) = merge_changes_from_previous_possibly_edited_df(
+                accumulating_df=df_with_previous_edits_across_columns,
+                previous_possibly_edited_df=previous_possibly_edited_df,
+                edit_file=edit_file,
+                record_type=record_type,
+                clerkai_input_folder_path=clerkai_input_folder_path,
+                current_history_reference=current_history_reference,
+                keep_unmerged_previous_edits=keep_unmerged_previous_edits,
+            )
+        except InvalidPreviouslyEditedDfException as e:
             print(
-                "Warning: Ignoring invalid previous_possibly_edited_df",
+                "Warning: Ignoring invalid previous_possibly_edited_df (%s)" % e,
                 previous_possibly_edited_df,
             )
             continue
-        (
-            df_with_previous_edits_across_columns,
-            additional_columns_to_drop_after_propagation_of_previous_edits,
-        ) = merge_changes_from_previous_possibly_edited_df(
-            accumulating_df=df_with_previous_edits_across_columns,
-            previous_possibly_edited_df=previous_possibly_edited_df,
-            edit_file=edit_file,
-            record_type=record_type,
-            clerkai_input_folder_path=clerkai_input_folder_path,
-            current_history_reference=current_history_reference,
-            keep_unmerged_previous_edits=keep_unmerged_previous_edits,
-        )
         columns_to_drop_after_propagation_of_previous_edits = [
             *columns_to_drop_after_propagation_of_previous_edits,
             *additional_columns_to_drop_after_propagation_of_previous_edits,
@@ -674,6 +678,20 @@ def merge_changes_from_previous_possibly_edited_df(
             )
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
+
+    # sanity check
+    if file_name_column_name not in previous_possibly_edited_df.columns:
+        raise InvalidPreviouslyEditedDfException(
+            "Missing column: %s" % file_name_column_name
+        )
+    if file_path_column_name not in previous_possibly_edited_df.columns:
+        raise InvalidPreviouslyEditedDfException(
+            "Missing column: %s" % file_path_column_name
+        )
+    if additional_join_column not in previous_possibly_edited_df.columns:
+        raise InvalidPreviouslyEditedDfException(
+            "Missing column: %s" % additional_join_column
+        )
 
     # print("df.head(), edit_file, previous_possibly_edited_df.head()")
     # print(df.head(), edit_file, previous_possibly_edited_df.head())
