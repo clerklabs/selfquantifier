@@ -61,7 +61,7 @@ def current_gitcommit_datetime(repo):
 def commits_by_short_gitsha1(repo_path, repo):
     from pydriller import RepositoryMining
 
-    commits_iterator = RepositoryMining(repo_path, filepath=".").traverse_commits()
+    commits_iterator = RepositoryMining(repo_path).traverse_commits()
     commits = {}
     for commit in commits_iterator:
         history_reference = short_gitsha1(repo, commit.hash)
