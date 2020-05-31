@@ -69,31 +69,37 @@ def transactions_flow(
         possibly_edited_transaction_files_df["Ignore"] != 1
     ]
 
-    # make sure that the edited column values yields new commits
-    # so that edit-files are dependent on the editable columns of file metadata
-    transaction_files_editable_data_df = included_transaction_files[
-        transaction_files_editable_columns + ["File metadata"]
-    ]
-    save_transaction_files_editable_data_in_transactions_folder(
-        transactions_folder_path, transaction_files_editable_data_df
-    )
-    acknowledge_changes_in_clerkai_input_folder()
+    if len(included_transaction_files) > 0:
 
-    from clerkai.transactions.parse import parse_transaction_files
+        # make sure that the edited column values yields new commits
+        # so that edit-files are dependent on the editable columns of file metadata
+        transaction_files_editable_data_df = included_transaction_files[
+            transaction_files_editable_columns + ["File metadata"]
+        ]
+        save_transaction_files_editable_data_in_transactions_folder(
+            transactions_folder_path, transaction_files_editable_data_df
+        )
+        acknowledge_changes_in_clerkai_input_folder()
 
-    parsed_transaction_files = parse_transaction_files(
-        transaction_files=included_transaction_files,
-        clerkai_input_folder_path=clerkai_input_folder_path,
-        failfast=failfast,
-    )
+        from clerkai.transactions.parse import parse_transaction_files
 
-    unsuccessfully_parsed_transaction_files = parsed_transaction_files[
-        ~parsed_transaction_files["Error"].isnull()
-    ].drop(["File metadata", "Parse results"], axis=1)
+        parsed_transaction_files = parse_transaction_files(
+            transaction_files=included_transaction_files,
+            clerkai_input_folder_path=clerkai_input_folder_path,
+            failfast=failfast,
+        )
 
-    successfully_parsed_transaction_files = parsed_transaction_files[
-        parsed_transaction_files["Error"].isnull()
-    ].drop(["Error"], axis=1)
+        unsuccessfully_parsed_transaction_files = parsed_transaction_files[
+            ~parsed_transaction_files["Error"].isnull()
+        ].drop(["File metadata", "Parse results"], axis=1)
+
+        successfully_parsed_transaction_files = parsed_transaction_files[
+            parsed_transaction_files["Error"].isnull()
+        ].drop(["Error"], axis=1)
+
+    else:
+        unsuccessfully_parsed_transaction_files = []
+        successfully_parsed_transaction_files = []
 
     if len(successfully_parsed_transaction_files) > 0:
         # concat all transactions
