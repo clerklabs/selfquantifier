@@ -818,15 +818,24 @@ def propagate_previous_edits_from_across_columns(
                 suffixed_column_name
                 not in df_with_previous_edits_across_columns.columns
             ):
+                print(
+                    ' - Merge info: "%s" was not found in the previous edit columns (maybe it is a column that has recently been added?)'
+                    % (suffixed_column_name)
+                )
                 pass
             else:
                 if column_name in df_with_previous_edits_across_columns.columns:
-                    df_where_column_is_null_mask = df_with_previous_edits_across_columns[
-                        column_name
+                    df_where_previous_edit_row_number_column_is_not_null_mask = ~df_with_previous_edits_across_columns[
+                        "clerkai_path%s" % (suffix)
                     ].isnull()
                     df_with_previous_edits_across_columns.loc[
-                        df_where_column_is_null_mask, column_name
+                        df_where_previous_edit_row_number_column_is_not_null_mask,
+                        column_name,
                     ] = df_with_previous_edits_across_columns[suffixed_column_name]
+                    print(
+                        ' - Merge info: Propagated previous edits from "%s" to "%s" where previous edit had a row'
+                        % (suffixed_column_name, column_name)
+                    )
                 else:
                     df_with_previous_edits_across_columns[
                         column_name
