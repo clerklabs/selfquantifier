@@ -46,6 +46,17 @@ def init_notebook_and_return_helpers(clerkai_folder):
         clerkai_input_folder_path, "Location History"
     )
     edits_folder_path = os.path.join(clerkai_folder_path, "Edits")
+    clerkai_output_folder_path = os.path.join(clerkai_folder_path, "Output")
+    expenses_reports_folder_path = os.path.join(
+        clerkai_output_folder_path, "Expense reports"
+    )
+    financial_reports_folder_path = os.path.join(
+        clerkai_output_folder_path, "Financial reports"
+    )
+    time_reports_folder_path = os.path.join(clerkai_output_folder_path, "Time reports")
+    travel_reports_folder_path = os.path.join(
+        clerkai_output_folder_path, "Travel reports"
+    )
 
     # set working dir to be the clerk.ai folder
     os.chdir(clerkai_folder_path)
@@ -282,4 +293,17 @@ def init_notebook_and_return_helpers(clerkai_folder):
         "acknowledge_changes_in_clerkai_input_folder": acknowledge_changes_in_clerkai_input_folder,
         "store_gsheets_edits": store_gsheets_edits,
         "download_and_store_gsheets_edits": download_and_store_gsheets_edits,
+        "paths": {
+            "clerkai_input_folder_path": clerkai_input_folder_path,
+            "transactions_folder_path": transactions_folder_path,
+            "receipts_folder_path": receipts_folder_path,
+            "time_tracking_folder_path": time_tracking_folder_path,
+            "location_history_folder_path": location_history_folder_path,
+            "edits_folder_path": edits_folder_path,
+            "clerkai_output_folder_path": clerkai_output_folder_path,
+            "expenses_reports_folder_path": expenses_reports_folder_path,
+            "financial_reports_folder_path": financial_reports_folder_path,
+            "time_reports_folder_path": time_reports_folder_path,
+            "travel_reports_folder_path": travel_reports_folder_path,
+        },
     }
