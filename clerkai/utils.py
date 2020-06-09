@@ -380,9 +380,23 @@ def save_edited_commit_specific_df(
             )
 
 
+def add_date_columns_for_pivoting(df, date_column_name):
+    df.loc[:, "Year"] = df[date_column_name].dt.to_period("Y")
+    df.loc[:, "Year-half"] = df[date_column_name].apply(
+        lambda date: "%sH%s" % (date.year, 1 if date.quarter < 3 else 2)
+    )
+    df.loc[:, "Quarter"] = df[date_column_name].dt.to_period("Q")
+    df.loc[:, "Month"] = df[date_column_name].dt.to_period("M")
+    df.loc[:, "Week"] = df[date_column_name].dt.to_period("W")
+    return df
+
+
 def set_export_transactions_formulas(df, eu_locale=False):
+    # TODO:
+    # use this only for dynamic formulas (such as filling in some editable column
+    # or showing a value based on an editable column ) rather than those that can be calculated beforehand
+    """
     from xlsxwriter.utility import xl_col_to_name
-    import numpy as np
 
     def col_letter(column_name):
         return xl_col_to_name(df.columns.get_loc(column_name))
@@ -421,8 +435,6 @@ def set_export_transactions_formulas(df, eu_locale=False):
             col_letter("Date"),
         )
 
-    df["Row number at export"] = np.arange(len(df)) + 2
-
     # make formulas row-specific
     def insert_row_numbers(df_row, colname):
         return df_row[colname].replace("[ROW]", str(df_row["Row number at export"]))
@@ -431,6 +443,7 @@ def set_export_transactions_formulas(df, eu_locale=False):
     df["Date"] = df.apply(insert_row_numbers, axis=1, colname="Date")
     df["Year"] = df.apply(insert_row_numbers, axis=1, colname="Year")
     df["Month"] = df.apply(insert_row_numbers, axis=1, colname="Month")
+    """
 
     return df
 
@@ -510,8 +523,12 @@ def export_to_gsheets(
                 axis=1,
             )
 
-    # set formulas for export
     if len(df) > 0:
+        # set row number at export always
+        import numpy as np
+
+        df["Row number at export"] = np.arange(len(df)) + 2
+        # set formulas for export
         if (
             record_type == "transaction_files"
             or record_type == "receipt_files"
@@ -520,7 +537,8 @@ def export_to_gsheets(
         ):
             pass
         elif record_type == "transactions":
-            df = set_export_transactions_formulas(df, eu_locale)
+            pass
+            # df = set_export_transactions_formulas(df, eu_locale)
         elif record_type == "location_history_by_date":
             pass
         elif record_type == "time_tracking_entries":

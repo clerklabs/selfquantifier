@@ -2,7 +2,8 @@ import os
 
 import pandas as pd
 
-from clerkai.utils import list_files_in_clerk_input_subfolder
+from clerkai.utils import (add_date_columns_for_pivoting,
+                           list_files_in_clerk_input_subfolder)
 
 
 def transactions_flow(
@@ -140,6 +141,27 @@ def transactions_flow(
             transactions_df["Currency"] = transactions_df[
                 "Source transaction file: Account currency"
             ]
+
+        # calculate a main date column that is informed by the other date columns
+        def choose_date(transaction):
+            if pd.isnull(transaction["Real Date"]) or transaction["Real Date"] is None:
+                return transaction["Bank Date"]
+            else:
+                return transaction["Real Date"]
+
+        transactions_df["Date"] = transactions_df.apply(choose_date, axis=1)
+
+        # add columns that are useful for aggregation / pivoting
+        transactions_df = add_date_columns_for_pivoting(transactions_df, "Date")
+
+        def join_account_info(transaction):
+            return "%s - %s" % (
+                transaction["Source transaction file: Account provider"],
+                transaction["Source transaction file: Account"],
+            )
+
+        # a joint column for account information
+        transactions_df["Account"] = transactions_df.apply(join_account_info, axis=1)
 
         # export all transactions to xlsx
         record_type = "transactions"
