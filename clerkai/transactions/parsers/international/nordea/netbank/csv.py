@@ -79,21 +79,30 @@ def nordea_netbank_csv_transactions_to_general_clerk_format(df):
             ]
         ].to_dict(orient="records")
 
-    # swedish and finnish netbank files have different date formats
-    first_encountered_date = (
-        normalized_df["Raw Bank Date"]
-        .loc[~normalized_df["Raw Bank Date"].isnull()]
-        .iloc[0]
-    )
-    if "." in first_encountered_date:
-        date_parser = fi_dmy_date_to_naive_datetime_obj
-    elif "-" in first_encountered_date:
-        date_parser = ymd_date_to_naive_datetime_obj
-    else:
-        raise Exception("Unexpected date format encountered")
-
     normalized_df["Real Date"] = None
-    normalized_df["Bank Date"] = normalized_df["Raw Bank Date"].apply(date_parser)
+
+    # only consider rows with bank dates - the rest are invalid / pending
+    rows_with_bank_dates_mask = ~normalized_df["Raw Bank Date"].isnull() & (
+        normalized_df["Raw Bank Date"] != "Invalid date"
+    )
+    normalized_df = normalized_df[rows_with_bank_dates_mask]
+
+    # swedish and finnish netbank files have different date formats
+    rows_with_bank_dates = normalized_df["Raw Bank Date"][rows_with_bank_dates_mask]
+    if len(rows_with_bank_dates) > 0:
+        first_encountered_date = rows_with_bank_dates.iloc[0]
+        if "." in first_encountered_date:
+            date_parser = fi_dmy_date_to_naive_datetime_obj
+        elif "-" in first_encountered_date:
+            date_parser = ymd_date_to_naive_datetime_obj
+        else:
+            raise Exception(
+                "Unexpected date format encountered in %s" % first_encountered_date
+            )
+        normalized_df["Bank Date"] = normalized_df["Raw Bank Date"].apply(date_parser)
+    else:
+        normalized_df["Bank Date"] = None
+
     normalized_df["Payer"] = normalized_df["Raw Payer"]
     normalized_df["Payee"] = normalized_df["Raw Payee"]
     normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]

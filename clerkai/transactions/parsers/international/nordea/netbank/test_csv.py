@@ -75,3 +75,21 @@ def test_nordea_netbank_csv_transactions_parser_fi_lang_en():
     with open(expected_file_path, "r") as f:
         expected = f.read()
     assert actual == expected
+
+
+def test_nordea_netbank_csv_transactions_parser_fi_lang_sv_with_pending_reservations():
+    # type: () -> None
+    transaction_file_path = join(
+        test_data_dir_path,
+        "Foo FI12 3456 7890 1234 56 - 2020.06.06 10.25 - sv.edited.csv",
+    )
+    transactions_df = nordea_netbank_csv_transactions_parser(transaction_file_path)
+    assert not transactions_df.empty
+    actual = transactions_df.to_csv(index=False)
+    actual_file_path = "%s%s" % (transaction_file_path, ".actual.csv")
+    with open(actual_file_path, "w") as f:
+        f.write(actual)
+    expected_file_path = "%s%s" % (transaction_file_path, ".expected.csv")
+    with open(expected_file_path, "r") as f:
+        expected = f.read()
+    assert actual == expected
