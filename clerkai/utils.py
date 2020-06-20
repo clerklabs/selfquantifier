@@ -157,9 +157,16 @@ def possibly_edited_df_util(
         "%s.gsheets." % export_file_name_base
     )
 
-    unmerged_non_current_main_edit_files = edit_files_df[
-        previous_main_edit_files_mask | gsheets_edit_files_mask
-    ]
+    # note: the order of these files is important
+    # we make sure that gsheet edit files come later, being authoritative in case they exist
+    # or else edits therein will be ignored
+    unmerged_non_current_main_edit_files = pd.concat(
+        [
+            edit_files_df[previous_main_edit_files_mask],
+            edit_files_df[gsheets_edit_files_mask],
+        ]
+    )
+
     # print("unmerged_non_current_main_edit_files", unmerged_non_current_main_edit_files)
 
     # check if edit for the head commit already exists
