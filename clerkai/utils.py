@@ -553,6 +553,14 @@ def export_to_gsheets(
         else:
             raise ValueError("record_type '%s' not recognized" % record_type)
 
+    # escape history references so that they are not parsed as scientific notation
+    if "History reference" in df.columns:
+        df["History reference"] = "'" + df["History reference"].astype(str)
+    if "Source transaction file: History reference" in df.columns:
+        df["Source transaction file: History reference"] = "'" + df[
+            "Source transaction file: History reference"
+        ].astype(str)
+
     # export to gsheets
     # if len(df) == 0:
     #     set_frozen(worksheet, rows=0)
@@ -598,7 +606,26 @@ def fetch_gsheets_worksheet_as_df(gsheets_client, gsheets_title, gsheets_sheet_n
     # spreadsheet_url = "https://docs.google.com/spreadsheets/d/%s" % sh.id
     # print(spreadsheet_url)
     worksheet = sh.worksheet(gsheets_sheet_name)
-    return get_as_dataframe(worksheet)
+    df = get_as_dataframe(worksheet, dtype={"History reference": str})
+
+    # work around bug https://github.com/robin900/gspread-dataframe/issues/26
+    def strip_initial_quote_if_present(s):
+        if s.startswith("'"):
+            return s[1:]
+        return s
+
+    if "History reference" in df.columns:
+        df["History reference"] = (
+            df["History reference"].astype(str).apply(strip_initial_quote_if_present)
+        )
+    if "Source transaction file: History reference" in df.columns:
+        df["Source transaction file: History reference"] = (
+            df["Source transaction file: History reference"]
+            .astype(str)
+            .apply(strip_initial_quote_if_present)
+        )
+
+    return df
 
 
 def changes_between_two_commits(repo_base_path, from_commit, to_commit):
