@@ -12,6 +12,8 @@ def amount_to_rounded_decimal(amount, **kwargs):
     DECIMAL_PLACES = Decimal(10) ** -accuracy
     if is_nan(amount):
         return None
+    if amount is None:
+        return None
     return Decimal(amount).quantize(DECIMAL_PLACES)
 
 
@@ -24,5 +26,7 @@ def convert_european_amount_to_decimal(value):
 
 def strip_whitespace_if_not_is_nan(x):
     if is_nan(x):
+        return None
+    if x is None:
         return None
     return x.strip()

@@ -34,6 +34,7 @@ parser_by_content_type = {
     "exported-transaction-file/norwegianreward.se.via-dataminer.xlsx": None,
     "exported-transaction-file/nordea.se.internetbanken-foretag.xls": None,
     "exported-transaction-file/banknorwegian.se.xlsx": banknorwegian_se_xlsx_transactions_parser,
+    "exported-transaction-file/banknorwegian.fi.xlsx": banknorwegian_se_xlsx_transactions_parser,
     "exported-transaction-file/clerk.ai.general-transactions-format.xlsx": None,
     "exported-transaction-file/paypal.com.activity-report.csv": None,
     "exported-transaction-file/skatteverket.se.skattekonto": None,

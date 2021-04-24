@@ -19,6 +19,11 @@ def nordea_netbank_csv_transactions_to_general_clerk_format(df):
 
     # these files are found in three languages: sv, fi, en
     if "Bokföringsdag" in df.columns:
+        # Some columns not always available. eg exports on 2021-04-24 no longer had Saldo but had Referensnummer instead
+        if "Saldo" not in df.columns:
+            df["Saldo"] = None
+        if "Referensnummer" not in df.columns:
+            df["Referensnummer"] = None
         normalized_df["Raw Bank Date"] = df["Bokföringsdag"]
         normalized_df["Raw Payer"] = df["Avsändare"]
         normalized_df["Raw Payee"] = df["Mottagare"]
@@ -35,6 +40,7 @@ def nordea_netbank_csv_transactions_to_general_clerk_format(df):
                 "Namn",
                 "Rubrik",
                 "Saldo",
+                "Referensnummer",
                 "Valuta",
             ]
         ].to_dict(orient="records")

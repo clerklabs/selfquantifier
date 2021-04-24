@@ -9,6 +9,15 @@ def import_banknorwegian_se_xlsx_transaction_file(transaction_file):
 
 
 def banknorwegian_se_xlsx_transactions_to_general_clerk_format(df):
+    # some columns are not available in all bank norwegian exports, eg savings account exports
+    if "Currency Amount" not in df.columns:
+        df["Currency Amount"] = None
+    if "Currency Rate" not in df.columns:
+        df["Currency Rate"] = None
+    if "Merchant Area" not in df.columns:
+        df["Merchant Area"] = None
+    if "Merchant Category" not in df.columns:
+        df["Merchant Category"] = None
     normalized_df = pd.DataFrame()
     normalized_df["Raw Real Date"] = None
     normalized_df["Raw Bank Date"] = df["TransactionDate"]

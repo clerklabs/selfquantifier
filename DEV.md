@@ -13,6 +13,12 @@ conda activate ./venvdev
 pytest -vv
 ```
 
+Only parsers:
+
+```
+pytest -vv clerkai/transactions/parsers
+```
+
 ### Add deps
 
 Add the dep to `requirements.txt` or `requirements_dev.txt`
