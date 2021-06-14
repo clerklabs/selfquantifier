@@ -188,6 +188,24 @@ def time_tracking_flow(
 
         # print("all_parsed_time_tracking_entries_df.columns", all_parsed_time_tracking_entries_df.columns)
 
+        time_tracking_entry_duplicates = all_parsed_time_tracking_entries_df.groupby(
+            "ID"
+        ).filter(lambda x: len(x) > 1)
+        print(
+            "time_tracking_entry_duplicates: ",
+            time_tracking_entry_duplicates[
+                [
+                    "Source time tracking file: File name",
+                    "Source time tracking file: File path",
+                    "Session",
+                    "Source Lines Summary",
+                    "UTC Timestamp",
+                    "Hours",
+                    "ID",
+                ]
+            ],
+        )
+
         time_tracking_entries_df = all_parsed_time_tracking_entries_df.drop_duplicates(
             subset=["ID"]
         )
