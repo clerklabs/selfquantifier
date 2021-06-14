@@ -8,6 +8,7 @@ from gspread import SpreadsheetNotFound, WorksheetNotFound
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
 from gspread_formatting import CellFormat, Color
 from gspread_formatting.dataframe import BasicFormatter, format_with_dataframe
+from imohash import hashfile
 
 
 def ensure_clerkai_folder_versioning(clerkai_input_folder_path):
@@ -934,6 +935,7 @@ def list_files_in_folder(folder_path):
     def is_not_ignored_file(filename):
         return not is_ignored_file(filename)
 
+    full_hash_filesize_threshold = 1024 * 1024 * 1
     all_files = []
     for root, dirs, files in os.walk(folder_path):
         # print(root, "consumes", end=" ")
@@ -944,16 +946,24 @@ def list_files_in_folder(folder_path):
         files = filter(is_not_ignored_file, files)
         # print(image_files)
         for file in list(files):
-            file_sha256sum = sha256sum(join(root, file))
-            file_sha1sum = sha1sum(join(root, file))
+            full_path = join(root, file)
+            size = getsize(full_path)
+            file_sha256sum = (
+                sha256sum(full_path) if size < full_hash_filesize_threshold else False
+            )
+            file_sha1sum = (
+                sha1sum(full_path) if size < full_hash_filesize_threshold else False
+            )
+            imohash = hashfile(full_path, hexdigest=True)
             all_files.append(
                 {
                     "File name": file,
                     "File path": root,
                     "File metadata": {
-                        "size": getsize(join(root, file)),
+                        "size": size,
                         "sha1sum": file_sha1sum,
                         "sha256sum": file_sha256sum,
+                        "imohash": imohash,
                     },
                 }
             )

@@ -2,6 +2,8 @@
 pandas
 jellyfish
 matplotlib
+imohash
+
 # for machine learning (autogluon)
 setuptools
 wheel
