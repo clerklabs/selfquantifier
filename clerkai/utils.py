@@ -395,6 +395,7 @@ def add_date_columns_for_pivoting(df, date_column_name):
     df.loc[:, "Quarter"] = df[date_column_name].dt.to_period("Q")
     df.loc[:, "Month"] = df[date_column_name].dt.to_period("M")
     df.loc[:, "Week"] = df[date_column_name].dt.to_period("W")
+    df.loc[:, "Weekday"] = df[date_column_name].dt.weekday
     return df
 
 
