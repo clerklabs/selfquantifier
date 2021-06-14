@@ -2,6 +2,12 @@
 pandas
 jellyfish
 matplotlib
+# for machine learning (autogluon)
+setuptools
+wheel
+mxnet<2.0.0
+autogluon
+
 
 # for location history analysis
 reverse_geocoder
