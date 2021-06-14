@@ -91,7 +91,11 @@ def time_tracking_flow(
     )
 
     included_time_tracking_files = possibly_edited_time_tracking_files_df[
-        possibly_edited_time_tracking_files_df["Ignore"] != 1
+        (
+            possibly_edited_time_tracking_files_df["Ignore"].isnull()
+            | (possibly_edited_time_tracking_files_df["Ignore"] == 0)
+            | (possibly_edited_time_tracking_files_df["Ignore"] == "0")
+        )
     ]
 
     # make sure that the edited column values yields new commits

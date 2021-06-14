@@ -67,7 +67,11 @@ def transactions_flow(
     )
 
     included_transaction_files = possibly_edited_transaction_files_df[
-        possibly_edited_transaction_files_df["Ignore"] != 1
+        (
+            possibly_edited_transaction_files_df["Ignore"].isnull()
+            | (possibly_edited_transaction_files_df["Ignore"] == 0)
+            | (possibly_edited_transaction_files_df["Ignore"] == "0")
+        )
     ]
 
     if len(included_transaction_files) > 0:
