@@ -39,7 +39,7 @@ def xolo_csv_transactions_to_general_clerk_format(df):
     )
     normalized_df["Payee"] = df.apply(xolo_expenses_vendor_category_bug_fixer, axis=1)
     normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]
-    normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
+    normalized_df["Amount"] = -normalized_df["Raw Amount"].apply(
         amount_to_rounded_decimal
     )
     normalized_df["Balance"] = None
