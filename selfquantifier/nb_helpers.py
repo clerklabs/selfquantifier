@@ -1,21 +1,21 @@
 import os
 
-from clerkai.location_history.defaults import (
+from selfquantifier.location_history.defaults import (
     location_history_by_date_editable_columns,
     location_history_files_editable_columns)
-from clerkai.location_history.flow import location_history_flow
-from clerkai.time_tracking.defaults import (
+from selfquantifier.location_history.flow import location_history_flow
+from selfquantifier.time_tracking.defaults import (
     default_time_tracking_entries_editable_columns,
     default_time_tracking_files_editable_columns)
-from clerkai.time_tracking.flow import time_tracking_flow
-from clerkai.transactions.defaults import (
+from selfquantifier.time_tracking.flow import time_tracking_flow
+from selfquantifier.transactions.defaults import (
     default_transaction_files_editable_columns,
     default_transactions_editable_columns)
-from clerkai.transactions.flow import transactions_flow
-from clerkai.utils import (add_all_untracked_and_changed_files,
+from selfquantifier.transactions.flow import transactions_flow
+from selfquantifier.utils import (add_all_untracked_and_changed_files,
                            commit_datetime_from_history_reference,
                            commits_by_short_gitsha1, current_gitsha1,
-                           ensure_clerkai_folder_versioning,
+                           ensure_selfquantifier_folder_versioning,
                            export_file_name_by_record_type,
                            fetch_gsheets_worksheet_as_df,
                            list_files_in_clerk_input_subfolder,
@@ -35,42 +35,42 @@ def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
     return commit_sha
 
 
-def init_notebook_and_return_helpers(clerkai_folder):
+def init_notebook_and_return_helpers(selfquantifier_folder):
     # expand given paths to absolute paths
-    clerkai_folder_path = os.path.expanduser(clerkai_folder).rstrip(os.sep)
-    clerkai_input_folder_path = os.path.join(clerkai_folder_path, "Input")
-    transactions_folder_path = os.path.join(clerkai_input_folder_path, "Transactions")
-    receipts_folder_path = os.path.join(clerkai_input_folder_path, "Receipts")
-    time_tracking_folder_path = os.path.join(clerkai_input_folder_path, "Time Tracking")
+    selfquantifier_folder_path = os.path.expanduser(selfquantifier_folder).rstrip(os.sep)
+    selfquantifier_input_folder_path = os.path.join(selfquantifier_folder_path, "Input")
+    transactions_folder_path = os.path.join(selfquantifier_input_folder_path, "Transactions")
+    receipts_folder_path = os.path.join(selfquantifier_input_folder_path, "Receipts")
+    time_tracking_folder_path = os.path.join(selfquantifier_input_folder_path, "Time Tracking")
     location_history_folder_path = os.path.join(
-        clerkai_input_folder_path, "Location History"
+        selfquantifier_input_folder_path, "Location History"
     )
-    edits_folder_path = os.path.join(clerkai_folder_path, "Edits")
-    clerkai_output_folder_path = os.path.join(clerkai_folder_path, "Output")
+    edits_folder_path = os.path.join(selfquantifier_folder_path, "Edits")
+    selfquantifier_output_folder_path = os.path.join(selfquantifier_folder_path, "Output")
     expenses_reports_folder_path = os.path.join(
-        clerkai_output_folder_path, "Expense reports"
+        selfquantifier_output_folder_path, "Expense reports"
     )
     financial_reports_folder_path = os.path.join(
-        clerkai_output_folder_path, "Financial reports"
+        selfquantifier_output_folder_path, "Financial reports"
     )
-    time_reports_folder_path = os.path.join(clerkai_output_folder_path, "Time reports")
+    time_reports_folder_path = os.path.join(selfquantifier_output_folder_path, "Time reports")
     travel_reports_folder_path = os.path.join(
-        clerkai_output_folder_path, "Travel reports"
+        selfquantifier_output_folder_path, "Travel reports"
     )
 
     # set working dir to be the clerk.ai folder
-    os.chdir(clerkai_folder_path)
+    os.chdir(selfquantifier_folder_path)
 
     # initiate / validate clerk.ai-folder versioning
-    clerkai_input_folder_repo = ensure_clerkai_folder_versioning(
-        clerkai_input_folder_path=clerkai_input_folder_path
+    selfquantifier_input_folder_repo = ensure_selfquantifier_folder_versioning(
+        selfquantifier_input_folder_path=selfquantifier_input_folder_path
     )
 
-    def acknowledge_changes_in_clerkai_input_folder():
-        add_all_untracked_and_changed_files(clerkai_input_folder_repo)
+    def acknowledge_changes_in_selfquantifier_input_folder():
+        add_all_untracked_and_changed_files(selfquantifier_input_folder_repo)
 
     def current_history_reference():
-        return current_gitsha1(clerkai_input_folder_repo)
+        return current_gitsha1(selfquantifier_input_folder_repo)
 
     # transactions
 
@@ -99,10 +99,10 @@ def init_notebook_and_return_helpers(clerkai_folder):
         return transactions_flow(
             transaction_files_editable_columns=transaction_files_editable_columns,
             transactions_editable_columns=transactions_editable_columns,
-            clerkai_input_folder_path=clerkai_input_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
             possibly_edited_df=possibly_edited_df,
             transactions_folder_path=transactions_folder_path,
-            acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
+            acknowledge_changes_in_selfquantifier_input_folder=acknowledge_changes_in_selfquantifier_input_folder,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             failfast=failfast,
@@ -112,7 +112,7 @@ def init_notebook_and_return_helpers(clerkai_folder):
 
     def list_receipt_files_in_receipts_folder():
         _ = list_files_in_clerk_input_subfolder(
-            receipts_folder_path, clerkai_input_folder_path=clerkai_input_folder_path
+            receipts_folder_path, selfquantifier_input_folder_path=selfquantifier_input_folder_path
         )
         if len(_) == 0:
             return _
@@ -128,10 +128,10 @@ def init_notebook_and_return_helpers(clerkai_folder):
         return location_history_flow(
             location_history_files_editable_columns=location_history_files_editable_columns,
             location_history_by_date_editable_columns=location_history_by_date_editable_columns,
-            clerkai_input_folder_path=clerkai_input_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
             possibly_edited_df=possibly_edited_df,
             location_history_folder_path=location_history_folder_path,
-            acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
+            acknowledge_changes_in_selfquantifier_input_folder=acknowledge_changes_in_selfquantifier_input_folder,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             failfast=failfast,
@@ -166,10 +166,10 @@ def init_notebook_and_return_helpers(clerkai_folder):
         return time_tracking_flow(
             time_tracking_files_editable_columns=time_tracking_files_editable_columns,
             time_tracking_entries_editable_columns=time_tracking_entries_editable_columns,
-            clerkai_input_folder_path=clerkai_input_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
             possibly_edited_df=possibly_edited_df,
             time_tracking_folder_path=time_tracking_folder_path,
-            acknowledge_changes_in_clerkai_input_folder=acknowledge_changes_in_clerkai_input_folder,
+            acknowledge_changes_in_selfquantifier_input_folder=acknowledge_changes_in_selfquantifier_input_folder,
             current_history_reference=current_history_reference,
             keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             failfast=failfast,
@@ -179,7 +179,7 @@ def init_notebook_and_return_helpers(clerkai_folder):
 
     def list_edit_files_in_edits_folder():
         _ = list_files_in_clerk_subfolder(
-            edits_folder_path, clerkai_folder_path=clerkai_folder_path
+            edits_folder_path, selfquantifier_folder_path=selfquantifier_folder_path
         )
         if len(_) == 0:
             return _
@@ -189,7 +189,7 @@ def init_notebook_and_return_helpers(clerkai_folder):
             return _
         # add commit-metadata to list
         commits = commits_by_short_gitsha1(
-            clerkai_input_folder_path, clerkai_input_folder_repo
+            selfquantifier_input_folder_path, selfquantifier_input_folder_repo
         )
         _["Related history reference"] = _["File path"].apply(
             extract_commit_sha_from_edit_subfolder_path
@@ -226,8 +226,8 @@ def init_notebook_and_return_helpers(clerkai_folder):
             list_edit_files_in_edits_folder,
             current_history_reference,
             edits_folder_path,
-            clerkai_input_folder_path,
-            clerkai_input_folder_repo,
+            selfquantifier_input_folder_path,
+            selfquantifier_input_folder_repo,
         )
 
     def store_gsheets_edits(gsheets_title, gsheets_sheet_name, edits_df, record_type):
@@ -258,7 +258,7 @@ def init_notebook_and_return_helpers(clerkai_folder):
         )
 
         commits = commits_by_short_gitsha1(
-            clerkai_input_folder_path, clerkai_input_folder_repo
+            selfquantifier_input_folder_path, selfquantifier_input_folder_repo
         )
         commit_datetime = commit_datetime_from_history_reference(
             history_reference, commits=commits
@@ -290,17 +290,17 @@ def init_notebook_and_return_helpers(clerkai_folder):
         "list_receipt_files_in_receipts_folder": list_receipt_files_in_receipts_folder,
         "location_history": location_history,
         "time_tracking_entries": time_tracking_entries,
-        "acknowledge_changes_in_clerkai_input_folder": acknowledge_changes_in_clerkai_input_folder,
+        "acknowledge_changes_in_selfquantifier_input_folder": acknowledge_changes_in_selfquantifier_input_folder,
         "store_gsheets_edits": store_gsheets_edits,
         "download_and_store_gsheets_edits": download_and_store_gsheets_edits,
         "paths": {
-            "clerkai_input_folder_path": clerkai_input_folder_path,
+            "selfquantifier_input_folder_path": selfquantifier_input_folder_path,
             "transactions_folder_path": transactions_folder_path,
             "receipts_folder_path": receipts_folder_path,
             "time_tracking_folder_path": time_tracking_folder_path,
             "location_history_folder_path": location_history_folder_path,
             "edits_folder_path": edits_folder_path,
-            "clerkai_output_folder_path": clerkai_output_folder_path,
+            "selfquantifier_output_folder_path": selfquantifier_output_folder_path,
             "expenses_reports_folder_path": expenses_reports_folder_path,
             "financial_reports_folder_path": financial_reports_folder_path,
             "time_reports_folder_path": time_reports_folder_path,

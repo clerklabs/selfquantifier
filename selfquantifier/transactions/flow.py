@@ -2,17 +2,17 @@ import os
 
 import pandas as pd
 
-from clerkai.utils import (add_date_columns_for_pivoting,
+from selfquantifier.utils import (add_date_columns_for_pivoting,
                            list_files_in_clerk_input_subfolder)
 
 
 def transactions_flow(
     transaction_files_editable_columns,
     transactions_editable_columns,
-    clerkai_input_folder_path,
+    selfquantifier_input_folder_path,
     possibly_edited_df,
     transactions_folder_path,
-    acknowledge_changes_in_clerkai_input_folder,
+    acknowledge_changes_in_selfquantifier_input_folder,
     current_history_reference,
     keep_unmerged_previous_edits=False,
     failfast=False,
@@ -20,7 +20,7 @@ def transactions_flow(
     def list_transaction_files_in_transactions_folder():
         _ = list_files_in_clerk_input_subfolder(
             transactions_folder_path,
-            clerkai_input_folder_path=clerkai_input_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
         )
         if len(_) == 0:
             return _
@@ -84,13 +84,13 @@ def transactions_flow(
         save_transaction_files_editable_data_in_transactions_folder(
             transactions_folder_path, transaction_files_editable_data_df
         )
-        acknowledge_changes_in_clerkai_input_folder()
+        acknowledge_changes_in_selfquantifier_input_folder()
 
-        from clerkai.transactions.parse import parse_transaction_files
+        from selfquantifier.transactions.parse import parse_transaction_files
 
         parsed_transaction_files = parse_transaction_files(
             transaction_files=included_transaction_files,
-            clerkai_input_folder_path=clerkai_input_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
             failfast=failfast,
         )
 
@@ -191,7 +191,7 @@ def transactions_flow(
 
         # convert Decimal columns to float prior to export or excel will treat them as strings
         # todo: less hacky conversion of Decimal-columns
-        from clerkai.utils import is_nan
+        from selfquantifier.utils import is_nan
 
         def float_if_not_nan(number):
             if is_nan(number) or number is None:

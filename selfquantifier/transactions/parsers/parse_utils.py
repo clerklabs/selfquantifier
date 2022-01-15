@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Union
 
-from clerkai.utils import is_nan
+from selfquantifier.utils import is_nan
 
 
 def amount_to_rounded_decimal(amount, **kwargs):

@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytz
 
-from clerkai.utils import is_nan
+from selfquantifier.utils import is_nan
 
 
 def timestamp_ms_to_utc_datetime_obj(timestamp_ms):

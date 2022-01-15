@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from clerkai.time_tracking.parse import (
+from selfquantifier.time_tracking.parse import (
     naive_time_tracking_entry_id_duplicate_nums, naive_time_tracking_entry_ids,
     time_tracking_entry_ids)
 

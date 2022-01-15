@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.transactions.parsers.international.n26.csv import \
+from selfquantifier.transactions.parsers.international.n26.csv import \
     n26_csv_transactions_parser
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")

@@ -11,14 +11,14 @@ from gspread_formatting.dataframe import BasicFormatter, format_with_dataframe
 from imohash import hashfile
 
 
-def ensure_clerkai_folder_versioning(clerkai_input_folder_path):
+def ensure_selfquantifier_folder_versioning(selfquantifier_input_folder_path):
     from git import Repo
 
-    if os.path.isdir(os.path.join(clerkai_input_folder_path, ".git")):
+    if os.path.isdir(os.path.join(selfquantifier_input_folder_path, ".git")):
         # TODO make sure that this is a clerk-managed git repository
-        repo = Repo(clerkai_input_folder_path)
+        repo = Repo(selfquantifier_input_folder_path)
     else:
-        repo = Repo.init(clerkai_input_folder_path)
+        repo = Repo.init(selfquantifier_input_folder_path)
         # make the commits in this repo be from clerk automation by default
         config = repo.config_writer()
         config.set_value("user", "name", "Clerk.ai")
@@ -83,9 +83,9 @@ def commit_datetime_from_history_reference(history_reference, commits):
     return commits[first_matching_commit_history_reference_key].author_date
 
 
-def clerkai_input_file_path(clerkai_input_folder_path, file):
+def selfquantifier_input_file_path(selfquantifier_input_folder_path, file):
     return os.path.join(
-        file["File path"].replace("@", clerkai_input_folder_path), file["File name"]
+        file["File path"].replace("@", selfquantifier_input_folder_path), file["File name"]
     )
 
 
@@ -123,8 +123,8 @@ def possibly_edited_df_util(
     list_edit_files_in_edits_folder,
     current_history_reference,
     edits_folder_path,
-    clerkai_input_folder_path,
-    clerkai_input_folder_repo,
+    selfquantifier_input_folder_path,
+    selfquantifier_input_folder_repo,
 ):
     # set config based on record type
     (export_file_name, export_file_name_base) = export_file_name_by_record_type(
@@ -143,7 +143,7 @@ def possibly_edited_df_util(
             record_type=record_type,
             export_file_name=export_file_name,
             edits_folder_path=edits_folder_path,
-            commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
+            commit_datetime=current_gitcommit_datetime(selfquantifier_input_folder_repo),
             history_reference=current_history_reference(),
             create_if_not_exists=True,
         )
@@ -176,7 +176,7 @@ def possibly_edited_df_util(
         record_type=record_type,
         export_file_name=export_file_name,
         edits_folder_path=edits_folder_path,
-        commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
+        commit_datetime=current_gitcommit_datetime(selfquantifier_input_folder_repo),
         history_reference=current_history_reference(),
         create_if_not_exists=False,
     )
@@ -236,7 +236,7 @@ def possibly_edited_df_util(
                 previous_possibly_edited_df=previous_possibly_edited_df,
                 edit_file=edit_file,
                 record_type=record_type,
-                clerkai_input_folder_path=clerkai_input_folder_path,
+                selfquantifier_input_folder_path=selfquantifier_input_folder_path,
                 current_history_reference=current_history_reference,
                 keep_unmerged_previous_edits=keep_unmerged_previous_edits,
             )
@@ -299,7 +299,7 @@ def possibly_edited_df_util(
         record_type=record_type,
         export_file_name=export_file_name,
         edits_folder_path=edits_folder_path,
-        commit_datetime=current_gitcommit_datetime(clerkai_input_folder_repo),
+        commit_datetime=current_gitcommit_datetime(selfquantifier_input_folder_repo),
         history_reference=current_history_reference(),
         create_if_not_exists=True,
     )
@@ -671,7 +671,7 @@ def merge_changes_from_previous_possibly_edited_df(
     previous_possibly_edited_df,
     edit_file,
     record_type,
-    clerkai_input_folder_path,
+    selfquantifier_input_folder_path,
     current_history_reference,
     keep_unmerged_previous_edits,
 ):
@@ -698,7 +698,7 @@ def merge_changes_from_previous_possibly_edited_df(
         file_path_column_name = "Source transaction file: File path"
         # Add ID column if not present in previous edits file
         if additional_join_column not in previous_possibly_edited_df.columns:
-            from clerkai.transactions.parse import transaction_ids
+            from selfquantifier.transactions.parse import transaction_ids
 
             previous_possibly_edited_df[additional_join_column] = transaction_ids(
                 previous_possibly_edited_df
@@ -713,7 +713,7 @@ def merge_changes_from_previous_possibly_edited_df(
         file_path_column_name = "Source location history file: File path"
         # Add ID column if not present in previous edits file
         if additional_join_column not in previous_possibly_edited_df.columns:
-            from clerkai.location_history.parse import location_history_ids
+            from selfquantifier.location_history.parse import location_history_ids
 
             previous_possibly_edited_df[additional_join_column] = location_history_ids(
                 previous_possibly_edited_df
@@ -725,7 +725,7 @@ def merge_changes_from_previous_possibly_edited_df(
         file_path_column_name = "Source time tracking file: File path"
         # Add ID column if not present in previous edits file
         if additional_join_column not in previous_possibly_edited_df.columns:
-            from clerkai.transactions.parse import transaction_ids
+            from selfquantifier.transactions.parse import transaction_ids
 
             previous_possibly_edited_df[additional_join_column] = transaction_ids(
                 previous_possibly_edited_df
@@ -771,10 +771,10 @@ def merge_changes_from_previous_possibly_edited_df(
         )
         return normalize_encoding(joined_path)
 
-    accumulating_df["clerkai_path"] = accumulating_df.apply(
+    accumulating_df["selfquantifier_path"] = accumulating_df.apply(
         joined_normalized_path, axis=1
     )
-    left_on = ["clerkai_path"]
+    left_on = ["selfquantifier_path"]
 
     if from_commit != to_commit:
         (
@@ -782,33 +782,33 @@ def merge_changes_from_previous_possibly_edited_df(
             old_now_deleted_paths,
             old_non_existing_now_added_paths,
         ) = changes_between_two_commits(
-            clerkai_input_folder_path, from_commit, to_commit
+            selfquantifier_input_folder_path, from_commit, to_commit
         )
 
-        previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
+        previous_possibly_edited_df["selfquantifier_path"] = previous_possibly_edited_df.apply(
             joined_normalized_path, axis=1
         )
 
-        def find_head_commit_corresponding_clerkai_path(clerkai_path):
-            clerkai_path_key = clerkai_path.replace("@/", "")
-            if clerkai_path_key in old_to_new_paths:
-                return "@/%s" % old_to_new_paths[clerkai_path_key]
+        def find_head_commit_corresponding_selfquantifier_path(selfquantifier_path):
+            selfquantifier_path_key = selfquantifier_path.replace("@/", "")
+            if selfquantifier_path_key in old_to_new_paths:
+                return "@/%s" % old_to_new_paths[selfquantifier_path_key]
             else:
                 # if no moves occurred just use the old path as is
-                return clerkai_path
+                return selfquantifier_path
 
         previous_possibly_edited_df[
-            "head_commit_corresponding_clerkai_path"
-        ] = previous_possibly_edited_df["clerkai_path"].apply(
-            find_head_commit_corresponding_clerkai_path
+            "head_commit_corresponding_selfquantifier_path"
+        ] = previous_possibly_edited_df["selfquantifier_path"].apply(
+            find_head_commit_corresponding_selfquantifier_path
         )
 
-        right_on = ["head_commit_corresponding_clerkai_path"]
+        right_on = ["head_commit_corresponding_selfquantifier_path"]
     else:
-        previous_possibly_edited_df["clerkai_path"] = previous_possibly_edited_df.apply(
+        previous_possibly_edited_df["selfquantifier_path"] = previous_possibly_edited_df.apply(
             joined_normalized_path, axis=1
         )
-        right_on = ["clerkai_path"]
+        right_on = ["selfquantifier_path"]
 
     suffix = " (%s - %s)" % (from_commit, edit_file["File name"])
 
@@ -837,7 +837,7 @@ def merge_changes_from_previous_possibly_edited_df(
     )
 
     # drop temporary merge columns
-    merged_possibly_edited_df = merged_possibly_edited_df.drop(["clerkai_path"], axis=1)
+    merged_possibly_edited_df = merged_possibly_edited_df.drop(["selfquantifier_path"], axis=1)
 
     # hint that more columns may be dropped upon successful propagation of previous edits
     columns_to_drop_after_propagation_of_previous_edits = (
@@ -880,7 +880,7 @@ def propagate_previous_edits_from_across_columns(
             else:
                 if column_name in df_with_previous_edits_across_columns.columns:
                     df_where_previous_edit_row_number_column_is_not_null_mask = ~df_with_previous_edits_across_columns[
-                        "clerkai_path%s" % (suffix)
+                        "selfquantifier_path%s" % (suffix)
                     ].isnull()
                     df_with_previous_edits_across_columns.loc[
                         df_where_previous_edit_row_number_column_is_not_null_mask,
@@ -970,13 +970,13 @@ def list_files_in_folder(folder_path):
     return all_files
 
 
-def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path):
+def list_files_in_clerk_subfolder(folder_path, selfquantifier_folder_path):
     import pandas as pd
 
     _ = pd.DataFrame(list_files_in_folder(folder_path))
     if len(_) > 0:
         _["File path"] = _["File path"].apply(
-            lambda root: root.replace(clerkai_folder_path, "@")
+            lambda root: root.replace(selfquantifier_folder_path, "@")
         )
         # ignore *_editable_data.csv
         _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]
@@ -985,13 +985,13 @@ def list_files_in_clerk_subfolder(folder_path, clerkai_folder_path):
     return _
 
 
-def list_files_in_clerk_input_subfolder(folder_path, clerkai_input_folder_path):
+def list_files_in_clerk_input_subfolder(folder_path, selfquantifier_input_folder_path):
     import pandas as pd
 
     _ = pd.DataFrame(list_files_in_folder(folder_path))
     if len(_) > 0:
         _["File path"] = _["File path"].apply(
-            lambda root: root.replace(clerkai_input_folder_path, "@")
+            lambda root: root.replace(selfquantifier_input_folder_path, "@")
         )
         # ignore *_editable_data.csv
         _ = _[~_["File name"].str.contains("_editable_data.csv$", regex=True)]

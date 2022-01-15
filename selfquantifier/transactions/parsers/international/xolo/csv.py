@@ -1,8 +1,8 @@
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from clerkai.transactions.parsers.parse_utils import amount_to_rounded_decimal
-from clerkai.utils import is_nan, ymd_date_to_naive_datetime_obj
+from selfquantifier.transactions.parsers.parse_utils import amount_to_rounded_decimal
+from selfquantifier.utils import is_nan, ymd_date_to_naive_datetime_obj
 
 
 def import_xolo_csv_transaction_file(transaction_file):

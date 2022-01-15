@@ -3,9 +3,9 @@ import json
 import pandas as pd
 from joblib import Memory
 
-from clerkai.time_tracking.parsers.neamtime.tslog import \
+from selfquantifier.time_tracking.parsers.neamtime.tslog import \
     neamtime_tslog_time_tracking_entries_parser
-from clerkai.utils import clerkai_input_file_path, is_nan, raw_if_available
+from selfquantifier.utils import selfquantifier_input_file_path, is_nan, raw_if_available
 
 memory = Memory(location="/tmp", verbose=0)
 
@@ -68,7 +68,7 @@ def time_tracking_entry_ids(time_tracking_entries):
 
 
 def parse_time_tracking_files(
-    time_tracking_files, clerkai_input_folder_path, keepraw=False, failfast=False
+    time_tracking_files, selfquantifier_input_folder_path, keepraw=False, failfast=False
 ):
     class ContentTypeNotSetError(Exception):
         pass
@@ -104,8 +104,8 @@ def parse_time_tracking_files(
                     % time_tracking_file.name
                 )
                 raise InvalidRowEncountered(error_msg)
-            time_tracking_file_path = clerkai_input_file_path(
-                clerkai_input_folder_path, time_tracking_file
+            time_tracking_file_path = selfquantifier_input_file_path(
+                selfquantifier_input_folder_path, time_tracking_file
             )
             content_type = time_tracking_file["Content type"]
             if not content_type:

@@ -1,1 +1,1 @@
-pyannotate --type-info pyannotations.json -w clerkai
+pyannotate --type-info pyannotations.json -w selfquantifier

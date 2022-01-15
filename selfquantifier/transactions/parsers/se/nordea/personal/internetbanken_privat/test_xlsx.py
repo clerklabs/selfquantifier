@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx import (
+from selfquantifier.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx import (
     nordea_se_personal_internetbanken_privat_xlsx_transactions_parser,
     nordea_se_transaction_text_to_datetime_obj)
 

@@ -3,7 +3,7 @@ from io import StringIO
 
 import pandas as pd
 
-from clerkai.transactions.parsers.parse_utils import (
+from selfquantifier.transactions.parsers.parse_utils import (
     amount_to_rounded_decimal, convert_european_amount_to_decimal)
 
 

@@ -1,9 +1,9 @@
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from clerkai.location_history.parsers.parse_utils import \
+from selfquantifier.location_history.parsers.parse_utils import \
     exiftool_date_to_utc_datetime_obj
-from clerkai.utils import is_nan
+from selfquantifier.utils import is_nan
 
 
 def either_date_time_original_or_create_date(raw_dates):

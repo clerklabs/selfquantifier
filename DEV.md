@@ -67,7 +67,7 @@ Run tests against all supported Python environments:
 tox -- test
 ```
 
-### Using the development version of python-clerkai in a notebook
+### Using the development version of selfquantifier in a notebook
 
 Run the following to install a Jupyter kernel and opening the example Jupyter notebook:
 
@@ -76,7 +76,7 @@ poe install_kernel
 jupyter-notebook example-notebook.py
 ```
 
-After selecting the `python-clerkai` kernel in Jupyter you should be able to interact with the development version as if it was installed via pip.
+After selecting the `selfquantifier` kernel in Jupyter you should be able to interact with the development version as if it was installed via pip.
 
 ### Development setup
 
@@ -151,7 +151,7 @@ poetry build
 poetry publish -r test-pypi
 ```
 
-6. Check the README at TestPyPi etc to see that it is correct: https://test.pypi.org/project/clerkai/
+6. Check the README at TestPyPi etc to see that it is correct: https://test.pypi.org/project/selfquantifier/
 7. Verify that the package installs and works properly in a new environment:
 
 ```shell
@@ -164,7 +164,7 @@ poetry run pytest
 You can also ask others to install and test the package via pip:
 
 ```shell
-pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple clerkai
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple selfquantifier
 ```
 
 8. Commit and changes and fixes

@@ -1,4 +1,4 @@
-# python-clerkai
+# selfquantifier
 
 Tools for extracting, annotating and summarizing transaction, location history and time tracking data from local files
 
@@ -7,13 +7,13 @@ Tools for extracting, annotating and summarizing transaction, location history a
 Using pip:
 
 ```shell
-pip install clerkai
+pip install selfquantifier
 ```
 
 Using [Poetry](https://python-poetry.org/):
 
 ```shell
-poetry add clerkai
+poetry add selfquantifier
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ poetry add clerkai
 Import the library:
 
 ```py
-import clerkai
+import selfquantifier
 ```
 
 ## Development

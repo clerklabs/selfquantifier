@@ -1,8 +1,8 @@
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from clerkai.transactions.parsers.parse_utils import amount_to_rounded_decimal
-from clerkai.utils import (fi_dmy_date_to_naive_datetime_obj,
+from selfquantifier.transactions.parsers.parse_utils import amount_to_rounded_decimal
+from selfquantifier.utils import (fi_dmy_date_to_naive_datetime_obj,
                            ymd_date_to_naive_datetime_obj)
 
 

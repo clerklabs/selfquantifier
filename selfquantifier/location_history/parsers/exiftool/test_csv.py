@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.location_history.parsers.exiftool.csv import \
+from selfquantifier.location_history.parsers.exiftool.csv import \
     exiftool_csv_location_history_parser
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")

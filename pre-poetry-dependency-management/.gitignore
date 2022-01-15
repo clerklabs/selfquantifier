@@ -3,7 +3,7 @@
 venv*
 __pycache__
 .eggs
-clerkai.egg-info
+selfquantifier.egg-info
 .mypy_cache
 pyannotations.json
 *.actual.csv

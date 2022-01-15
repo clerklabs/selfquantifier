@@ -2,23 +2,23 @@ import json
 
 import pandas as pd
 
-from clerkai.transactions.parsers.ee.lhv.csv import \
+from selfquantifier.transactions.parsers.ee.lhv.csv import \
     lhv_ee_csv_transactions_parser
-from clerkai.transactions.parsers.fi.nordea.personal.txt import \
+from selfquantifier.transactions.parsers.fi.nordea.personal.txt import \
     nordea_fi_lang_se_txt_transactions_parser
-from clerkai.transactions.parsers.international.n26.csv import \
+from selfquantifier.transactions.parsers.international.n26.csv import \
     n26_csv_transactions_parser
-from clerkai.transactions.parsers.international.nordea.netbank.csv import \
+from selfquantifier.transactions.parsers.international.nordea.netbank.csv import \
     nordea_netbank_csv_transactions_parser
-from clerkai.transactions.parsers.international.xolo.csv import \
+from selfquantifier.transactions.parsers.international.xolo.csv import \
     xolo_csv_transactions_parser
-from clerkai.transactions.parsers.se.banknorwegian.xlsx import \
+from selfquantifier.transactions.parsers.se.banknorwegian.xlsx import \
     banknorwegian_se_xlsx_transactions_parser
-from clerkai.transactions.parsers.se.danskebank.personal.csv import \
+from selfquantifier.transactions.parsers.se.danskebank.personal.csv import \
     danskebank_se_csv_transactions_parser
-from clerkai.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx import \
+from selfquantifier.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx import \
     nordea_se_personal_internetbanken_privat_xlsx_transactions_parser
-from clerkai.utils import clerkai_input_file_path, is_nan, raw_if_available
+from selfquantifier.utils import selfquantifier_input_file_path, is_nan, raw_if_available
 
 parser_by_content_type = {
     "exported-transaction-file/nordea.fi.natbanken-privat.xls": nordea_fi_lang_se_txt_transactions_parser,
@@ -95,7 +95,7 @@ def transaction_ids(transactions):
 
 
 def parse_transaction_files(
-    transaction_files, clerkai_input_folder_path, keepraw=False, failfast=False
+    transaction_files, selfquantifier_input_folder_path, keepraw=False, failfast=False
 ):
     class ContentTypeNotSetError(Exception):
         pass
@@ -104,8 +104,8 @@ def parse_transaction_files(
         pass
 
     def parse_transaction_file_row(transaction_file):
-        transaction_file_path = clerkai_input_file_path(
-            clerkai_input_folder_path, transaction_file
+        transaction_file_path = selfquantifier_input_file_path(
+            selfquantifier_input_folder_path, transaction_file
         )
         results = None
         error = None

@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.transactions.parsers.international.nordea.netbank.csv import \
+from selfquantifier.transactions.parsers.international.nordea.netbank.csv import \
     nordea_netbank_csv_transactions_parser
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")

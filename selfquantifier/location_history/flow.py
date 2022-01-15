@@ -4,16 +4,16 @@ import geopy.distance
 import pandas as pd
 import reverse_geocoder as rg
 
-from clerkai.utils import list_files_in_clerk_input_subfolder
+from selfquantifier.utils import list_files_in_clerk_input_subfolder
 
 
 def location_history_flow(
     location_history_files_editable_columns,
     location_history_by_date_editable_columns,
-    clerkai_input_folder_path,
+    selfquantifier_input_folder_path,
     possibly_edited_df,
     location_history_folder_path,
-    acknowledge_changes_in_clerkai_input_folder,
+    acknowledge_changes_in_selfquantifier_input_folder,
     current_history_reference,
     keep_unmerged_previous_edits=False,
     failfast=False,
@@ -21,7 +21,7 @@ def location_history_flow(
     def list_location_history_files_in_location_history_folder():
         _ = list_files_in_clerk_input_subfolder(
             location_history_folder_path,
-            clerkai_input_folder_path=clerkai_input_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
         )
         if len(_) == 0:
             return _
@@ -86,12 +86,12 @@ def location_history_flow(
     save_location_history_files_editable_data_in_location_history_folder(
         location_history_folder_path, location_history_files_editable_data_df
     )
-    acknowledge_changes_in_clerkai_input_folder()
+    acknowledge_changes_in_selfquantifier_input_folder()
 
-    from clerkai.location_history.parse import parse_location_history_files
+    from selfquantifier.location_history.parse import parse_location_history_files
 
     parsed_location_history_files = parse_location_history_files(
-        included_location_history_files, clerkai_input_folder_path, failfast
+        included_location_history_files, selfquantifier_input_folder_path, failfast
     )
 
     unsuccessfully_parsed_location_history_files = parsed_location_history_files[

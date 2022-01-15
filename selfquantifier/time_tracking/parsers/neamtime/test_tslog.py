@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.time_tracking.parsers.neamtime.tslog import (
+from selfquantifier.time_tracking.parsers.neamtime.tslog import (
     neamtime_datetime_to_naive_datetime_obj,
     neamtime_tslog_time_tracking_entries_parser)
 

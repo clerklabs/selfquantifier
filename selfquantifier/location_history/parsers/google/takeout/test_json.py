@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.location_history.parsers.google.takeout.json import \
+from selfquantifier.location_history.parsers.google.takeout.json import \
     google_takeout_location_history_json_location_history_parser
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")

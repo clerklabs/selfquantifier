@@ -1,6 +1,6 @@
 import pandas as pd
 
-from clerkai.transactions.parsers.parse_utils import (
+from selfquantifier.transactions.parsers.parse_utils import (
     amount_to_rounded_decimal, strip_whitespace_if_not_is_nan)
 
 

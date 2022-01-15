@@ -2,17 +2,17 @@ import os
 
 import pandas as pd
 
-from clerkai.utils import (add_date_columns_for_pivoting,
+from selfquantifier.utils import (add_date_columns_for_pivoting,
                            list_files_in_clerk_input_subfolder)
 
 
 def time_tracking_flow(
     time_tracking_files_editable_columns,
     time_tracking_entries_editable_columns,
-    clerkai_input_folder_path,
+    selfquantifier_input_folder_path,
     possibly_edited_df,
     time_tracking_folder_path,
-    acknowledge_changes_in_clerkai_input_folder,
+    acknowledge_changes_in_selfquantifier_input_folder,
     current_history_reference,
     keep_unmerged_previous_edits=False,
     failfast=False,
@@ -33,7 +33,7 @@ def time_tracking_flow(
     def list_time_tracking_files_in_time_tracking_folder():
         _ = list_files_in_clerk_input_subfolder(
             time_tracking_folder_path,
-            clerkai_input_folder_path=clerkai_input_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
         )
         if len(_) == 0:
             return _
@@ -106,13 +106,13 @@ def time_tracking_flow(
     save_time_tracking_files_editable_data_in_time_tracking_folder(
         time_tracking_folder_path, time_tracking_files_editable_data_df
     )
-    acknowledge_changes_in_clerkai_input_folder()
+    acknowledge_changes_in_selfquantifier_input_folder()
 
-    from clerkai.time_tracking.parse import parse_time_tracking_files
+    from selfquantifier.time_tracking.parse import parse_time_tracking_files
 
     parsed_time_tracking_files = parse_time_tracking_files(
         time_tracking_files=included_time_tracking_files,
-        clerkai_input_folder_path=clerkai_input_folder_path,
+        selfquantifier_input_folder_path=selfquantifier_input_folder_path,
         failfast=failfast,
     )
 
@@ -214,20 +214,20 @@ def time_tracking_flow(
             subset=["ID"]
         )
 
-        # ensure that empty currency values is filled with source file currency if available
+        # ensure that empty tag values is filled with source file default tag if available
         """
         time_tracking_entries_df_where_currency_column_is_null_mask = time_tracking_entries_df[
-            "Currency"
+            "Tags"
         ].isnull()
         time_tracking_entries_df_where_source_transaction_file_account_currency_column_is_null_mask = \
             time_tracking_entries_df[
-            "Source transaction file: Account currency"
+            "Source transaction file: Default tags"
         ].isnull()
         time_tracking_entries_df.loc[
-            time_tracking_entries_df_where_currency_column_is_null_mask, "Currency",
+            time_tracking_entries_df_where_currency_column_is_null_mask, "Tags",
         ] = time_tracking_entries_df.loc[
             ~time_tracking_entries_df_where_source_transaction_file_account_currency_column_is_null_mask,
-            "Source transaction file: Account currency",
+            "Source transaction file: Default tags",
         ]
         """
 
@@ -256,7 +256,7 @@ def time_tracking_flow(
 
         # convert Decimal columns to float prior to export or excel will treat them as strings
         # todo: less hacky conversion of Decimal-columns
-        from clerkai.utils import is_nan
+        from selfquantifier.utils import is_nan
 
         def float_if_not_nan(number):
             if is_nan(number) or number is None:

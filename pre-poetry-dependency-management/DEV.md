@@ -16,7 +16,7 @@ pytest -vv
 Only parsers:
 
 ```
-pytest -vv clerkai/transactions/parsers
+pytest -vv selfquantifier/transactions/parsers
 ```
 
 ### Add deps
@@ -50,5 +50,5 @@ Bump version, tag, push and create a new release on Github, then:
 
 ```
 python setup.py sdist
-twine upload dist/clerkai-0.1.2.tar.gz # change to the version that is being released
+twine upload dist/selfquantifier-0.1.2.tar.gz # change to the version that is being released
 ```

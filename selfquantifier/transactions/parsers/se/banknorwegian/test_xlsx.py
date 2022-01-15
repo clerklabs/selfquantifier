@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.transactions.parsers.se.banknorwegian.xlsx import \
+from selfquantifier.transactions.parsers.se.banknorwegian.xlsx import \
     banknorwegian_se_xlsx_transactions_parser
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")

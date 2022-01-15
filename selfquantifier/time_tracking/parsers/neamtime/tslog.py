@@ -8,7 +8,7 @@ import pytz
 from pandas import json_normalize
 from pandas.core.frame import DataFrame
 
-from clerkai.utils import is_nan, ymd_date_to_naive_datetime_obj
+from selfquantifier.utils import is_nan, ymd_date_to_naive_datetime_obj
 
 return_columns: List[str] = [
     "Raw Ignore",

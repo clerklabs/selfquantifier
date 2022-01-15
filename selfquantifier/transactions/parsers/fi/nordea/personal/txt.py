@@ -4,7 +4,7 @@ from io import StringIO
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from clerkai.transactions.parsers.parse_utils import \
+from selfquantifier.transactions.parsers.parse_utils import \
     convert_european_amount_to_decimal
 
 

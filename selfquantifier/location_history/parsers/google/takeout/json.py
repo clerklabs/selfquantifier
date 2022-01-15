@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 from pandas.core.frame import DataFrame
 
-from clerkai.location_history.parsers.parse_utils import \
+from selfquantifier.location_history.parsers.parse_utils import \
     timestamp_ms_to_utc_datetime_obj
 
 

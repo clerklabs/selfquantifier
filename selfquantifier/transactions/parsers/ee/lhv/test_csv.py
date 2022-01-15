@@ -1,6 +1,6 @@
 from os.path import dirname, join, realpath
 
-from clerkai.transactions.parsers.ee.lhv.csv import (
+from selfquantifier.transactions.parsers.ee.lhv.csv import (
     lhv_ee_csv_transactions_parser, lhv_ee_description_to_datetime_obj)
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")

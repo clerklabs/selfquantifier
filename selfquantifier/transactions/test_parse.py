@@ -3,7 +3,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from clerkai.transactions.parse import (naive_transaction_id_duplicate_nums,
+from selfquantifier.transactions.parse import (naive_transaction_id_duplicate_nums,
                                         naive_transaction_ids, transaction_ids)
 
 transactions_df = pd.DataFrame(

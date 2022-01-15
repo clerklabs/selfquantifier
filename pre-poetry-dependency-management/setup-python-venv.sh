@@ -9,7 +9,7 @@ conda config --set env_prompt '({name}) ' # https://stackoverflow.com/questions/
 
 FOLDER="venv$1"
 
-# Create a fresh local Python 3.7 (conda-pack does not support 3.8 yet) venv based on the python-clerkai environment
+# Create a fresh local Python 3.7 (conda-pack does not support 3.8 yet) venv based on the selfquantifier environment
 if [[ -d $FOLDER ]]; then
   rm -rf $FOLDER
 fi

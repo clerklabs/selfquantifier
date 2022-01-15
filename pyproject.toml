@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "clerkai"
+name = "selfquantifier"
 version = "0.2.5"
 description = "Tools for extracting, annotating and summarizing transaction, location history and time tracking data from local files."
 license = "MPL-2.0"
-authors = ["Clerk.ai <info@clerk.ai>"]
+authors = ["Motin <motin@motin.eu>"]
 readme = "README.md"
-homepage = "https://github.com/clerklabs/python-clerkai"
-repository = "https://github.com/clerklabs/python-clerkai"
-documentation = "https://github.com/clerklabs/python-clerkai"
+homepage = "https://github.com/clerklabs/selfquantifier"
+repository = "https://github.com/clerklabs/selfquantifier"
+documentation = "https://github.com/clerklabs/selfquantifier"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-packages = [{ include = "clerkai" }]
+packages = [{ include = "selfquantifier" }]
 
 [tool.poetry.dependencies]
 python = "^3.8.0"
@@ -49,6 +49,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
 test = ["pytest", "lint"]
-pytest = "pytest --cov=clerkai --verbose tests/"
+pytest = "pytest --cov=selfquantifier --verbose tests/"
 lint = "pre-commit run --all-files"
-install_kernel = "python -m ipykernel install --user --name python-clerkai"
+install_kernel = "python -m ipykernel install --user --name selfquantifier"

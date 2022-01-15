@@ -8,14 +8,14 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.13.3
 #   kernelspec:
-#     display_name: python-clerkai
+#     display_name: selfquantifier
 #     language: python
-#     name: python-clerkai
+#     name: selfquantifier
 # ---
 
 # makes edits in libs available without restarting the kernel
 # %reload_ext autoreload
 # %autoreload 2
 
-import clerkai
+import selfquantifier
 
