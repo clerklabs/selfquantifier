@@ -1,7 +1,9 @@
 import pandas as pd
 
 from selfquantifier.transactions.parsers.parse_utils import (
-    amount_to_rounded_decimal, strip_whitespace_if_not_is_nan)
+    amount_to_rounded_decimal,
+    strip_whitespace_if_not_is_nan,
+)
 
 
 def import_banknorwegian_se_xlsx_transaction_file(transaction_file):

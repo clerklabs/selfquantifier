@@ -2,26 +2,32 @@ import os
 
 from selfquantifier.location_history.defaults import (
     location_history_by_date_editable_columns,
-    location_history_files_editable_columns)
+    location_history_files_editable_columns,
+)
 from selfquantifier.location_history.flow import location_history_flow
 from selfquantifier.time_tracking.defaults import (
     default_time_tracking_entries_editable_columns,
-    default_time_tracking_files_editable_columns)
+    default_time_tracking_files_editable_columns,
+)
 from selfquantifier.time_tracking.flow import time_tracking_flow
 from selfquantifier.transactions.defaults import (
     default_transaction_files_editable_columns,
-    default_transactions_editable_columns)
+    default_transactions_editable_columns,
+)
 from selfquantifier.transactions.flow import transactions_flow
-from selfquantifier.utils import (add_all_untracked_and_changed_files,
-                           commit_datetime_from_history_reference,
-                           commits_by_short_gitsha1, current_gitsha1,
-                           ensure_selfquantifier_folder_versioning,
-                           export_file_name_by_record_type,
-                           fetch_gsheets_worksheet_as_df,
-                           list_files_in_clerk_input_subfolder,
-                           list_files_in_clerk_subfolder,
-                           possibly_edited_commit_specific_df,
-                           possibly_edited_df_util)
+from selfquantifier.utils import (
+    add_all_untracked_and_changed_files,
+    commit_datetime_from_history_reference,
+    commits_by_short_gitsha1,
+    current_gitsha1,
+    ensure_selfquantifier_folder_versioning,
+    export_file_name_by_record_type,
+    fetch_gsheets_worksheet_as_df,
+    list_files_in_clerk_input_subfolder,
+    list_files_in_clerk_subfolder,
+    possibly_edited_commit_specific_df,
+    possibly_edited_df_util,
+)
 
 
 def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
@@ -37,23 +43,33 @@ def extract_commit_sha_from_edit_subfolder_path(edit_subfolder_path):
 
 def init_notebook_and_return_helpers(selfquantifier_folder):
     # expand given paths to absolute paths
-    selfquantifier_folder_path = os.path.expanduser(selfquantifier_folder).rstrip(os.sep)
+    selfquantifier_folder_path = os.path.expanduser(selfquantifier_folder).rstrip(
+        os.sep
+    )
     selfquantifier_input_folder_path = os.path.join(selfquantifier_folder_path, "Input")
-    transactions_folder_path = os.path.join(selfquantifier_input_folder_path, "Transactions")
+    transactions_folder_path = os.path.join(
+        selfquantifier_input_folder_path, "Transactions"
+    )
     receipts_folder_path = os.path.join(selfquantifier_input_folder_path, "Receipts")
-    time_tracking_folder_path = os.path.join(selfquantifier_input_folder_path, "Time Tracking")
+    time_tracking_folder_path = os.path.join(
+        selfquantifier_input_folder_path, "Time Tracking"
+    )
     location_history_folder_path = os.path.join(
         selfquantifier_input_folder_path, "Location History"
     )
     edits_folder_path = os.path.join(selfquantifier_folder_path, "Edits")
-    selfquantifier_output_folder_path = os.path.join(selfquantifier_folder_path, "Output")
+    selfquantifier_output_folder_path = os.path.join(
+        selfquantifier_folder_path, "Output"
+    )
     expenses_reports_folder_path = os.path.join(
         selfquantifier_output_folder_path, "Expense reports"
     )
     financial_reports_folder_path = os.path.join(
         selfquantifier_output_folder_path, "Financial reports"
     )
-    time_reports_folder_path = os.path.join(selfquantifier_output_folder_path, "Time reports")
+    time_reports_folder_path = os.path.join(
+        selfquantifier_output_folder_path, "Time reports"
+    )
     travel_reports_folder_path = os.path.join(
         selfquantifier_output_folder_path, "Travel reports"
     )
@@ -112,7 +128,8 @@ def init_notebook_and_return_helpers(selfquantifier_folder):
 
     def list_receipt_files_in_receipts_folder():
         _ = list_files_in_clerk_input_subfolder(
-            receipts_folder_path, selfquantifier_input_folder_path=selfquantifier_input_folder_path
+            receipts_folder_path,
+            selfquantifier_input_folder_path=selfquantifier_input_folder_path,
         )
         if len(_) == 0:
             return _
@@ -252,7 +269,7 @@ def init_notebook_and_return_helpers(selfquantifier_folder):
         (dt, micro) = datetime.utcnow().strftime("%Y-%m-%d %H%M%S.%f").split(".")
         timestamp = "%s%03d" % (dt, int(micro) / 1000)
 
-        suffix = ".gsheets.%s.%s.%s" % (gsheets_title, gsheets_sheet_name, timestamp)
+        suffix = ".gsheets.{}.{}.{}".format(gsheets_title, gsheets_sheet_name, timestamp)
         (export_file_name, export_file_name_base) = export_file_name_by_record_type(
             record_type, suffix=suffix
         )

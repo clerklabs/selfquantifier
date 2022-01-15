@@ -2,13 +2,19 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 
 from selfquantifier.transactions.parsers.parse_utils import amount_to_rounded_decimal
-from selfquantifier.utils import (fi_dmy_date_to_naive_datetime_obj,
-                           ymd_date_to_naive_datetime_obj)
+from selfquantifier.utils import (
+    fi_dmy_date_to_naive_datetime_obj,
+    ymd_date_to_naive_datetime_obj,
+)
 
 
 def import_nordea_netbank_csv_transaction_file(transaction_file):
     # type: (str) -> DataFrame
-    return pd.read_csv(transaction_file, sep=";", decimal=",",)
+    return pd.read_csv(
+        transaction_file,
+        sep=";",
+        decimal=",",
+    )
 
 
 def nordea_netbank_csv_transactions_to_general_clerk_format(df):

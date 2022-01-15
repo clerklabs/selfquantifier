@@ -4,8 +4,9 @@ from io import StringIO
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from selfquantifier.transactions.parsers.parse_utils import \
-    convert_european_amount_to_decimal
+from selfquantifier.transactions.parsers.parse_utils import (
+    convert_european_amount_to_decimal,
+)
 
 
 def fi_date_to_datetime_obj(datetime_str):

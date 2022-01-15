@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd
 
 from selfquantifier.time_tracking.parse import (
-    naive_time_tracking_entry_id_duplicate_nums, naive_time_tracking_entry_ids,
-    time_tracking_entry_ids)
+    naive_time_tracking_entry_id_duplicate_nums,
+    naive_time_tracking_entry_ids,
+    time_tracking_entry_ids,
+)
 
 time_tracking_entries_df = pd.DataFrame(
     {

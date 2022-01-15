@@ -2,8 +2,9 @@ from datetime import datetime
 
 import pandas as pd
 
-from selfquantifier.transactions.parsers.parse_utils import \
-    convert_european_amount_to_decimal
+from selfquantifier.transactions.parsers.parse_utils import (
+    convert_european_amount_to_decimal,
+)
 from selfquantifier.utils import ymd_date_to_naive_datetime_obj
 
 

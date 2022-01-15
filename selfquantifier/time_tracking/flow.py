@@ -2,8 +2,10 @@ import os
 
 import pandas as pd
 
-from selfquantifier.utils import (add_date_columns_for_pivoting,
-                           list_files_in_clerk_input_subfolder)
+from selfquantifier.utils import (
+    add_date_columns_for_pivoting,
+    list_files_in_clerk_input_subfolder,
+)
 
 
 def time_tracking_flow(
@@ -75,7 +77,8 @@ def time_tracking_flow(
         mask2 = df["File path"].str.contains("/ts")
         mask3 = df["File name"].str.contains(".md")
         df.loc[
-            mask1 & mask2 & mask3, "Content type",
+            mask1 & mask2 & mask3,
+            "Content type",
         ] = "exported-time-tracking-file/neamtime-tslog"
         return df
 
@@ -119,7 +122,8 @@ def time_tracking_flow(
     # concat all processing errors into a single dataframe
     if len(parsed_time_tracking_files) > 0:
         all_time_tracking_processing_errors_df = pd.concat(
-            parsed_time_tracking_files["Processing errors"].values, sort=False,
+            parsed_time_tracking_files["Processing errors"].values,
+            sort=False,
         ).reset_index(drop=True)
         all_time_tracking_processing_errors_df[
             "History reference"
@@ -146,8 +150,10 @@ def time_tracking_flow(
             ),
             "Row number at export",
         ]
-        all_time_tracking_processing_errors_df = all_time_tracking_processing_errors_df.reindex(
-            time_tracking_processing_errors_export_columns, axis=1
+        all_time_tracking_processing_errors_df = (
+            all_time_tracking_processing_errors_df.reindex(
+                time_tracking_processing_errors_export_columns, axis=1
+            )
         )
     else:
         all_time_tracking_processing_errors_df = []

@@ -1,8 +1,9 @@
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from selfquantifier.location_history.parsers.parse_utils import \
-    exiftool_date_to_utc_datetime_obj
+from selfquantifier.location_history.parsers.parse_utils import (
+    exiftool_date_to_utc_datetime_obj,
+)
 from selfquantifier.utils import is_nan
 
 

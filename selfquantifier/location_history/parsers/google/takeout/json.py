@@ -4,8 +4,9 @@ import pandas as pd
 from pandas import json_normalize
 from pandas.core.frame import DataFrame
 
-from selfquantifier.location_history.parsers.parse_utils import \
-    timestamp_ms_to_utc_datetime_obj
+from selfquantifier.location_history.parsers.parse_utils import (
+    timestamp_ms_to_utc_datetime_obj,
+)
 
 
 def import_google_takeout_location_history_json_location_history_file(
@@ -104,6 +105,8 @@ def google_takeout_location_history_json_location_history_parser(location_histor
     ) = import_google_takeout_location_history_json_location_history_file(
         location_history_file
     )
-    return google_takeout_location_history_json_location_history_to_general_clerk_format(
-        locations_df
+    return (
+        google_takeout_location_history_json_location_history_to_general_clerk_format(
+            locations_df
+        )
     )

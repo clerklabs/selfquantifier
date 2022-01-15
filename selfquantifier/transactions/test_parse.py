@@ -3,8 +3,11 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from selfquantifier.transactions.parse import (naive_transaction_id_duplicate_nums,
-                                        naive_transaction_ids, transaction_ids)
+from selfquantifier.transactions.parse import (
+    naive_transaction_id_duplicate_nums,
+    naive_transaction_ids,
+    transaction_ids,
+)
 
 transactions_df = pd.DataFrame(
     {

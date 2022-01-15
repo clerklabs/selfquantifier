@@ -2,17 +2,18 @@ from os.path import dirname, join, realpath
 
 from selfquantifier.time_tracking.parsers.neamtime.tslog import (
     neamtime_datetime_to_naive_datetime_obj,
-    neamtime_tslog_time_tracking_entries_parser)
+    neamtime_tslog_time_tracking_entries_parser,
+)
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")
 
 
 def assert_actual_vs_expected_via_csvs(df, file_path):
     actual = df.to_csv(index=False)
-    actual_file_path = "%s%s" % (file_path, ".actual.csv")
+    actual_file_path = "{}{}".format(file_path, ".actual.csv")
     with open(actual_file_path, "w") as f:
         f.write(actual)
-    expected_file_path = "%s%s" % (file_path, ".expected.csv")
+    expected_file_path = "{}{}".format(file_path, ".expected.csv")
     with open(expected_file_path, "r") as f:
         expected = f.read()
     assert actual == expected

@@ -2,7 +2,8 @@ from os.path import dirname, join, realpath
 
 from selfquantifier.location_history.defaults import (
     location_history_by_date_editable_columns,
-    location_history_files_editable_columns)
+    location_history_files_editable_columns,
+)
 from selfquantifier.location_history.flow import location_history_flow
 
 test_data_dir_path = join(dirname(realpath(__file__)), "test_data")
@@ -33,7 +34,9 @@ def test_location_history_flow():
         return current_commit_df
 
     selfquantifier_input_folder_path = join(test_data_dir_path, "Input")
-    location_history_folder_path = join(selfquantifier_input_folder_path, "Location History")
+    location_history_folder_path = join(
+        selfquantifier_input_folder_path, "Location History"
+    )
 
     (
         location_history_files_df,
@@ -62,13 +65,13 @@ def test_location_history_flow():
     possibly_edited_location_history_by_date_df_csv_path = join(
         test_data_dir_path, "possibly_edited_location_history_by_date_df"
     )
-    actual_file_path = "%s%s" % (
+    actual_file_path = "{}{}".format(
         possibly_edited_location_history_by_date_df_csv_path,
         ".actual.csv",
     )
     with open(actual_file_path, "w") as f:
         f.write(actual)
-    expected_file_path = "%s%s" % (
+    expected_file_path = "{}{}".format(
         possibly_edited_location_history_by_date_df_csv_path,
         ".expected.csv",
     )

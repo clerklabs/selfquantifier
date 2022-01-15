@@ -1,5 +1,7 @@
 from selfquantifier.location_history.parsers.parse_utils import (
-    exiftool_date_to_utc_datetime_obj, timestamp_ms_to_utc_datetime_obj)
+    exiftool_date_to_utc_datetime_obj,
+    timestamp_ms_to_utc_datetime_obj,
+)
 
 
 def test_timestamp_ms_to_utc_datetime_obj():

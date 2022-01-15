@@ -18,4 +18,3 @@
 # %autoreload 2
 
 import selfquantifier
-

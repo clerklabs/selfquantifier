@@ -3,9 +3,14 @@ import json
 import pandas as pd
 from joblib import Memory
 
-from selfquantifier.time_tracking.parsers.neamtime.tslog import \
-    neamtime_tslog_time_tracking_entries_parser
-from selfquantifier.utils import selfquantifier_input_file_path, is_nan, raw_if_available
+from selfquantifier.time_tracking.parsers.neamtime.tslog import (
+    neamtime_tslog_time_tracking_entries_parser,
+)
+from selfquantifier.utils import (
+    is_nan,
+    raw_if_available,
+    selfquantifier_input_file_path,
+)
 
 memory = Memory(location="/tmp", verbose=0)
 

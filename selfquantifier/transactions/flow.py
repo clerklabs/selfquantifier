@@ -2,8 +2,10 @@ import os
 
 import pandas as pd
 
-from selfquantifier.utils import (add_date_columns_for_pivoting,
-                           list_files_in_clerk_input_subfolder)
+from selfquantifier.utils import (
+    add_date_columns_for_pivoting,
+    list_files_in_clerk_input_subfolder,
+)
 
 
 def transactions_flow(
@@ -136,7 +138,8 @@ def transactions_flow(
                 "Source transaction file: Account currency"
             ].isnull()
             transactions_df.loc[
-                transactions_df_where_currency_column_is_null_mask, "Currency",
+                transactions_df_where_currency_column_is_null_mask,
+                "Currency",
             ] = transactions_df.loc[
                 ~transactions_df_where_source_transaction_file_account_currency_column_is_null_mask,
                 "Source transaction file: Account currency",
@@ -159,7 +162,7 @@ def transactions_flow(
         transactions_df = add_date_columns_for_pivoting(transactions_df, "Date")
 
         def join_account_info(transaction):
-            return "%s - %s" % (
+            return "{} - {}".format(
                 transaction["Source transaction file: Account provider"],
                 transaction["Source transaction file: Account"],
             )

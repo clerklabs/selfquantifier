@@ -251,8 +251,8 @@ def location_history_flow(
 
         # index by date
         dates = pd.to_datetime(location_history_by_date_export_df["date"])
-        location_history_by_date_export_df = location_history_by_date_export_df.set_index(
-            dates
+        location_history_by_date_export_df = (
+            location_history_by_date_export_df.set_index(dates)
         )
 
         # include all dates, so that the edit file can be used to fill in locations for missing dates as well
@@ -275,8 +275,8 @@ def location_history_flow(
 
         # index by date again after reading from edit file
         dates = pd.to_datetime(possibly_edited_location_history_by_date_df["date"])
-        possibly_edited_location_history_by_date_df = possibly_edited_location_history_by_date_df.set_index(
-            dates
+        possibly_edited_location_history_by_date_df = (
+            possibly_edited_location_history_by_date_df.set_index(dates)
         )
 
     else:

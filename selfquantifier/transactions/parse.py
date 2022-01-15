@@ -2,23 +2,35 @@ import json
 
 import pandas as pd
 
-from selfquantifier.transactions.parsers.ee.lhv.csv import \
-    lhv_ee_csv_transactions_parser
-from selfquantifier.transactions.parsers.fi.nordea.personal.txt import \
-    nordea_fi_lang_se_txt_transactions_parser
-from selfquantifier.transactions.parsers.international.n26.csv import \
-    n26_csv_transactions_parser
-from selfquantifier.transactions.parsers.international.nordea.netbank.csv import \
-    nordea_netbank_csv_transactions_parser
-from selfquantifier.transactions.parsers.international.xolo.csv import \
-    xolo_csv_transactions_parser
-from selfquantifier.transactions.parsers.se.banknorwegian.xlsx import \
-    banknorwegian_se_xlsx_transactions_parser
-from selfquantifier.transactions.parsers.se.danskebank.personal.csv import \
-    danskebank_se_csv_transactions_parser
-from selfquantifier.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx import \
-    nordea_se_personal_internetbanken_privat_xlsx_transactions_parser
-from selfquantifier.utils import selfquantifier_input_file_path, is_nan, raw_if_available
+from selfquantifier.transactions.parsers.ee.lhv.csv import (
+    lhv_ee_csv_transactions_parser,
+)
+from selfquantifier.transactions.parsers.fi.nordea.personal.txt import (
+    nordea_fi_lang_se_txt_transactions_parser,
+)
+from selfquantifier.transactions.parsers.international.n26.csv import (
+    n26_csv_transactions_parser,
+)
+from selfquantifier.transactions.parsers.international.nordea.netbank.csv import (
+    nordea_netbank_csv_transactions_parser,
+)
+from selfquantifier.transactions.parsers.international.xolo.csv import (
+    xolo_csv_transactions_parser,
+)
+from selfquantifier.transactions.parsers.se.banknorwegian.xlsx import (
+    banknorwegian_se_xlsx_transactions_parser,
+)
+from selfquantifier.transactions.parsers.se.danskebank.personal.csv import (
+    danskebank_se_csv_transactions_parser,
+)
+from selfquantifier.transactions.parsers.se.nordea.personal.internetbanken_privat.xlsx import (
+    nordea_se_personal_internetbanken_privat_xlsx_transactions_parser,
+)
+from selfquantifier.utils import (
+    is_nan,
+    raw_if_available,
+    selfquantifier_input_file_path,
+)
 
 parser_by_content_type = {
     "exported-transaction-file/nordea.fi.natbanken-privat.xls": nordea_fi_lang_se_txt_transactions_parser,

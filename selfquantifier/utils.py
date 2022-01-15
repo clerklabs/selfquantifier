@@ -85,7 +85,8 @@ def commit_datetime_from_history_reference(history_reference, commits):
 
 def selfquantifier_input_file_path(selfquantifier_input_folder_path, file):
     return os.path.join(
-        file["File path"].replace("@", selfquantifier_input_folder_path), file["File name"]
+        file["File path"].replace("@", selfquantifier_input_folder_path),
+        file["File name"],
     )
 
 
@@ -107,7 +108,7 @@ def export_file_name_by_record_type(record_type, suffix=""):
         export_file_name_base = "Time tracking entries"
     else:
         raise ValueError("record_type '%s' not recognized" % record_type)
-    export_file_name = "%s%s.%s" % (export_file_name_base, suffix, file_extension)
+    export_file_name = "{}{}.{}".format(export_file_name_base, suffix, file_extension)
     return (export_file_name, export_file_name_base)
 
 
@@ -143,7 +144,9 @@ def possibly_edited_df_util(
             record_type=record_type,
             export_file_name=export_file_name,
             edits_folder_path=edits_folder_path,
-            commit_datetime=current_gitcommit_datetime(selfquantifier_input_folder_repo),
+            commit_datetime=current_gitcommit_datetime(
+                selfquantifier_input_folder_repo
+            ),
             history_reference=current_history_reference(),
             create_if_not_exists=True,
         )
@@ -351,7 +354,7 @@ def edited_commit_specific_df_exists(
 
     utc_commit_datetime = commit_datetime.astimezone(pytz.utc)
 
-    commit_specific_directory = "%s (%s)" % (
+    commit_specific_directory = "{} ({})".format(
         utc_commit_datetime.strftime("%Y-%m-%d %H%M"),
         history_reference,
     )
@@ -374,7 +377,7 @@ def save_edited_commit_specific_df(
     record_type,
     xlsx_path,
 ):
-    print("Creating '%s/%s'" % (commit_specific_directory, export_file_name))
+    print("Creating '{}/{}'".format(commit_specific_directory, export_file_name))
     if not os.path.isdir(commit_specific_directory_path):
         os.mkdir(commit_specific_directory_path)
     export_columns = df.columns
@@ -391,7 +394,7 @@ def save_edited_commit_specific_df(
 def add_date_columns_for_pivoting(df, date_column_name):
     df.loc[:, "Year"] = df[date_column_name].dt.to_period("Y")
     df.loc[:, "Year-half"] = df[date_column_name].apply(
-        lambda date: "%sH%s" % (date.year, 1 if date.quarter < 3 else 2)
+        lambda date: "{}H{}".format(date.year, 1 if date.quarter < 3 else 2)
     )
     df.loc[:, "Quarter"] = df[date_column_name].dt.to_period("Q")
     df.loc[:, "Month"] = df[date_column_name].dt.to_period("M")
@@ -470,21 +473,25 @@ def export_transactions_xlsx(export_df, writer):
     default_column_width = 10
     last_column_index = len(export_df.columns) - 1
     worksheet.set_column(
-        "%s:%s" % (xl_col_to_name(0), xl_col_to_name(last_column_index),),
+        "%s:%s"
+        % (
+            xl_col_to_name(0),
+            xl_col_to_name(last_column_index),
+        ),
         default_column_width,
     )
     # account column
     account_column_index = export_df.columns.get_loc("Account")
     account_column_letter = xl_col_to_name(account_column_index)
-    worksheet.set_column("%s:%s" % (account_column_letter, account_column_letter), 30)
+    worksheet.set_column("{}:{}".format(account_column_letter, account_column_letter), 30)
     # date column
     date_column_index = export_df.columns.get_loc("Date")
     date_format = workbook.add_format({"num_format": "yyyy-mm-dd"})
     date_column_letter = xl_col_to_name(date_column_index)
     worksheet.set_column(
-        "%s:%s" % (date_column_letter, date_column_letter), None, date_format
+        "{}:{}".format(date_column_letter, date_column_letter), None, date_format
     )
-    worksheet.set_column("%s:%s" % (date_column_letter, date_column_letter), 20)
+    worksheet.set_column("{}:{}".format(date_column_letter, date_column_letter), 20)
     # TODO: possibly pre-calculate values of formulas to avoid LibreOffice issue
     # see https://stackoverflow.com/questions/32205927/xlsxwriter-and-libreoffice-not-showing-formulas-result
 
@@ -576,8 +583,12 @@ def export_to_gsheets(
     # light_orange_3 = Color(255 / 255, 229 / 255, 227 / 255)
     light_grey = Color(240 / 255, 240 / 255, 240 / 255)
 
-    editable_column_cell_format = CellFormat(backgroundColor=white,)
-    non_editable_column_cell_format = CellFormat(backgroundColor=light_grey,)
+    editable_column_cell_format = CellFormat(
+        backgroundColor=white,
+    )
+    non_editable_column_cell_format = CellFormat(
+        backgroundColor=light_grey,
+    )
 
     column_formats = {}
     if editable_columns:
@@ -765,7 +776,7 @@ def merge_changes_from_previous_possibly_edited_df(
 
     def joined_normalized_path(record):
         # normalize encodings to properly join paths that have been encoded differently for whatever reason
-        joined_path = "%s/%s" % (
+        joined_path = "{}/{}".format(
             record[file_path_column_name],
             record[file_name_column_name],
         )
@@ -785,9 +796,9 @@ def merge_changes_from_previous_possibly_edited_df(
             selfquantifier_input_folder_path, from_commit, to_commit
         )
 
-        previous_possibly_edited_df["selfquantifier_path"] = previous_possibly_edited_df.apply(
-            joined_normalized_path, axis=1
-        )
+        previous_possibly_edited_df[
+            "selfquantifier_path"
+        ] = previous_possibly_edited_df.apply(joined_normalized_path, axis=1)
 
         def find_head_commit_corresponding_selfquantifier_path(selfquantifier_path):
             selfquantifier_path_key = selfquantifier_path.replace("@/", "")
@@ -805,15 +816,15 @@ def merge_changes_from_previous_possibly_edited_df(
 
         right_on = ["head_commit_corresponding_selfquantifier_path"]
     else:
-        previous_possibly_edited_df["selfquantifier_path"] = previous_possibly_edited_df.apply(
-            joined_normalized_path, axis=1
-        )
+        previous_possibly_edited_df[
+            "selfquantifier_path"
+        ] = previous_possibly_edited_df.apply(joined_normalized_path, axis=1)
         right_on = ["selfquantifier_path"]
 
-    suffix = " (%s - %s)" % (from_commit, edit_file["File name"])
+    suffix = " ({} - {})".format(from_commit, edit_file["File name"])
 
     def add_suffix(column_name):
-        return "%s%s" % (column_name, suffix)
+        return "{}{}".format(column_name, suffix)
 
     if additional_join_column:
         left_on.append(additional_join_column)
@@ -837,7 +848,9 @@ def merge_changes_from_previous_possibly_edited_df(
     )
 
     # drop temporary merge columns
-    merged_possibly_edited_df = merged_possibly_edited_df.drop(["selfquantifier_path"], axis=1)
+    merged_possibly_edited_df = merged_possibly_edited_df.drop(
+        ["selfquantifier_path"], axis=1
+    )
 
     # hint that more columns may be dropped upon successful propagation of previous edits
     columns_to_drop_after_propagation_of_previous_edits = (
@@ -859,7 +872,7 @@ def propagate_previous_edits_from_across_columns(
 ):
 
     for index, edit_file in unmerged_edit_files.iterrows():
-        suffix = " (%s - %s)" % (
+        suffix = " ({} - {})".format(
             edit_file["Related history reference"],
             edit_file["File name"],
         )
@@ -867,7 +880,7 @@ def propagate_previous_edits_from_across_columns(
             if column_name not in df_with_previous_edits_across_columns.columns:
                 # the editable column has not been seen before, make sure to initiate it
                 df_with_previous_edits_across_columns[column_name] = None
-            suffixed_column_name = "%s%s" % (column_name, suffix)
+            suffixed_column_name = "{}{}".format(column_name, suffix)
             if (
                 suffixed_column_name
                 not in df_with_previous_edits_across_columns.columns
@@ -879,9 +892,11 @@ def propagate_previous_edits_from_across_columns(
                 pass
             else:
                 if column_name in df_with_previous_edits_across_columns.columns:
-                    df_where_previous_edit_row_number_column_is_not_null_mask = ~df_with_previous_edits_across_columns[
-                        "selfquantifier_path%s" % (suffix)
-                    ].isnull()
+                    df_where_previous_edit_row_number_column_is_not_null_mask = (
+                        ~df_with_previous_edits_across_columns[
+                            "selfquantifier_path%s" % (suffix)
+                        ].isnull()
+                    )
                     df_with_previous_edits_across_columns.loc[
                         df_where_previous_edit_row_number_column_is_not_null_mask,
                         column_name,
