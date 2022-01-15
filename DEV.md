@@ -58,7 +58,7 @@ poe pytest
 Run a specific test:
 
 ```
-poe pytest tests/test_clerkai.py
+poe pytest tests/test_import_lib.py
 ```
 
 Run tests against all supported Python environments:

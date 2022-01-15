@@ -6,6 +6,4 @@ def test_version():
 
     import clerkai
 
-    clerkai_df = DataFrame()
-    clerkai.export_for_github(clerkai_df)
     assert __version__ == "0.1.0"
