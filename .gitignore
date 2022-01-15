@@ -1,0 +1,12 @@
+.idea
+*.pyc
+*.egg-info
+*.bak
+.coverage
+.tox
+.venv
+node_modules
+poetry.lock
+test.db
+.ipynb_checkpoints
+dist
