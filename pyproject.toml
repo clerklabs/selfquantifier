@@ -2,7 +2,7 @@
 name = "selfquantifier"
 version = "0.2.5"
 description = "Tools for extracting, annotating and summarizing transaction, location history and time tracking data from local files."
-license = "MPL-2.0"
+license = "ISC"
 authors = ["Motin <motin@motin.eu>"]
 readme = "README.md"
 homepage = "https://github.com/clerklabs/selfquantifier"
@@ -11,7 +11,7 @@ documentation = "https://github.com/clerklabs/selfquantifier"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+    "License :: OSI Approved :: ISC License (ISCL)",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
