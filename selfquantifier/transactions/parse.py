@@ -14,6 +14,12 @@ from selfquantifier.transactions.parsers.international.n26.csv import (
 from selfquantifier.transactions.parsers.international.nordea.netbank.csv import (
     nordea_netbank_csv_transactions_parser,
 )
+from selfquantifier.transactions.parsers.international.revolut.csv import (
+    revolut_csv_transactions_parser,
+)
+from selfquantifier.transactions.parsers.international.revolut.legacy.csv import (
+    revolut_legacy_csv_transactions_parser,
+)
 from selfquantifier.transactions.parsers.international.xolo.csv import (
     xolo_csv_transactions_parser,
 )
@@ -41,6 +47,8 @@ parser_by_content_type = {
     "exported-transaction-file/nordea.netbank.csv": nordea_netbank_csv_transactions_parser,
     "exported-transaction-file/danskebank.se.csv": danskebank_se_csv_transactions_parser,
     "exported-transaction-file/xolo.io.expenses.csv": xolo_csv_transactions_parser,
+    "exported-transaction-file/revolut.com.csv": revolut_csv_transactions_parser,
+    "exported-transaction-file/revolut.com.legacy.csv": revolut_legacy_csv_transactions_parser,
     "exported-transaction-file/n26.com.csv": n26_csv_transactions_parser,
     "exported-transaction-file/avanza.se.transaktioner.csv": None,
     "exported-transaction-file/norwegianreward.se.via-dataminer.xlsx": None,

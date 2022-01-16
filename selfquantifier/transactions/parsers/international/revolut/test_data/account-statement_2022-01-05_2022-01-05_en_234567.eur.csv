@@ -1,0 +1,3 @@
+Type,Product,Started Date,Completed Date,Description,Amount,Fee,Currency,State,Balance
+CARD_PAYMENT,Current,2022-01-03 10:53:10,2022-01-04 11:04:34,apple.com/bill,-9.99,0.00,EUR,COMPLETED,535.96
+CARD_PAYMENT,Current,2022-01-05 11:41:21,,Capperi,-33.90,0.00,EUR,PENDING,
