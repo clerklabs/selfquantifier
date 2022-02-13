@@ -269,7 +269,9 @@ def init_notebook_and_return_helpers(selfquantifier_folder):
         (dt, micro) = datetime.utcnow().strftime("%Y-%m-%d %H%M%S.%f").split(".")
         timestamp = "%s%03d" % (dt, int(micro) / 1000)
 
-        suffix = ".gsheets.{}.{}.{}".format(gsheets_title, gsheets_sheet_name, timestamp)
+        suffix = ".gsheets.{}.{}.{}".format(
+            gsheets_title, gsheets_sheet_name, timestamp
+        )
         (export_file_name, export_file_name_base) = export_file_name_by_record_type(
             record_type, suffix=suffix
         )

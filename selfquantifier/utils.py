@@ -483,7 +483,9 @@ def export_transactions_xlsx(export_df, writer):
     # account column
     account_column_index = export_df.columns.get_loc("Account")
     account_column_letter = xl_col_to_name(account_column_index)
-    worksheet.set_column("{}:{}".format(account_column_letter, account_column_letter), 30)
+    worksheet.set_column(
+        "{}:{}".format(account_column_letter, account_column_letter), 30
+    )
     # date column
     date_column_index = export_df.columns.get_loc("Date")
     date_format = workbook.add_format({"num_format": "yyyy-mm-dd"})
