@@ -1,39 +1,21 @@
 # general
-pandas
-jellyfish
 matplotlib
-imohash
 
 # for machine learning (autogluon)
-setuptools
 wheel
 mxnet<2.0.0
 autogluon
 
 
 # for location history analysis
-reverse_geocoder
-geopy
 calmap
-# TODO: Use the later version from the a bit more maintained fork:
-# --editable=git+https://github.com/MarvinT/calmap@dev#egg=calmap
 
 # for panda's df.to_excel()
-openpyxl
-xlsxwriter
 
 # for panda's df.read_excel()
-xlrd
 
 # for gsheets import/export
-gspread>=3.6.0
-gspread-dataframe
-pathvalidate
-gspread-formatting==0.0.8
 
 # for git-related util functions
-GitPython
-pydriller
 
 # for caching computational tasks
-joblib

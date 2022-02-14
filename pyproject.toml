@@ -35,16 +35,14 @@ imohash = "^1.0.4"
 # explicitly require scipy 1.7+ since this works well on M1 macs
 scipy = "^1.7.3"
 
-# for machine learning (autogluon)
-
 # for location history analysis
 reverse_geocoder = "^1.5.1"
 geopy = "^2.2.0"
-# TODO: Use the later version from the a bit more maintained fork:
-# --editable=git+https://github.com/MarvinT/calmap@dev#egg=calmap
+calmap = "^0.0.9"
 
 # for panda's df.to_excel()
 openpyxl = "^3.0.9"
+XlsxWriter = "^3.0.2"
 
 # for panda's df.read_excel()
 xlrd = "^2.0.1"
@@ -53,14 +51,19 @@ xlrd = "^2.0.1"
 gspread = "^5.1.1"
 gspread-dataframe = "^3.2.2"
 gspread-formatting = "^1.0.5"
+pathvalidate = "^2.2.2"
 
 # for git-related util functions
+GitPython = "^3.1.26"
+PyDriller = "^1.13"
 
 # for caching computational tasks
 joblib = "^1.1.0"
 
+# necessary to enable editable installation
+setuptools = "*"
+
 # unsorted
-PyGithub = "^1.55"
 
 [tool.poetry.dev-dependencies]
 coverage = "*"
@@ -77,7 +80,7 @@ ipykernel = "^6.6.0"
 jupytext = "^1.13.3"
 
 [build-system]
-requires = ["poetry-core>=1.2.0"]
+requires = ["poetry-core>=1.0.0", "setuptools"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
