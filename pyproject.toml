@@ -31,9 +31,8 @@ python = ">=3.8,<3.11"
 pandas = "^1.3.4"
 jellyfish = "^0.9.0"
 imohash = "^1.0.4"
-
-# explicitly require scipy 1.7+ since this works well on M1 macs
-scipy = "^1.7.3"
+scipy = ">=1.7.3" # explicitly require scipy 1.7.3+ since only this works well on M1 macs
+numpy = ">=1.21.0" # explicitly require scipy 1.21.0+ since only this works well on M1 macs
 
 # for location history analysis
 reverse_geocoder = "^1.5.1"
@@ -62,6 +61,9 @@ joblib = "^1.1.0"
 
 # necessary to enable editable installation
 setuptools = "*"
+
+# for transactions metadata enrichment
+CurrencyConverter = "^0.16.8"
 
 # unsorted
 
