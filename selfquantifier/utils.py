@@ -392,14 +392,27 @@ def save_edited_commit_specific_df(
 
 
 def add_date_columns_for_pivoting(df, date_column_name):
-    df.loc[:, "Year"] = df[date_column_name].dt.to_period("Y")
-    df.loc[:, "Year-half"] = df[date_column_name].apply(
+    to_datetime_column_name = f"{date_column_name} (to_datetime)"
+    df.loc[:, to_datetime_column_name] = pd.to_datetime(df[date_column_name], errors='coerce')
+    date_parse_errors = df[df[to_datetime_column_name].isnull()]
+    if len(date_parse_errors) > 0:
+        print("date_parse_errors: ", date_parse_errors)
+        print("dtype", df[date_column_name].dtype)
+        raise Exception(f"Some dates in column {date_column_name} where not parsed successfully as dates")
+
+    dt = df[to_datetime_column_name].dt
+
+    df.loc[:, "Year"] = dt.to_period("Y")
+    df.loc[:, "Year-half"] = df[to_datetime_column_name].apply(
         lambda date: "{}H{}".format(date.year, 1 if date.quarter < 3 else 2)
     )
-    df.loc[:, "Quarter"] = df[date_column_name].dt.to_period("Q")
-    df.loc[:, "Month"] = df[date_column_name].dt.to_period("M")
-    df.loc[:, "Week"] = df[date_column_name].dt.to_period("W")
-    df.loc[:, "Weekday"] = df[date_column_name].dt.weekday
+    df.loc[:, "Quarter"] = dt.to_period("Q")
+    df.loc[:, "Month"] = dt.to_period("M")
+    df.loc[:, "Week"] = dt.to_period("W")
+    df.loc[:, "Weekday"] = dt.weekday
+
+    df.drop(columns=[to_datetime_column_name], inplace=True)
+
     return df
 
 
