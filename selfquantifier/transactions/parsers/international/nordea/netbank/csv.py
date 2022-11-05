@@ -5,6 +5,7 @@ from selfquantifier.transactions.parsers.parse_utils import amount_to_rounded_de
 from selfquantifier.utils import (
     fi_dmy_date_to_naive_datetime_obj,
     ymd_date_to_naive_datetime_obj,
+    ymd_with_slashes_date_to_naive_datetime_obj,
 )
 
 
@@ -94,9 +95,10 @@ def nordea_netbank_csv_transactions_to_general_clerk_format(df):
     normalized_df["Real Date"] = None
 
     # only consider rows with bank dates - the rest are invalid / pending
-    rows_with_bank_dates_mask = ~normalized_df["Raw Bank Date"].isnull() & (
-        normalized_df["Raw Bank Date"] != "Invalid date"
-    )
+    rows_with_bank_dates_mask = ~normalized_df["Raw Bank Date"].isnull() & ~normalized_df["Raw Bank Date"].isin([
+        "Invalid date",
+        "Reserverat",
+    ])
     normalized_df = normalized_df[rows_with_bank_dates_mask]
 
     # swedish and finnish netbank files have different date formats
@@ -107,6 +109,8 @@ def nordea_netbank_csv_transactions_to_general_clerk_format(df):
             date_parser = fi_dmy_date_to_naive_datetime_obj
         elif "-" in first_encountered_date:
             date_parser = ymd_date_to_naive_datetime_obj
+        elif "/" in first_encountered_date:
+            date_parser = ymd_with_slashes_date_to_naive_datetime_obj
         else:
             raise Exception(
                 "Unexpected date format encountered in %s" % first_encountered_date
