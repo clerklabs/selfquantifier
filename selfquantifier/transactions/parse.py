@@ -1,4 +1,5 @@
 import json
+import traceback
 
 import pandas as pd
 
@@ -129,6 +130,7 @@ def parse_transaction_files(
         )
         results = None
         error = None
+        error_string = None
 
         if failfast:
             print(
@@ -187,7 +189,8 @@ def parse_transaction_files(
                 results = parse()
             except Exception as e:
                 error = e
-        return pd.Series([results, error], index=["Parse results", "Error"])
+                error_string = f"Error occurred:\n\n{e}\n\n{traceback.format_exc()}\n"
+        return pd.Series([results, error_string], index=["Parse results", "Error"])
 
     if len(transaction_files) == 0:
         raise Exception("No transaction files to parse")
