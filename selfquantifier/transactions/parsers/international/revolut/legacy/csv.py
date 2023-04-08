@@ -15,7 +15,7 @@ def revolut_date_to_naive_datetime_obj(datetime_str):
 
 
 def convert_revolut_amount_to_decimal(value, **kwargs):
-    # type: (Union[float, str]) -> Decimal
+    # type: (Union[float, str], dict) -> Decimal
     if value is None:
         return None
     if is_nan(value):

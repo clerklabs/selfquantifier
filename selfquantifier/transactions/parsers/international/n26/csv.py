@@ -48,7 +48,7 @@ def n26_csv_transactions_to_general_clerk_format(df):
             "Account number",
             "Transaction type",
             "Payment reference",
-            "Category",
+            # "Category", # No longer included in exports
             "Amount (EUR)",
             "Amount (Foreign Currency)",
             "Type Foreign Currency",

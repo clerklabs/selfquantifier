@@ -1046,6 +1046,13 @@ def ymd_date_to_naive_datetime_obj(datetime_str):
     return datetime_obj
 
 
+def ymd_with_slashes_date_to_naive_datetime_obj(datetime_str):
+    if is_nan(datetime_str):
+        return None
+    datetime_obj = datetime.strptime(datetime_str, "%Y/%m/%d")
+    return datetime_obj
+
+
 def fi_dmy_date_to_naive_datetime_obj(datetime_str):
     if is_nan(datetime_str):
         return None
