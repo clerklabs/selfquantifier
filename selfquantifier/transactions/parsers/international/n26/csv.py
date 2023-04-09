@@ -28,7 +28,8 @@ def n26_csv_transactions_to_general_clerk_format(df):
         ymd_date_to_naive_datetime_obj
     )
     normalized_df["Payee"] = normalized_df["Raw Payee"]
-    normalized_df["Bank Message"] = normalized_df["Raw Bank Message"]
+    normalized_df["Bank Message"] = normalized_df["Raw Payee"].fillna("") + " " + normalized_df["Raw Bank Message"].fillna("")
+    normalized_df["Bank Message"] = normalized_df["Bank Message"].str.strip()
     normalized_df["Amount"] = normalized_df["Raw Amount"].apply(
         amount_to_rounded_decimal
     )
