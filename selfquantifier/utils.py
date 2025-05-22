@@ -579,9 +579,9 @@ def export_to_gsheets(
 
     # escape history references so that they are not parsed as scientific notation
     if "History reference" in df.columns:
-        df["History reference"] = "'" + df["History reference"].astype(str)
+        df["History reference"] = "commit:" + df["History reference"].astype(str)
     if "Source transaction file: History reference" in df.columns:
-        df["Source transaction file: History reference"] = "'" + df[
+        df["Source transaction file: History reference"] = "commit:" + df[
             "Source transaction file: History reference"
         ].astype(str)
 
@@ -637,6 +637,10 @@ def fetch_gsheets_worksheet_as_df(gsheets_client, gsheets_title, gsheets_sheet_n
     df = get_as_dataframe(worksheet, dtype={"History reference": str})
 
     # work around bug https://github.com/robin900/gspread-dataframe/issues/26
+    def strip_commit_prefix_if_present(s):
+        if s.startswith("commit:"):
+            return s[len("commit:"):]
+        return s
     def strip_initial_quote_if_present(s):
         if s.startswith("'"):
             return s[1:]
@@ -644,13 +648,16 @@ def fetch_gsheets_worksheet_as_df(gsheets_client, gsheets_title, gsheets_sheet_n
 
     if "History reference" in df.columns:
         df["History reference"] = (
-            df["History reference"].astype(str).apply(strip_initial_quote_if_present)
+            df["History reference"].astype(str)
+            .apply(strip_initial_quote_if_present)
+            .apply(strip_commit_prefix_if_present)
         )
     if "Source transaction file: History reference" in df.columns:
         df["Source transaction file: History reference"] = (
             df["Source transaction file: History reference"]
             .astype(str)
             .apply(strip_initial_quote_if_present)
+            .apply(strip_commit_prefix_if_present)
         )
 
     return df
